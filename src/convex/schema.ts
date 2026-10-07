@@ -32,12 +32,82 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    cycleDays: defineTable({
+      userId: v.id("users"),
+      date: v.string(),
+      isPeriodDay: v.boolean(),
+      note: v.optional(v.string()),
+      symptoms: v.array(
+        v.union(
+          v.literal("bloating"),
+          v.literal("cramps"),
+          v.literal("fatigue"),
+          v.literal("headache"),
+          v.literal("mood"),
+          v.literal("tender_breasts"),
+          v.literal("other"),
+        ),
+      ),
+    }).index("by_user_date", ["userId", "date"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    cycleSettings: defineTable({
+      userId: v.id("users"),
+      lateAlertsEnabled: v.boolean(),
+    }).index("by_user", ["userId"]),
+
+    personalNotes: defineTable({
+      userId: v.id("users"),
+      content: v.string(),
+      title: v.optional(v.string()),
+      createdAt: v.number(),
+      isUnread: v.boolean(),
+      archived: v.optional(v.boolean()),
+      urgent: v.optional(v.boolean()),
+      color: v.optional(
+        v.union(
+          v.literal("yellow"),
+          v.literal("pink"),
+          v.literal("blue"),
+          v.literal("green"),
+          v.literal("lavender"),
+        ),
+      ),
+      position: v.optional(v.number()),
+    }).index("by_user_createdAt", ["userId", "createdAt"]),
+
+    adhkarProgress: defineTable({
+      userId: v.id("users"),
+      date: v.string(),
+      session: v.union(v.literal("morning"), v.literal("evening")),
+      currentIndex: v.number(),
+      repetitionCount: v.number(),
+    }).index("by_user_date", ["userId", "date"]),
+
+    quranReadingLogs: defineTable({
+      userId: v.id("users"),
+      date: v.string(),
+      time: v.optional(v.string()),
+      passage: v.string(),
+      pagesOrVerses: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      createdAt: v.number(),
+    })
+      .index("by_user_createdAt", ["userId", "createdAt"])
+      .index("by_user_date", ["userId", "date"]),
+
+    scienceStudyLogs: defineTable({
+      userId: v.id("users"),
+      date: v.string(),
+      time: v.optional(v.string()),
+      title: v.string(),
+      lesson: v.string(),
+      source: v.optional(v.string()),
+      url: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      createdAt: v.number(),
+    })
+      .index("by_user_createdAt", ["userId", "createdAt"])
+      .index("by_user_date", ["userId", "date"]),
   },
   {
     schemaValidation: false,

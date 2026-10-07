@@ -174,7 +174,7 @@ export default function Landing() {
         </button>
       </header>
 
-      <section className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:min-h-[620px] lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:min-h-155 lg:grid-cols-[0.95fr_1.05fr]">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -222,7 +222,7 @@ export default function Landing() {
           initial={{ opacity: 0, y: 22, rotate: 1.5 }}
           animate={{ opacity: 1, y: 0, rotate: 0 }}
           transition={{ duration: 0.65, delay: 0.1 }}
-          className="relative z-10 mx-auto w-full max-w-[570px]"
+          className="relative z-10 mx-auto w-full max-w-142.5"
         >
           <div className="relative rounded-xl border border-[#ECE7DF] bg-white p-3 sm:p-5">
             <div className="rounded-xl border border-[#ECE7DF] bg-[#FBF9F6] p-4 sm:p-6">
