@@ -1,8 +1,7 @@
 import { Dialog } from "@radix-ui/react-dialog";
-import { AlertTriangle, ChevronDown, ExternalLink } from "lucide-react";
+import { AlertTriangle, ChevronDown } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,7 +10,6 @@ import {
 import {
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -62,34 +60,6 @@ function normalizeError(value: unknown): GenericError {
   };
 }
 
-async function reportErrorToVly(errorData: {
-  error: string;
-  stackTrace?: string;
-  filename?: string;
-  lineno?: number;
-  colno?: number;
-}) {
-  const appId = import.meta.env.VITE_VLY_APP_ID;
-  const monitoringUrl = import.meta.env.VITE_VLY_MONITORING_URL;
-
-  if (!appId || !monitoringUrl) {
-    return;
-  }
-
-  try {
-    await fetch(monitoringUrl, {
-      method: "POST",
-      body: JSON.stringify({
-        ...errorData,
-        url: window.location.href,
-        projectSemanticIdentifier: appId,
-      }),
-    });
-  } catch (error) {
-    console.error("Failed to report error to Vly:", error);
-  }
-}
-
 function ErrorDialog({
   error,
   setError,
@@ -133,7 +103,7 @@ function ErrorDialog({
           <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200/70">
             Error message
           </div>
-          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-200">
+          <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed text-zinc-200">
             {error.error}
           </p>
         </div>
@@ -150,27 +120,12 @@ function ErrorDialog({
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <pre className="mt-2 max-h-60 overflow-auto whitespace-pre-wrap break-words rounded-md border border-zinc-800 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-zinc-400">
+              <pre className="mt-2 max-h-60 overflow-auto whitespace-pre-wrap wrap-break-word rounded-md border border-zinc-800 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-zinc-400">
                 {technicalDetails}
               </pre>
             </CollapsibleContent>
           </Collapsible>
         )}
-
-        <DialogFooter className="gap-3 sm:items-center">
-          <span className="text-xs text-zinc-500">
-            Your error details are also available in chat.
-          </span>
-          <a
-            href={`https://freebuff.com/project/${import.meta.env.VITE_VLY_APP_ID}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Button className="bg-zinc-100 text-zinc-900 hover:bg-white">
-              <ExternalLink className="h-4 w-4" /> Open editor
-            </Button>
-          </a>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -202,13 +157,6 @@ class ErrorBoundary extends React.Component<
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     const normalizedError = normalizeError(error);
     const componentStack = info.componentStack?.trim();
-
-    reportErrorToVly({
-      error: normalizedError.error,
-      stackTrace: [normalizedError.stack, componentStack]
-        .filter(Boolean)
-        .join("\n\n"),
-    });
 
     this.setState((state) => ({
       hasError: true,
@@ -256,14 +204,6 @@ export function InstrumentationProvider({
           colno: event.colno || undefined,
         };
         setError(capturedError);
-
-        await reportErrorToVly({
-          error: normalizedError.error,
-          stackTrace: normalizedError.stack,
-          filename: event.filename,
-          lineno: event.lineno,
-          colno: event.colno,
-        });
       } catch (error) {
         console.error("Error in handleError:", error);
       }
@@ -272,13 +212,8 @@ export function InstrumentationProvider({
     const handleRejection = async (event: PromiseRejectionEvent) => {
       try {
         const normalizedError = normalizeError(event.reason);
-        console.error("[Freebuff runtime error]", normalizedError.error);
+        console.error("[Nour runtime error]", normalizedError.error);
         setError(normalizedError);
-
-        await reportErrorToVly({
-          error: normalizedError.error,
-          stackTrace: normalizedError.stack,
-        });
       } catch (error) {
         console.error("Error in handleRejection:", error);
       }

@@ -1,5 +1,4 @@
 import { Email } from "@convex-dev/auth/providers/Email";
-import axios from "axios";
 import { RandomReader, generateRandomString } from "@oslojs/crypto/random";
 
 export const emailOtp = Email({
@@ -16,22 +15,41 @@ export const emailOtp = Email({
     return generateRandomString(random, alphabet, 6);
   },
   async sendVerificationRequest({ identifier: email, token }) {
-    try {
-      await axios.post(
-        "https://auth.freebuff.app/send_otp",
-        {
-          to: email,
-          otp: token,
-          appName: process.env.VLY_APP_NAME || "a freebuff.com application",
-        },
-        {
-          headers: {
-            "x-api-key": "fb_email_2crN1hqIArZP2bEfvjp5Qik4",
-          },
-        },
+    const mailerUrl = process.env.NOUR_MAILER_URL;
+    const mailerApiKey = process.env.NOUR_MAILER_API_KEY;
+
+    if (!mailerUrl || !mailerApiKey) {
+      throw new Error(
+        "NOUR_MAILER_URL and NOUR_MAILER_API_KEY must be configured in Convex.",
       );
-    } catch (error) {
-      throw new Error(JSON.stringify(error));
+    }
+
+    const endpoint = new URL(mailerUrl);
+    if (endpoint.protocol !== "https:") {
+      throw new Error("NOUR_MAILER_URL must use HTTPS.");
+    }
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${mailerApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ to: email, otp: token }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Nour email relay failed with HTTP ${response.status}.`);
+    }
+
+    const result: unknown = await response.json();
+    if (
+      typeof result !== "object" ||
+      result === null ||
+      !("ok" in result) ||
+      result.ok !== true
+    ) {
+      throw new Error("Nour email relay returned an invalid response.");
     }
   },
 });

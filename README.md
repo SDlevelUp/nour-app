@@ -1,6 +1,7 @@
 ## Overview
 
 This project uses the following tech stack:
+
 - Vite
 - Typescript
 - React Router v7 (all imports from `react-router` instead of `react-router-dom`)
@@ -17,6 +18,10 @@ All relevant files live in the 'src' directory.
 
 Use bun for the package manager.
 
+Keep `src/convex/_generated` in version control. The frontend build needs these
+Convex TypeScript bindings, so they must be available in clean deployment
+environments such as Vercel.
+
 ## Setup
 
 This project is set up already and running on a cloud environment, as well as a convex development in the sandbox.
@@ -29,18 +34,26 @@ The convex server has a separate set of environment variables that are accessibl
 
 Currently, these variables include auth-specific keys: JWKS, JWT_PRIVATE_KEY, and SITE_URL.
 
+Google sign-in also requires `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in the
+Convex deployment environment (set them with `npx convex env set`). In Google
+Cloud Console, add the Convex site URL callback
+`https://<your-deployment>.convex.site/api/auth/callback/google` as an authorized
+redirect URI. Never put these server credentials in a `VITE_` variable.
 
 # Using Authentication (Important!)
 
 You must follow these conventions when using authentication.
 
-## Auth is already set up.
+## Convex Auth is already set up for email one-time codes and anonymous sessions;
 
-All convex authentication functions are already set up. The auth currently uses email OTP and anonymous users, but can support more.
+Google OAuth is also enabled.
 
-The email OTP configuration is defined in `src/convex/auth/emailOtp.ts`. DO NOT MODIFY THIS FILE.
+All Convex authentication functions are already set up.
+Email OTP delivery is configured in `src/convex/auth/emailOtp.ts` and uses the
+Hostinger relay documented in `hostinger-mailer/README.md`.
 
-Also, DO NOT MODIFY THESE AUTH FILES: `src/convex/auth.config.ts` and `src/convex/auth.ts`.
+`src/convex/auth.ts` declares the enabled providers. `src/convex/auth.config.ts`
+contains the Convex token issuer configuration.
 
 ## Using Convex Auth on the backend
 
@@ -48,9 +61,68 @@ On the `src/convex/users.ts` file, you can use the `getCurrentUser` function to 
 
 ## Using Convex Auth on the frontend
 
-The `/auth` page is already set up to use auth. Navigate to `/auth` for all log in / sign up sequences.
+The `/auth` page supports Google OAuth and email OTP (which signs in existing
+accounts or creates an account for a new email). Navigate to `/auth` for all
+log in / sign up sequences.
+
+## Temporary anonymous test deployment
+
+Use a separate Convex deployment and database for external testers; never point
+the public test build at the production Convex deployment. On the test Convex
+deployment, set `NOUR_DEMO_MODE=true` to disable Google and email authentication
+at the backend. Set `NOUR_DEMO_MODE=false` or remove it from the normal
+deployment to keep the regular sign-in methods enabled.
+
+For the separate Vercel test project, set `VITE_DEMO_MODE=true` and
+`VITE_CONVEX_URL` to the test Convex deployment URL. Only anonymous sign-in is
+shown in this mode. Test data is still saved in the test database, so testers
+must not enter real personal or sensitive information. After testing, disable
+the test deployment and delete its Convex project/data when no longer needed.
+
+## Cycle tracking
+
+Cycle days and selected observations are stored in Convex against the authenticated
+user, and the backend only returns or changes records belonging to that user.
+New accounts start with an empty calendar. Late-cycle estimates are shown only
+after at least three recorded period starts; they are informational, not medical
+advice. Optional browser notifications require permission and can only be
+delivered while the app is open.
+Users can select a continuous period range and attach a private note to an
+individual date; both are stored on the same account-scoped cycle records.
+The separate Notes tab stores personal notes against the signed-in account. Newly
+added notes show a sidebar indicator until the Notes tab is opened.
+
+The dashboard navigation presents the overview, prayer/Quran/science planning,
+cycle tracking, personal notes, and reminder settings as separate views. The
+Al-‘Udhr switch is available in the sidebar and hides prayer slots in the planner.
+
+Prayer times can be calculated from the device's location using the free
+AlAdhan API. Location permission is requested only after the user selects
+"Utiliser ma position"; coordinates and calculation preferences stay in browser
+storage, while coordinates are sent to AlAdhan to retrieve timings. These
+calculated times may differ from a specific mosque's timetable.
+
+Morning and evening adhkar progress is also saved per authenticated user and
+calendar day. The next invocation stays locked until the required repetitions
+for the current one are recorded. Arabic text, transliteration, meanings, and
+source references are maintained in `src/convex/adhkarData.ts`.
+
+The Al-Qur’an area keeps a per-account reading journal with passages, page or
+verse references, and personal notes. The Science bénéfique area records lessons
+from courses or books, their source or link, and study notes. The Planning area
+remains the daily schedule and prayer-time view. Journal entries include a
+date and time and automatically appear in the day and week planner; the
+corresponding generic default activity is hidden on dates with a journal entry.
+From the week planner, journal sessions can be rescheduled or removed, with
+changes reflected in their journal and planner entry together.
+On the overview, up to six shortcut blocks can be added, removed, and reordered.
+The Planning view also has day and week modes; activities can be added,
+rescheduled, moved between days, or removed. Shortcut preferences and planner
+activities are stored in this browser, while prayer times remain calculated
+separately from the user's location and method settings.
 
 You MUST use this hook to get user data. Never do this yourself without the hook:
+
 ```typescript
 import { useAuth } from "@/hooks/use-auth";
 
@@ -130,6 +202,7 @@ When adding a page, update the react router configuration in `src/main.tsx` to i
 ## Shad CN conventions
 
 Follow these conventions when using Shad CN components, which you should use by default.
+
 - Remember to use "cursor-pointer" to make the element clickable
 - For title text, use the "tracking-tight font-bold" class to make the text more readable
 - Always make apps MOBILE RESPONSIVE. This is important
@@ -137,10 +210,10 @@ Follow these conventions when using Shad CN components, which you should use by 
 - AVOID SHADOWS. Avoid adding any shadows to components. stick with a thin border without the shadow.
 - Avoid skeletons; instead, use the loader2 component to show a spinning loading state when loading data.
 
-
 ## Landing Pages
 
-You must always create good-looking designer-level styles to your application. 
+You must always create good-looking designer-level styles to your application.
+
 - Make it well animated and fit a certain "theme", ie neo brutalist, retro, neumorphism, glass morphism, etc
 
 Use known images and emojis from online.
@@ -163,8 +236,8 @@ You must add animations to components using Framer Motion. It is already install
 
 To use it, import the `motion` component from `framer-motion` and use it to wrap the component you want to animate.
 
-
 ### Other Items to animate
+
 - Fade in and Fade Out
 - Slide in and Slide Out animations
 - Rendering animations
@@ -175,7 +248,6 @@ Animate for all components, including on landing page and app pages.
 ## Three JS Graphics
 
 Your app comes with three js by default. You can use it to create 3D graphics for landing pages, games, etc.
-
 
 ## Colors
 
@@ -235,7 +307,7 @@ Remember to import { toast } from "sonner". Usage: `toast("Event has been create
 
 Always ensure your larger dialogs have a scroll in its content to ensure that its content fits the screen size. Make sure that the content is not cut off from the screen.
 
-Ideally, instead of using a new page, use a Dialog instead. 
+Ideally, instead of using a new page, use a Dialog instead.
 
 # Using the Convex backend
 
@@ -249,7 +321,6 @@ The schema is defined in `src/convex/schema.ts`.
 
 Do not include the `_id` and `_creationTime` fields in your queries (it is included by default for each table).
 Do not index `_creationTime` as it is indexed for you. Never have duplicate indexes.
-
 
 ## Convex Actions: Using CRUD operations
 
@@ -277,10 +348,10 @@ await ctx.runMutation(internal.users.update, {
 });
 ```
 
-
 ## Common Convex Mistakes To Avoid
 
 When using convex, make sure:
+
 - Document IDs are referenced as `_id` field, not `id`.
 - Document ID types are referenced as `Id<"TableName">`, not `string`.
 - Document object types are referenced as `Doc<"TableName">`.
