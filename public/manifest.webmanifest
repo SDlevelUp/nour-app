@@ -1,11 +1,11 @@
 {
-  "name": "freebuff.com application",
-  "short_name": "freebuff.com",
-  "description": "freebuff.com application",
+  "name": "Nour",
+  "short_name": "Nour",
+  "description": "Nour - Muslim Dhikr Companion",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#FBF9F6",
+  "theme_color": "#523B46",
   "icons": [
     {
       "src": "/logo.svg",
