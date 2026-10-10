@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -8,7 +8,6 @@ import {
   Heart,
   MoonStar,
   Smartphone,
-  Sparkles,
   Sun,
   TimerReset,
 } from "lucide-react";
@@ -91,29 +90,72 @@ const previewEvents = [
     time: "05:48",
     title: "Fajr & adhkars du matin",
     detail: "Prière · invocations du matin",
-    tone: "border-[#ECE7DF] bg-[#F3EFEC]",
-    marker: "bg-[#523B46]",
+    tone: "border-violet-100 bg-violet-50/80",
+    marker: "bg-violet-800",
   },
   {
     time: "09:00",
     title: "Lecture du Coran",
     detail: "Un moment pour reprendre doucement",
-    tone: "border-[#ECE7DF] bg-white",
-    marker: "bg-[#8B707D]",
+    tone: "border-violet-100 bg-white/90",
+    marker: "bg-violet-600",
   },
   {
     time: "13:20",
     title: "Dhuhr",
     detail: "Prière selon l’horaire local",
-    tone: "border-[#ECE7DF] bg-[#F5F2EE]",
-    marker: "bg-[#93806E]",
+    tone: "border-violet-100 bg-purple-50/80",
+    marker: "bg-purple-500",
   },
   {
     time: "18:45",
     title: "Étude bénéfique",
     detail: "Quelques pages, sans pression",
-    tone: "border-[#ECE7DF] bg-white",
-    marker: "bg-[#B39AA3]",
+    tone: "border-violet-100 bg-white/90",
+    marker: "bg-fuchsia-400",
+  },
+];
+
+const howSteps = [
+  {
+    icon: BookOpen,
+    eyebrow: "01 · Adhkar",
+    title: "Retrouve les invocations du matin et du soir",
+    detail:
+      "Choisis un moment, avance invocation après invocation et garde le fil de ta pratique.",
+    use: "Suis les invocations une à une, arrête-toi quand tu veux et retrouve facilement ta progression.",
+    previewTitle: "Adhkar du matin",
+    previewDetail: "Invocation 3 sur 8",
+  },
+  {
+    icon: Sun,
+    eyebrow: "02 · Planning",
+    title: "Rassemble tes repères pour la journée",
+    detail:
+      "Visualise tes prières et tes moments importants dans un planning clair, facile à suivre.",
+    use: "Visualise tes horaires de prière au même endroit et organise le reste de ta journée en fonction de tes repères.",
+    previewTitle: "Aujourd’hui",
+    previewDetail: "Fajr · Dhuhr · Asr · Maghrib",
+  },
+  {
+    icon: Heart,
+    eyebrow: "03 · À ton rythme",
+    title: "Adapte ton espace à ta situation",
+    detail:
+      "Note ton cycle et active le mode Al-‘Udhr pour ajuster les créneaux du planning quand tu en as besoin.",
+    use: "Note les jours de ton cycle et adapte les créneaux du planning à ta situation, selon tes besoins.",
+    previewTitle: "Mon espace, mes repères",
+    previewDetail: "Planning adapté à ta situation",
+  },
+  {
+    icon: Bell,
+    eyebrow: "04 · Petits pas",
+    title: "Reprends quand tu le souhaites",
+    detail:
+      "Retrouve tes progrès et tes notes sans série à maintenir ni retard à rattraper.",
+    use: "Retrouve tes avancées après une pause et continue à ton rythme, sans série à maintenir ni retard à rattraper.",
+    previewTitle: "Ta progression",
+    previewDetail: "Tu avances à ton propre rythme",
   },
 ];
 
@@ -134,9 +176,10 @@ export default function Landing() {
   const openDashboard = () => navigate("/auth?returnTo=%2Fdashboard");
 
   return (
-    <main
-      className={`landing-page min-h-screen overflow-hidden bg-[#FBF9F6] text-foreground transition-colors duration-300 ${isDarkMode ? "landing-dark" : ""}`}
-    >
+    <MotionConfig reducedMotion="user">
+      <main
+        className={`landing-page min-h-screen overflow-hidden bg-[#FBF8FF] text-foreground transition-colors duration-300 ${isDarkMode ? "landing-dark" : ""}`}
+      >
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
         <button
           type="button"
@@ -174,33 +217,26 @@ export default function Landing() {
         </button>
       </header>
 
-      <section className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:min-h-155 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="landing-hero relative mx-auto flex max-w-6xl flex-col items-center gap-12 px-5 pb-16 pt-16 text-center sm:px-8 sm:pb-24 sm:pt-20">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="relative z-10"
+          className="relative z-10 flex w-full flex-col items-center"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ECE7DF] bg-white px-3.5 py-2 text-xs font-semibold text-primary">
-            <Sparkles className="size-3.5" />
-            TON COMPAGNON SPIRITUEL
-          </div>
-          <h1 className="max-w-xl text-5xl font-semibold leading-[0.96] tracking-tight sm:text-[54px]">
-            Fais de la place
-            <br />
-            à l’essentiel,
-            <br />
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
+            Fais de la place à l’essentiel,
             <span className="text-primary italic">en douceur.</span>
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
             Tes prières, tes adhkars et tes petits pas réunis dans un espace
-            doux, pensé pour la vraie vie — et pour ton propre rythme.
+            doux, pensé pour la vraie vie - et pour ton propre rythme.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <button
               type="button"
               onClick={openDashboard}
-              className="group inline-flex items-center gap-3 rounded-xl bg-[#523B46] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#3D2A34]"
+              className="group inline-flex items-center gap-3 rounded-xl bg-violet-800 px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
             >
               Entrer dans mon espace
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -212,21 +248,17 @@ export default function Landing() {
               Découvrir Nour <ArrowDownRight className="size-4" />
             </a>
           </div>
-          <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-            <Heart className="size-4 fill-[#B39AA3] text-primary" />
-            Un espace rien qu’à toi. Sans pression, sans jugement.
-          </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 22, rotate: 1.5 }}
           animate={{ opacity: 1, y: 0, rotate: 0 }}
           transition={{ duration: 0.65, delay: 0.1 }}
-          className="relative z-10 mx-auto w-full max-w-142.5"
+          className="relative z-10 mx-auto w-full max-w-3xl"
         >
-          <div className="relative rounded-xl border border-[#ECE7DF] bg-white p-3 sm:p-5">
-            <div className="rounded-xl border border-[#ECE7DF] bg-[#FBF9F6] p-4 sm:p-6">
-              <div className="flex items-center justify-between border-b border-[#ECE7DF] pb-4">
+          <div className="landing-preview relative rounded-[28px] border border-white/80 bg-white/80 p-3 shadow-2xl shadow-violet-300/20 backdrop-blur-xl sm:p-5">
+            <div className="rounded-[22px] border border-white/90 bg-white/75 p-4 shadow-inner sm:p-6">
+              <div className="flex items-center justify-between border-b border-violet-100 pb-4">
                 <div>
                   <p className="text-xs font-semibold capitalize text-muted-foreground">
                     {today}
@@ -235,9 +267,6 @@ export default function Landing() {
                     Ta journée
                   </h2>
                 </div>
-                <span className="flex size-11 items-center justify-center rounded-xl bg-[#F3EFEC] text-primary">
-                  <Sparkles className="size-5" />
-                </span>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -249,7 +278,7 @@ export default function Landing() {
                 ].map(([name, time]) => (
                   <span
                     key={name}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#ECE7DF] bg-white px-2.5 py-1.5 text-xs text-primary"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-white px-2.5 py-1.5 text-xs text-primary"
                   >
                     <MoonStar className="size-3 text-primary" />
                     {name}
@@ -277,10 +306,10 @@ export default function Landing() {
                         className={`size-2.5 shrink-0 rounded-full ${event.marker}`}
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-stone-900">
+                        <span className="block truncate text-sm font-semibold text-foreground">
                           {event.title}
                         </span>
-                        <span className="mt-0.5 block truncate text-xs text-stone-600">
+                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                           {event.detail}
                         </span>
                       </span>
@@ -290,27 +319,14 @@ export default function Landing() {
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-[#ECE7DF] pt-4">
-                <span className="text-sm text-muted-foreground">
-                  Une journée à ton image
-                </span>
-                <span className="rounded-full bg-[#F3EFEC] px-3 py-1.5 text-xs font-semibold text-primary">
-                  Tout en douceur
-                </span>
+              <div className="mt-4 flex items-center justify-between border-t border-violet-100 pt-4">
               </div>
             </div>
           </div>
-          <span className="absolute -bottom-5 -left-3 flex size-12 items-center justify-center rounded-xl border border-[#ECE7DF] bg-white text-primary sm:-left-6 sm:size-14">
-            <Heart className="size-5 fill-[#B39AA3]" />
-          </span>
-          <span className="absolute -right-2 top-14 flex size-10 items-center justify-center rounded-xl border border-[#ECE7DF] bg-[#F5F2EE] text-primary sm:-right-5 sm:size-12">
-            <Sun className="size-5" />
-          </span>
         </motion.div>
       </section>
-
-      <section id="bienfaits" className="border-y border-[#ECE7DF] bg-white">
-        <div className="mx-auto grid max-w-6xl divide-y divide-[#ECE7DF] px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <section id="bienfaits" className="border-y border-white/70 bg-white/55 backdrop-blur">
+        <div className="mx-auto grid max-w-6xl divide-y divide-violet-100 px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0">
           {practices.map(({ icon: Icon, label, detail }, index) => (
             <motion.div
               key={label}
@@ -320,7 +336,7 @@ export default function Landing() {
               transition={{ delay: index * 0.07 }}
               className="flex items-center gap-3 py-5 md:px-6 md:py-6 first:md:pl-0 last:md:pr-0"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#ECE7DF] bg-white text-primary">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-white text-primary">
                 <Icon className="size-4" />
               </span>
               <div>
@@ -333,10 +349,107 @@ export default function Landing() {
       </section>
 
       <section
+        id="comment-ca-marche"
+        className="landing-steps relative mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-14 max-w-2xl text-center"
+        >
+          <h2 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">
+            Un compagnon qui suit ton rythme.
+          </h2>
+          <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
+            Quelques repères simples pour nourrir ta pratique, sans pression et
+            sans chercher à tout faire parfaitement.
+          </p>
+        </motion.div>
+
+        <div className="landing-timeline relative space-y-7 sm:space-y-10">
+          {howSteps.map(({ icon: Icon, eyebrow, title, detail, use, previewTitle, previewDetail }, index) => {
+            const copy = (
+              <motion.div
+                initial={{ opacity: 0, x: index % 2 === 0 ? -18 : 18 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+                className={`landing-step-copy ${index % 2 === 0 ? "sm:text-right" : "sm:text-left"}`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                  {eyebrow}
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+                  {title}
+                </h3>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+                  {detail}
+                </p>
+              </motion.div>
+            );
+            const preview = (
+              <motion.div
+                initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.55, delay: 0.08, ease: "easeOut" }}
+                className="landing-step-preview rounded-[24px] border border-white/90 bg-white/75 p-4 shadow-xl shadow-violet-300/15 backdrop-blur sm:p-5"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-violet-100/80 text-violet-800">
+                    <Icon className="size-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {previewTitle}
+                    </p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {previewDetail}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 border-t border-violet-100 pt-3">
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {use}
+                  </p>
+                </div>
+              </motion.div>
+            );
+
+            return (
+              <div
+                key={eyebrow}
+                className="landing-step-row relative grid items-center gap-4 sm:grid-cols-[1fr_64px_1fr] sm:gap-5"
+              >
+                <div className={index % 2 === 0 ? "sm:col-start-1" : "sm:col-start-3 sm:row-start-1"}>
+                  {copy}
+                </div>
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: 0.1 }}
+                  className="landing-step-node absolute left-0 top-5 z-10 hidden size-11 items-center justify-center rounded-2xl border border-white bg-white text-violet-800 shadow-md shadow-violet-200/40 sm:static sm:col-start-2 sm:row-start-1 sm:flex"
+                  aria-hidden="true"
+                >
+                  <Icon className="size-5" />
+                </motion.span>
+                <div className={index % 2 === 0 ? "sm:col-start-3 sm:row-start-1" : "sm:col-start-1 sm:row-start-1"}>
+                  {preview}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section
         id="fonctionnalites"
         className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24"
       >
-        <div className="mb-9 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-9 flex flex-col items-center gap-4 text-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               Pensé pour tes journées
@@ -345,12 +458,9 @@ export default function Landing() {
               Un petit espace pour rester proche de l’essentiel.
             </h2>
           </div>
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#ECE7DF] bg-white px-3 py-1.5 text-xs font-medium text-primary">
-            <Check className="size-3.5" /> Simple, doux, utile
-          </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2">
           {benefits.map(({ icon: Icon, title, text }, index) => (
             <motion.article
               key={title}
@@ -358,9 +468,9 @@ export default function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.06 }}
-              className="rounded-xl border border-[#ECE7DF] bg-white p-5"
+              className="rounded-[24px] border border-white/80 bg-white/75 p-6 shadow-lg shadow-violet-200/20 backdrop-blur-sm"
             >
-              <span className="flex size-11 items-center justify-center rounded-xl bg-[#F3EFEC] text-primary">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-violet-100/80 text-violet-800">
                 <Icon className="size-5" />
               </span>
               <h3 className="mt-4 text-2xl font-semibold">{title}</h3>
@@ -388,7 +498,7 @@ export default function Landing() {
         <Accordion
           type="single"
           collapsible
-          className="rounded-xl border border-[#ECE7DF] bg-white p-3"
+          className="rounded-[24px] border border-white/80 bg-white/75 p-3 shadow-xl shadow-violet-200/20 backdrop-blur-sm"
         >
           {faqs.map(({ question, answer }) => (
             <AccordionItem
@@ -407,28 +517,29 @@ export default function Landing() {
         </Accordion>
       </section>
 
-      <section className="mx-auto mb-10 flex max-w-6xl flex-col items-start justify-between gap-6 rounded-xl border border-[#ECE7DF] bg-white px-6 py-10 sm:flex-row sm:items-center sm:px-10 sm:py-12">
-        <div>
+      <section className="landing-cta mx-5 mb-10 flex flex-col items-center justify-between gap-6 rounded-[34px] border border-white/80 bg-white/55 px-6 py-14 text-center shadow-xl shadow-violet-200/20 backdrop-blur-sm sm:mx-auto sm:max-w-6xl sm:px-10 sm:py-16">
+        <div className="flex flex-col items-center">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
             Un espace sans culpabilité
           </p>
-          <h2 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
+          <h2 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl">
             Le lien ne se mesure pas au nombre de cases cochées.
           </h2>
         </div>
         <button
           type="button"
           onClick={openDashboard}
-          className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-[#3D2A34]"
+          className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5"
         >
           Continuer vers mon espace
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
         </button>
       </section>
 
-      <footer className="border-t border-[#ECE7DF] px-5 py-6 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-violet-100 px-5 py-6 text-center text-sm text-muted-foreground">
         nour. · Ton rythme est le bon.
       </footer>
-    </main>
+      </main>
+    </MotionConfig>
   );
 }

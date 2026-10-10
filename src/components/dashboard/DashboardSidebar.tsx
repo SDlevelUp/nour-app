@@ -66,8 +66,8 @@ export function DashboardSidebar({
               <MoonStar className="size-5" aria-hidden="true" />
             </span>
             {!isCollapsed && (
-              <span className="text-xl font-semibold tracking-tight text-[#23191C]">
-                nour<span className="text-[#523B46]">.</span>
+              <span className="text-xl font-semibold tracking-tight text-foreground">
+                nour
               </span>
             )}
           </button>

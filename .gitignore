@@ -4,3 +4,5 @@ dist
 src/convex/_generated
 !src/convex/_generated/
 !src/convex/_generated/**
+.env
+.env.examples
