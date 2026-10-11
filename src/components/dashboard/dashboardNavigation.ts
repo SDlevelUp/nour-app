@@ -25,7 +25,7 @@ export const dashboardNavigation: {
   icon: LucideIcon;
 }[] = [
   {
-    label: "Overview",
+    label: "Accueil",
     view: "overview",
     targetId: "dashboard-home",
     icon: LayoutDashboard,

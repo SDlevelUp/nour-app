@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,12 +28,7 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import {
-  Archive,
-  ArchiveRestore,
-  MoonStar,
-  Trash2,
-} from "lucide-react";
+import { Archive, ArchiveRestore, MoonStar, Trash2 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -128,110 +123,6 @@ function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
 }
 
-const dailyEncouragements = [
-  "Quelques versets aujourd’hui, à ton rythme.",
-  "Pense à noter ta lecture pour la retrouver demain.",
-  "Choisis une petite action bénéfique à inscrire à ton planning.",
-  "Prends un instant pour les adhkars du matin ou du soir.",
-  "Tu peux reprendre là où tu t’es arrêtée, sans chercher à rattraper.",
-  "Garde une place dans ta journée pour ce qui compte.",
-  "Une petite étape compte aussi.",
-];
-
-function QuranHabitTracker({
-  today,
-  onNavigate,
-}: {
-  today: string;
-  onNavigate: (view: DashboardView) => void;
-}) {
-  const weekStart = format(subDays(parseISO(today), 6), "yyyy-MM-dd");
-  const readings = useQuery(api.quranProgress.forPlanner, {
-    fromDate: weekStart,
-    toDate: today,
-  });
-  const readingDates = new Set(readings?.map((reading) => reading.date) ?? []);
-  const days = Array.from({ length: 7 }, (_, index) => {
-    const date = subDays(parseISO(today), 6 - index);
-    const key = format(date, "yyyy-MM-dd");
-    return {
-      key,
-      label: format(date, "EEEEE", { locale: fr }),
-      date: format(date, "d"),
-      completed: readingDates.has(key),
-    };
-  });
-  const completedDays = days.filter((day) => day.completed).length;
-
-  return (
-    <section
-      aria-label="Habitude de lecture du Coran"
-      className="h-fit rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            Habitude de la semaine
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-foreground">
-            Lecture du Coran
-          </h2>
-        </div>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100/80 text-violet-800">
-        </span>
-      </div>
-
-      <p className="mt-2 text-xs leading-5 text-muted-foreground">
-        Chaque jour où tu notes une lecture apparaît ici.
-      </p>
-
-      <div className="mt-5 grid grid-cols-7 gap-1.5" role="list" aria-label="Sept derniers jours">
-        {days.map((day) => (
-          <div key={day.key} role="listitem" className="text-center">
-            <span className="block text-[10px] font-medium uppercase text-muted-foreground">
-              {day.label}
-            </span>
-            <span
-              className={`mx-auto mt-2 flex size-8 items-center justify-center rounded-full text-[11px] font-semibold ${day.completed ? "bg-violet-700 text-white" : "bg-violet-50 text-violet-700"}`}
-              aria-label={`${day.date}, ${day.completed ? "lecture notée" : "aucune lecture notée"}`}
-            >
-              {day.date}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex items-center justify-between text-xs">
-        <span className="font-semibold text-foreground">
-          {readings === undefined ? "Chargement…" : `${completedDays}/7 jours avec une lecture`}
-        </span>
-        <span className="text-muted-foreground">À ton rythme</span>
-      </div>
-      <div
-        className="mt-2 h-1.5 overflow-hidden rounded-full bg-violet-100"
-        role="progressbar"
-        aria-label="Jours de lecture cette semaine"
-        aria-valuemin={0}
-        aria-valuemax={7}
-        aria-valuenow={completedDays}
-      >
-        <div
-          className="h-full rounded-full bg-violet-600 transition-[width] duration-500"
-          style={{ width: `${(completedDays / 7) * 100}%` }}
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => onNavigate("quran")}
-        className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-violet-800 transition hover:text-violet-950"
-      >
-        Ajouter une lecture
-      </button>
-    </section>
-  );
-}
-
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -245,6 +136,7 @@ export default function Dashboard() {
     readStored("nour-dark-mode", false),
   );
   const [adhkarSession, setAdhkarSession] = useState<AdhkarSession>("morning");
+  const [clock, setClock] = useState(() => Date.now());
   const [isSavingAdhkar, setIsSavingAdhkar] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() =>
     startOfMonth(new Date()),
@@ -285,16 +177,6 @@ export default function Dashboard() {
   const notifiedLateCycle = useRef<string | null>(null);
   const firstName = user?.name?.trim().split(" ")[0];
   const today = todayKey();
-  const reminderDate = parseISO(today);
-  const reminderDay = Math.floor(
-    Date.UTC(
-      reminderDate.getFullYear(),
-      reminderDate.getMonth(),
-      reminderDate.getDate(),
-    ) / 86_400_000,
-  );
-  const reminderIndex = reminderDay % dailyEncouragements.length;
-  const dailyReminder = dailyEncouragements[reminderIndex];
   const historyStart = startOfMonth(subMonths(new Date(), 18));
   const visibleMonthStart = startOfMonth(calendarMonth);
   const visibleMonthEnd = endOfMonth(calendarMonth);
@@ -312,6 +194,7 @@ export default function Dashboard() {
   const cycleSettings = useQuery(api.cycleTracking.getSettings, {});
   const personalNotes = useQuery(api.personalNotes.list, {});
   const adhkarProgress = useQuery(api.adhkarProgress.forDate, { date: today });
+  const quranEntries = useQuery(api.quranProgress.list, {});
   const saveCycleDay = useMutation(api.cycleTracking.saveDay);
   const setPeriodRange = useMutation(api.cycleTracking.setPeriodRange);
   const updatePeriodRange = useMutation(api.cycleTracking.updatePeriodRange);
@@ -333,16 +216,35 @@ export default function Dashboard() {
   );
   const adhkarSequence = adhkarBySession[adhkarSession];
   const currentInvocation = adhkarSequence[sessionProgress?.currentIndex ?? 0];
+  const latestQuranEntry = quranEntries?.[0];
+  const currentMinutes =
+    new Date(clock).getHours() * 60 + new Date(clock).getMinutes();
+  const asrMinutes = prayer.times
+    ? prayer.times.asr
+        .split(":")
+        .map(Number)
+        .reduce((hours, minutes) => hours * 60 + minutes, 0)
+    : 16 * 60;
+  const momentAdhkarSession: AdhkarSession =
+    currentMinutes >= asrMinutes ? "evening" : "morning";
+  const nextPrayer = prayer.times
+    ? (
+        [
+          ["Fajr", prayer.times.fajr],
+          ["Dhuhr", prayer.times.dhuhr],
+          ["Asr", prayer.times.asr],
+          ["Maghrib", prayer.times.maghrib],
+          ["Isha", prayer.times.isha],
+        ] as const
+      ).find(([, time]) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes > currentMinutes;
+      })
+    : undefined;
   const currentRepetitionCount = sessionProgress?.repetitionCount ?? 0;
   const isInvocationComplete =
     currentInvocation !== undefined &&
     currentRepetitionCount >= currentInvocation.repetitions;
-  const completedMorningAdhkar =
-    adhkarProgress?.find((entry) => entry.session === "morning")
-      ?.currentIndex ?? 0;
-  const completedEveningAdhkar =
-    adhkarProgress?.find((entry) => entry.session === "evening")
-      ?.currentIndex ?? 0;
   const records = cycleDays ?? [];
   const selectedDayKey = format(selectedDate, "yyyy-MM-dd");
   const selectedEntry = records.find((entry) => entry.date === selectedDayKey);
@@ -765,6 +667,11 @@ export default function Dashboard() {
     });
   };
 
+  useEffect(() => {
+    const interval = window.setInterval(() => setClock(Date.now()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
   const savePersonalNote = async () => {
     setIsSavingPersonalNote(true);
     try {
@@ -908,83 +815,91 @@ export default function Dashboard() {
       <div
         className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
-        <header className="border-b border-violet-100 bg-white/90">
+        <header
+          className={`border-b border-[#E7E1D6] ${activeView === "overview" ? "bg-background" : "bg-white/90"}`}
+        >
           {activeView === "overview" ? (
             <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-4 sm:px-6 xl:px-8">
               <div className="flex items-center gap-3">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm">
                   <MoonStar className="size-5" />
                 </span>
-                <span className="text-lg font-bold tracking-tight text-stone-900">nour</span>
+                <span className="text-lg font-bold tracking-tight text-stone-900">
+                  nour
+                </span>
               </div>
-              <span className="text-sm font-medium text-stone-500">Ton espace quotidien</span>
+              <span className="text-sm font-medium text-stone-500">
+                Ton espace quotidien
+              </span>
             </div>
           ) : (
-          <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
-            <div className="min-w-0">
-              <p className="text-base font-semibold text-stone-900">
-                {new Intl.DateTimeFormat("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }).format(new Date())}
-              </p>
-              <p className="mt-1 text-[14px] leading-5 text-stone-500">
-                {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }).format(new Date())}
-                <span className="mt-0.5 block text-[14px] text-stone-400">
-                  Date hégirienne indicative
-                </span>
-              </p>
-            </div>
+            <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
+              <div className="min-w-0">
+                <p className="text-base font-semibold text-stone-900">
+                  {new Intl.DateTimeFormat("fr-FR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date())}
+                </p>
+                <p className="mt-1 text-[14px] leading-5 text-stone-500">
+                  {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date())}
+                  <span className="mt-0.5 block text-[14px] text-stone-400">
+                    Date hégirienne indicative
+                  </span>
+                </p>
+              </div>
 
-            <div className="min-w-0">
-              <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
-                {prayer.times
-                  ? "Horaires calculés pour ta position"
-                  : "Horaires locaux · à configurer"}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { name: "Fajr", time: prayer.times?.fajr },
-                  { name: "Dhuhr", time: prayer.times?.dhuhr },
-                  { name: "Asr", time: prayer.times?.asr },
-                  { name: "Maghrib", time: prayer.times?.maghrib },
-                  { name: "Isha", time: prayer.times?.isha },
-                ].map(({ name, time }) => (
-                  <span
-                    key={name}
-                    className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
-                  >
-                    <span className="inline-flex items-center gap-2.5">
-                      <span className="font-medium">{name}</span>
-                      <span className="tabular-nums text-stone-500">
-                        {time ?? (prayer.isLoading ? "…" : "--:--")}
+              <div className="min-w-0">
+                <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+                  {prayer.times
+                    ? "Horaires calculés pour ta position"
+                    : "Horaires locaux · à configurer"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { name: "Fajr", time: prayer.times?.fajr },
+                    { name: "Dhuhr", time: prayer.times?.dhuhr },
+                    { name: "Asr", time: prayer.times?.asr },
+                    { name: "Maghrib", time: prayer.times?.maghrib },
+                    { name: "Isha", time: prayer.times?.isha },
+                  ].map(({ name, time }) => (
+                    <span
+                      key={name}
+                      className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
+                    >
+                      <span className="inline-flex items-center gap-2.5">
+                        <span className="font-medium">{name}</span>
+                        <span className="tabular-nums text-stone-500">
+                          {time ?? (prayer.isLoading ? "…" : "--:--")}
+                        </span>
                       </span>
                     </span>
-                  </span>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleSignOut()}
-              className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
-              aria-label="Se déconnecter"
-            >
-              Quitter
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleSignOut()}
+                className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
+                aria-label="Se déconnecter"
+              >
+                Quitter
+              </Button>
+            </div>
           )}
         </header>
 
-        <div className="mx-auto mt-3 min-h-[calc(100vh-100px)] max-w-[1600px] rounded-t-3xl border border-b-0 border-violet-100 bg-white px-4 pb-12 pt-6 sm:mt-4 sm:px-6 xl:px-8">
+        <div
+          className={`mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] px-4 pb-12 pt-6 sm:px-6 xl:px-8 ${activeView === "overview" ? "bg-background" : "mt-3 rounded-t-3xl border border-b-0 border-violet-100 bg-white sm:mt-4"}`}
+        >
           <div
             className={`grid items-start gap-6 xl:gap-8 ${activeView === "settings" ? "xl:grid-cols-[minmax(0,1fr)_360px]" : "xl:grid-cols-1"}`}
           >
@@ -995,68 +910,109 @@ export default function Dashboard() {
                 activeView === "science") && (
                 <>
                   {activeView === "overview" && (
-                    <div
-                      id="dashboard-home"
-                      className="scroll-mt-24 rounded-[28px] bg-primary p-5 text-white shadow-lg shadow-violet-200/40 sm:p-7"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-semibold text-violet-100">Espace personnel</p>
-                          <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-                            Salam, {firstName || "bienvenue"}
-                          </h1>
-                          <p className="mt-1.5 text-sm text-violet-100">{dailyReminder}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                    <div id="dashboard-home" className="scroll-mt-24 space-y-5">
+                      <section className="rounded-3xl border border-[#E7E1D6] bg-[#FAF7F0] px-5 py-6 sm:px-8 sm:py-8">
+                        <h1
+                          className="text-xl font-semibold leading-snug text-[#26362A] sm:text-2xl"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          السلام عليكم ورحمة الله وبركاته
+                        </h1>
+                        <p className="mt-2 text-sm leading-6 text-[#405348] sm:text-base">
+                          Que la paix, la miséricorde d’Allah et Ses
+                          bénédictions soient sur toi
+                          {firstName ? `, ${firstName}` : ""}.
+                        </p>
+                      </section>
 
-                  {activeView === "overview" && (
-                    <section aria-label="Tes repères quotidiens" className="grid gap-3 sm:grid-cols-2">
-                      <button type="button" onClick={() => navigateToView("salah")} className="rounded-2xl border border-violet-100 bg-[#f7f4fb] p-4 text-left transition hover:border-violet-200 hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="text-sm font-semibold text-violet-800">Horaires de prière</span>
-                        <span className="mt-4 flex flex-wrap gap-2">
-                          {[
-                            { name: "Fajr", time: prayer.times?.fajr },
-                            { name: "Dhuhr", time: prayer.times?.dhuhr },
-                            { name: "Asr", time: prayer.times?.asr },
-                            { name: "Maghrib", time: prayer.times?.maghrib },
-                            { name: "Isha", time: prayer.times?.isha },
-                          ].map(({ name, time }) => (
-                            <span key={name} className="rounded-full bg-white px-2.5 py-1.5 text-[11px] text-stone-600 shadow-sm">{name}{time ? ` ${time}` : ""}</span>
-                          ))}
-                        </span>
-                      </button>
+                      <section
+                        aria-label="Tes repères du jour"
+                        className="grid gap-3 sm:grid-cols-3"
+                      >
+                        <article className="rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Prochaine prière
+                          </h2>
+                          {nextPrayer ? (
+                            <p className="mt-3 text-lg font-semibold text-[#26362A]">
+                              {nextPrayer[0]}{" "}
+                              <span className="font-normal tabular-nums text-[#405348]">
+                                {nextPrayer[1]}
+                              </span>
+                            </p>
+                          ) : (
+                            <p className="mt-3 text-sm leading-5 text-[#405348]">
+                              {prayer.times
+                                ? `Fajr demain · ${prayer.times.fajr}`
+                                : "Configure tes horaires dans les réglages."}
+                            </p>
+                          )}
+                          {prayer.times && (
+                            <dl className="mt-4 grid grid-cols-5 gap-1 border-t border-[#E7EDE6] pt-3">
+                              {[
+                                ["Fajr", prayer.times.fajr],
+                                ["Dhuhr", prayer.times.dhuhr],
+                                ["Asr", prayer.times.asr],
+                                ["Maghrib", prayer.times.maghrib],
+                                ["Isha", prayer.times.isha],
+                              ].map(([name, time]) => (
+                                <div key={name} className="min-w-0 text-center">
+                                  <dt className="truncate text-[10px] text-[#52675A]">
+                                    {name}
+                                  </dt>
+                                  <dd className="mt-1 text-xs font-semibold tabular-nums text-[#35533D]">
+                                    {time}
+                                  </dd>
+                                </div>
+                              ))}
+                            </dl>
+                          )}
+                        </article>
 
-                      <button type="button" onClick={() => openAdhkarSession("morning")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="text-sm font-semibold text-emerald-900">Routine du jour</span>
-                        <span className="mt-3 block text-sm text-stone-600">Adhkar du matin et du soir</span>
-                        <span className="mt-1 block text-xs text-stone-500">{completedMorningAdhkar}/{adhkarBySession.morning.length} matin · {completedEveningAdhkar}/{adhkarBySession.evening.length} soir</span>
-                      </button>
+                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Adhkar du{" "}
+                            {momentAdhkarSession === "morning"
+                              ? "matin"
+                              : "soir"}
+                          </h2>
+                          <p className="mt-2 text-sm leading-5 text-[#405348]">
+                            Retrouve les invocations de ce moment.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openAdhkarSession(momentAdhkarSession)
+                            }
+                            className="mt-4 rounded-xl bg-[#5D7C65] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#45624D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
+                          >
+                            Continuer
+                          </button>
+                        </article>
 
-                      <button type="button" onClick={() => navigateToView("quran")} className="rounded-2xl border border-violet-100 bg-white p-4 text-left transition hover:border-violet-200 hover:bg-violet-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="text-sm font-semibold text-violet-800">Journal Al-Qur’an</span>
-                        <span className="mt-3 block text-sm text-stone-600">Note ta lecture et retrouve le passage où tu t’es arrêtée.</span>
-                      </button>
-
-                      <button type="button" onClick={() => navigateToView("periods")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="text-sm font-semibold text-emerald-900">Mes repères</span>
-                        <span className="mt-3 block text-sm text-stone-600">{currentPeriodDay !== null ? `Jour ${currentPeriodDay} · suivi personnel` : currentCycleDay !== null && currentCycleDay <= 60 ? `Jour ${currentCycleDay} du cycle` : "Cycle et planning adapté"}</span>
-                        <span className="mt-1 block text-xs text-stone-500">{isExcusePeriod ? "Mode Al-‘Udhr actif" : "Tes informations restent personnelles"}</span>
-                      </button>
-                    </section>
-                  )}
-
-                  {activeView === "overview" && (
-                    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
-                      <DailyPlanner
-                        isExcusePeriod={isExcusePeriod}
-                        prayerTimes={prayer.times}
-                      />
-                      <QuranHabitTracker
-                        today={today}
-                        onNavigate={navigateToView}
-                      />
+                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Reprendre ma lecture
+                          </h2>
+                          <p className="mt-2 text-sm leading-5 text-[#405348]">
+                            {latestQuranEntry?.passage ??
+                              "Aucune lecture récente pour le moment."}
+                          </p>
+                          {latestQuranEntry?.pagesOrVerses && (
+                            <p className="mt-1 text-xs text-[#52675A]">
+                              {latestQuranEntry.pagesOrVerses}
+                            </p>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => navigateToView("quran")}
+                            className="mt-4 rounded-xl border border-[#5D7C65] px-4 py-2 text-sm font-semibold text-[#35533D] transition hover:bg-[#F1F5EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
+                          >
+                            {latestQuranEntry ? "Reprendre" : "Ouvrir Al-Quran"}
+                          </button>
+                        </article>
+                      </section>
                     </div>
                   )}
 
@@ -1072,11 +1028,20 @@ export default function Dashboard() {
                   {activeView === "science" && <ScienceJournal />}
 
                   {activeView === "overview" && (
+                    <DailyPlanner
+                      isExcusePeriod={isExcusePeriod}
+                      prayerTimes={prayer.times}
+                      initialView="week"
+                      titleOverride="Tâches en cours"
+                    />
+                  )}
+
+                  {activeView === "overview" && (
                     <details
                       id="dashboard-routine"
-                      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
+                      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 [&:not([open])]:hidden"
                     >
-                      <summary className="cursor-pointer list-none">
+                      <summary className="sr-only">
                         <div className="mb-4 flex items-center justify-between gap-4">
                           <div>
                             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
@@ -1184,9 +1149,7 @@ export default function Dashboard() {
                                 className={`min-h-11 flex-1 rounded-full ${isInvocationComplete ? "" : "bg-[#523B46] text-white hover:bg-[#3D2A34]"}`}
                               >
                                 {isInvocationComplete ? (
-                                  <>
-                                    Invocation terminée
-                                  </>
+                                  <>Invocation terminée</>
                                 ) : (
                                   `J’ai récité (${currentRepetitionCount}/${currentInvocation.repetitions})`
                                 )}
@@ -1204,8 +1167,8 @@ export default function Dashboard() {
                             </div>
                             {!isInvocationComplete && (
                               <p className="mt-3 text-center text-xs text-muted-foreground">
-                                Marque chaque récitation ; tu pourras
-                                continuer une fois le nombre demandé atteint.
+                                Marque chaque récitation ; tu pourras continuer
+                                une fois le nombre demandé atteint.
                               </p>
                             )}
                           </>
@@ -1284,8 +1247,8 @@ export default function Dashboard() {
                           Ton cycle a peut-être un peu de retard
                         </p>
                         <p className="mt-1 leading-6">
-                          D’après les journées que tu as notées, la date
-                          estimée était le{" "}
+                          D’après les journées que tu as notées, la date estimée
+                          était le{" "}
                           {format(expectedNextPeriod, "d MMMM", { locale: fr })}
                           . Les cycles varient naturellement ; cette estimation
                           n’est pas un avis médical.
@@ -1371,9 +1334,7 @@ export default function Dashboard() {
                                 locale: fr,
                               })}
                         </p>
-                        <h3 className="mt-2 font-serif text-xl">
-                          Ta période
-                        </h3>
+                        <h3 className="mt-2 font-serif text-xl">Ta période</h3>
 
                         <p className="mt-2 text-xs leading-5 text-muted-foreground">
                           {editingPeriodRange
@@ -1760,9 +1721,9 @@ export default function Dashboard() {
 
                     {cycleDays?.length === 0 && (
                       <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-                        Ton calendrier est vide pour le moment. Sélectionne
-                        une date pour commencer ; tu pourras modifier ou
-                        retirer tes entrées à tout moment.
+                        Ton calendrier est vide pour le moment. Sélectionne une
+                        date pour commencer ; tu pourras modifier ou retirer tes
+                        entrées à tout moment.
                       </p>
                     )}
                   </div>
@@ -1775,8 +1736,7 @@ export default function Dashboard() {
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900">
-                    </span>
+                    <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900"></span>
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
                         Espace personnel
@@ -2153,14 +2113,11 @@ export default function Dashboard() {
             )}
 
             {activeView === "settings" && (
-              <aside
-                className="grid items-start gap-5 md:grid-cols-2"
-              >
+              <aside className="grid items-start gap-5 md:grid-cols-2">
                 <Card className="rounded-3xl border border-stone-200 bg-white shadow-none">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                      </span>
+                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800"></span>
                       <div>
                         <p className="text-sm font-semibold">
                           Horaires de prière
@@ -2172,8 +2129,8 @@ export default function Dashboard() {
                     </div>
 
                     <p className="mt-4 text-xs leading-5 text-stone-600">
-                      Ta position est enregistrée sur cet appareil et envoyée
-                      à AlAdhan pour calculer les horaires. Elle n’est pas
+                      Ta position est enregistrée sur cet appareil et envoyée à
+                      AlAdhan pour calculer les horaires. Elle n’est pas
                       enregistrée dans ton compte Nour.
                     </p>
 
@@ -2276,8 +2233,7 @@ export default function Dashboard() {
                 >
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                      </span>
+                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800"></span>
                       <div>
                         <p className="text-sm font-semibold">Rappels</p>
                         <p className="text-xs text-muted-foreground">
@@ -2326,8 +2282,8 @@ export default function Dashboard() {
           <footer className="mt-10 flex flex-col gap-2 border-t border-stone-200 pt-5 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
             <span>nour. · Suivi quotidien personnel</span>
             <span>
-              Ton calendrier est enregistré sur ton compte ; tes préférences
-              de rappel sont enregistrées sur cet appareil.
+              Ton calendrier est enregistré sur ton compte ; tes préférences de
+              rappel sont enregistrées sur cet appareil.
             </span>
           </footer>
         </div>

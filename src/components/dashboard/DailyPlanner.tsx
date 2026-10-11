@@ -68,11 +68,15 @@ function getPlannerEvents(
 type DailyPlannerProps = {
   isExcusePeriod: boolean;
   prayerTimes: PrayerTimes | null;
+  initialView?: "day" | "week";
+  titleOverride?: string;
 };
 
 export function DailyPlanner({
   isExcusePeriod,
   prayerTimes,
+  initialView = "day",
+  titleOverride,
 }: DailyPlannerProps) {
   const today = dateKey(new Date());
   const quranSessions = useQuery(api.quranProgress.forPlanner, {
@@ -86,7 +90,7 @@ export function DailyPlanner({
   const [activities, setActivities] = useState(() =>
     readPlannerActivities(today),
   );
-  const [view, setView] = useState<"day" | "week">("day");
+  const [view, setView] = useState<"day" | "week">(initialView);
   const [isAddingActivity, setIsAddingActivity] = useState(false);
   const [newActivityTitle, setNewActivityTitle] = useState("");
   const [newActivityTime, setNewActivityTime] = useState("12:00");
@@ -156,7 +160,8 @@ export function DailyPlanner({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            {view === "day" ? "Planning du jour" : "Vue hebdomadaire"}
+            {titleOverride ??
+              (view === "day" ? "Planning du jour" : "Vue hebdomadaire")}
           </p>
           <h2 className="mt-2 font-serif text-2xl tracking-tight text-stone-900">
             {view === "day" ? "Planning quotidien" : "Planning de la semaine"}
@@ -167,43 +172,45 @@ export function DailyPlanner({
         </span>
       </div>
 
-      <div
-        className="mt-4 inline-flex rounded-xl border border-stone-200 bg-stone-50 p-1"
-        role="group"
-        aria-label="Affichage du planning"
-      >
-        {(
-          [
-            { id: "day", label: "Jour" },
-            { id: "week", label: "Semaine" },
-          ] as const
-        ).map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setView(id)}
-            aria-pressed={view === id}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition ${
-              view === id
-                ? "bg-white text-emerald-900 shadow-sm"
-                : "text-stone-500 hover:text-stone-800"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {view === "day" && (
-        <button
-          type="button"
-          onClick={() => setIsAddingActivity((open) => !open)}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
-          aria-expanded={isAddingActivity}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div
+          className="inline-flex rounded-xl border border-stone-200 bg-stone-50 p-1"
+          role="group"
+          aria-label="Affichage du planning"
         >
-          {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
-        </button>
-      )}
+          {(
+            [
+              { id: "day", label: "Jour" },
+              { id: "week", label: "Semaine" },
+            ] as const
+          ).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setView(id)}
+              aria-pressed={view === id}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition ${
+                view === id
+                  ? "bg-white text-emerald-900 shadow-sm"
+                  : "text-stone-500 hover:text-stone-800"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {view === "day" && (
+          <button
+            type="button"
+            onClick={() => setIsAddingActivity((open) => !open)}
+            className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
+            aria-expanded={isAddingActivity}
+          >
+            {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
+          </button>
+        )}
+      </div>
 
       {view === "day" && isAddingActivity && (
         <form
@@ -282,13 +289,7 @@ export function DailyPlanner({
                   </div>
                   <div className="space-y-1 p-1.5 sm:p-2">
                     {events.map(
-                      ({
-                        time,
-                        displayTime,
-                        title,
-                        detail,
-                        kind,
-                      }) => (
+                      ({ time, displayTime, title, detail, kind }) => (
                         <article
                           key={`${kind}-${title}`}
                           className={`rounded-xl border px-3 py-3 ${
