@@ -10,6 +10,7 @@ import {
   type DashboardView,
 } from "@/components/dashboard/dashboardNavigation";
 import { DailyPlanner } from "@/components/dashboard/DailyPlanner";
+import { readPlannerActivities } from "@/components/dashboard/plannerActivities";
 import { QuranJournal } from "@/components/dashboard/QuranJournal";
 import {
   quranResumeEvent,
@@ -308,6 +309,7 @@ export default function Dashboard() {
     currentRepetitionCount >= currentInvocation.repetitions;
   const records = cycleDays ?? [];
   const selectedDayKey = format(selectedDate, "yyyy-MM-dd");
+  const todayActivities = readPlannerActivities(today).slice(0, 3);
   const selectedEntry = records.find((entry) => entry.date === selectedDayKey);
   const noteDraft = noteDrafts[selectedDayKey] ?? selectedEntry?.note ?? "";
   const periodDates = records
@@ -1064,26 +1066,6 @@ export default function Dashboard() {
                                 : "Configure tes horaires dans les réglages."}
                             </p>
                           )}
-                          {prayer.times && (
-                            <dl className="mt-4 grid grid-cols-5 gap-1 border-t border-[#E7EDE6] pt-3">
-                              {[
-                                ["Fajr", prayer.times.fajr],
-                                ["Dhuhr", prayer.times.dhuhr],
-                                ["Asr", prayer.times.asr],
-                                ["Maghrib", prayer.times.maghrib],
-                                ["Isha", prayer.times.isha],
-                              ].map(([name, time]) => (
-                                <div key={name} className="min-w-0 text-center">
-                                  <dt className="truncate text-[10px] text-[#52675A]">
-                                    {name}
-                                  </dt>
-                                  <dd className="mt-1 text-xs font-semibold tabular-nums text-[#35533D]">
-                                    {time}
-                                  </dd>
-                                </div>
-                              ))}
-                            </dl>
-                          )}
                         </article>
 
                         <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
@@ -1156,12 +1138,49 @@ export default function Dashboard() {
                   {activeView === "science" && <ScienceJournal />}
 
                   {activeView === "overview" && (
-                    <DailyPlanner
-                      isExcusePeriod={isExcusePeriod}
-                      prayerTimes={prayer.times}
-                      initialView="week"
-                      titleOverride="Tâches en cours"
-                    />
+                    <section className="rounded-3xl border border-[#DCE5DC] bg-white p-5 sm:p-6">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5F7F68]">
+                            Aujourd’hui
+                          </p>
+                          <h2 className="mt-1 text-xl font-semibold text-[#26362A]">
+                            Ce que tu veux faire
+                          </h2>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => navigateToView("salah")}
+                          className="rounded-xl border border-[#DCE5DC] px-3 py-2 text-sm font-medium text-[#35533D] transition hover:bg-[#EEF4EE]"
+                        >
+                          Modifier dans Planning
+                        </button>
+                      </div>
+                      <p className="mt-4 rounded-xl bg-[#EEF4EE] px-3 py-2 text-sm text-[#405348]">
+                        Rappel du jour : TODO — contenu validé à sélectionner.
+                      </p>
+                      {todayActivities.length > 0 ? (
+                        <ul className="mt-4 space-y-2">
+                          {todayActivities.map((activity) => (
+                            <li
+                              key={activity.id}
+                              className="rounded-xl border border-[#E7EDE6] px-4 py-3"
+                            >
+                              <p className="text-sm font-medium text-[#26362A]">
+                                {activity.title}
+                              </p>
+                              <p className="mt-1 text-xs text-[#52675A]">
+                                {activity.time} · {activity.detail}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="mt-4 text-sm text-[#52675A]">
+                          Ajoute les activités que tu souhaites dans ton planning.
+                        </p>
+                      )}
+                    </section>
                   )}
 
                   {activeView === "overview" && (
