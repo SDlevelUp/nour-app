@@ -1293,15 +1293,35 @@ export default function Dashboard() {
                               <dl className="mt-3 space-y-1.5">
                                 <div>
                                   <dt className="inline font-medium">Référence indiquée : </dt>
-                                  <dd className="inline">{currentInvocation.source} — à vérifier dans l’édition retenue.</dd>
+                                  <dd className="inline">{currentInvocation.proof.legacyReference} — référence existante à vérifier.</dd>
                                 </div>
                                 <div>
                                   <dt className="inline font-medium">Rapporteur : </dt>
-                                  <dd className="inline">TODO — à vérifier par une personne de science.</dd>
+                                  <dd className="inline">{currentInvocation.proof.narrator}</dd>
                                 </div>
                                 <div>
-                                  <dt className="inline font-medium">Degré et source de classification : </dt>
-                                  <dd className="inline">TODO — à vérifier par une personne de science.</dd>
+                                  <dt className="inline font-medium">Recueil et numéro : </dt>
+                                  <dd className="inline">{currentInvocation.proof.collection} {currentInvocation.proof.number}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Degré d’authenticité : </dt>
+                                  <dd className="inline">{currentInvocation.proof.grade}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Source de classification : </dt>
+                                  <dd className="inline">{currentInvocation.proof.gradingSource}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Édition : </dt>
+                                  <dd className="inline">{currentInvocation.proof.edition}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Moment : </dt>
+                                  <dd className="inline">{currentInvocation.moment === "morning" ? "Matin" : "Soir"}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Répétitions : </dt>
+                                  <dd className="inline">{currentInvocation.repetitions} — TODO : vérifier dans l’édition.</dd>
                                 </div>
                               </dl>
                             </details>

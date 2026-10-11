@@ -7,10 +7,42 @@ export type AdhkarInvocation = {
   transliteration: string;
   meaning: string;
   repetitions: number;
-  source: string;
+  moment: AdhkarSession;
+  proof: {
+    narrator: string;
+    collection: string;
+    number: string;
+    grade: string;
+    gradingSource: string;
+    edition: string;
+    legacyReference: string;
+  };
 };
 
-const commonInvocations: AdhkarInvocation[] = [
+type UnreviewedInvocation = Omit<AdhkarInvocation, "moment" | "proof"> & {
+  legacyReference: string;
+};
+
+const proofTodo = (legacyReference: string) => ({
+  narrator: "TODO — à relever et vérifier.",
+  collection: "TODO — à relever et vérifier.",
+  number: "TODO — à relever et vérifier.",
+  grade: "TODO — à vérifier.",
+  gradingSource: "TODO — classification et référence à vérifier.",
+  edition: "Sahih al-Adhkar, Éditions Tawbah — TODO : page/entrée.",
+  legacyReference,
+});
+
+const withProof = (
+  invocation: UnreviewedInvocation,
+  moment: AdhkarSession,
+): AdhkarInvocation => ({
+  ...invocation,
+  moment,
+  proof: proofTodo(invocation.legacyReference),
+});
+
+const commonInvocations: UnreviewedInvocation[] = [
   {
     id: "protection",
     title: "Au nom d’Allah, rien ne peut nuire",
@@ -21,7 +53,7 @@ const commonInvocations: AdhkarInvocation[] = [
     meaning:
       "Au nom d’Allah, avec le nom de qui rien ne peut nuire sur terre ni dans le ciel. Il est Celui qui entend tout et sait tout.",
     repetitions: 3,
-    source: "Sunan Abi Dawud 5088 · Jami‘ at-Tirmidhi 3388",
+    legacyReference: "Sunan Abi Dawud 5088 · Jami‘ at-Tirmidhi 3388",
   },
   {
     id: "contentment",
@@ -33,7 +65,7 @@ const commonInvocations: AdhkarInvocation[] = [
     meaning:
       "J’agrée Allah comme Seigneur, l’islam comme religion et Muhammad comme prophète.",
     repetitions: 3,
-    source: "Sunan Abi Dawud 5072 · Jami‘ at-Tirmidhi 3389",
+    legacyReference: "Sunan Abi Dawud 5072 · Jami‘ at-Tirmidhi 3389",
   },
   {
     id: "master-of-forgiveness",
@@ -45,14 +77,16 @@ const commonInvocations: AdhkarInvocation[] = [
     meaning:
       "Ô Allah, Tu es mon Seigneur, nul n’est digne d’adoration sauf Toi. Tu m’as créé et je suis Ton serviteur. Je m’efforce de respecter mon engagement envers Toi. Je cherche refuge auprès de Toi contre le mal que j’ai commis. Je reconnais Tes bienfaits envers moi et reconnais mes fautes. Pardonne-moi : nul ne pardonne les péchés si ce n’est Toi.",
     repetitions: 1,
-    source: "Sahih al-Bukhari 6306",
+    legacyReference: "Sahih al-Bukhari 6306",
   },
 ];
 
 export const adhkarBySession: Record<AdhkarSession, AdhkarInvocation[]> = {
   morning: [
-    ...commonInvocations,
-    {
+    ...commonInvocations.map((invocation) =>
+      withProof(invocation, "morning"),
+    ),
+    withProof({
       id: "morning-opening",
       title: "Au matin",
       arabic:
@@ -62,12 +96,14 @@ export const adhkarBySession: Record<AdhkarSession, AdhkarInvocation[]> = {
       meaning:
         "Ô Allah, c’est par Toi que nous atteignons le matin et le soir, c’est par Toi que nous vivons et mourons, et c’est vers Toi que sera la résurrection.",
       repetitions: 1,
-      source: "Jami‘ at-Tirmidhi 3391",
-    },
+      legacyReference: "Jami‘ at-Tirmidhi 3391",
+    }, "morning"),
   ],
   evening: [
-    ...commonInvocations,
-    {
+    ...commonInvocations.map((invocation) =>
+      withProof(invocation, "evening"),
+    ),
+    withProof({
       id: "evening-opening",
       title: "Au soir",
       arabic:
@@ -77,7 +113,26 @@ export const adhkarBySession: Record<AdhkarSession, AdhkarInvocation[]> = {
       meaning:
         "Ô Allah, c’est par Toi que nous atteignons le soir et le matin, c’est par Toi que nous vivons et mourons, et c’est vers Toi que sera le retour.",
       repetitions: 1,
-      source: "Jami‘ at-Tirmidhi 3391",
-    },
+      legacyReference: "Jami‘ at-Tirmidhi 3391",
+    }, "evening"),
   ],
 };
+
+export const adhkarReviewTodo = Object.entries(adhkarBySession).flatMap(
+  ([moment, invocations]) =>
+    invocations.map((invocation) => ({
+      id: invocation.id,
+      moment,
+      legacyReference: invocation.proof.legacyReference,
+      fieldsToVerify: [
+        "texte arabe et variantes de l’édition",
+        "translittération",
+        "traduction française",
+        "rapporteur",
+        "recueil et numéro",
+        "degré et source de classification",
+        "nombre de répétitions et moment",
+        "page/entrée de Sahih al-Adhkar, Éditions Tawbah",
+      ],
+    })),
+);
