@@ -101,7 +101,7 @@ const previewEvents = [
     title: "Dhuhr",
     detail: "Prière selon l’horaire local",
     tone: "border-violet-100 bg-purple-50/80",
-    marker: "bg-purple-500",
+    marker: "bg-fuchsia-400",
   },
   {
     time: "18:45",
@@ -170,7 +170,7 @@ export default function Landing() {
   return (
     <MotionConfig reducedMotion="user">
       <main
-        className={`landing-page min-h-screen overflow-hidden bg-[#FBF8FF] text-foreground transition-colors duration-300 ${isDarkMode ? "landing-dark" : ""}`}
+        className={`landing-page min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300 ${isDarkMode ? "landing-dark" : ""}`}
       >
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
         <button
@@ -227,7 +227,7 @@ export default function Landing() {
             <button
               type="button"
               onClick={openDashboard}
-              className="group inline-flex items-center gap-3 rounded-xl bg-violet-800 px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-3 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
             >
               Entrer dans mon espace
             </button>
@@ -475,7 +475,7 @@ export default function Landing() {
               </span>
             </div>
 
-            <div className="mt-3 rounded-2xl bg-gradient-to-r from-[#38245F] to-[#6848A0] p-4 text-white sm:p-5">
+            <div className="mt-3 rounded-2xl bg-primary p-4 text-white sm:p-5">
               <p className="text-xs text-white/75">Espace personnel</p>
               <div className="mt-1 flex items-center justify-between gap-3">
                 <p className="text-lg font-semibold sm:text-xl">

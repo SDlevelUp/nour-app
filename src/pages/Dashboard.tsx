@@ -64,9 +64,9 @@ const stickyNoteColors: {
   },
   {
     value: "pink",
-    label: "Rose",
-    card: "border-rose-200 bg-rose-100",
-    swatch: "bg-rose-300",
+    label: "Mauve",
+    card: "border-[#E0D8E3] bg-[#F0EBF2]",
+    swatch: "bg-[#91809B]",
   },
   {
     value: "blue",
@@ -889,7 +889,7 @@ export default function Dashboard() {
 
   return (
     <main
-      className={`dashboard-shell min-h-screen bg-[#f7f5fb] text-stone-900 ${isDarkMode ? "dark-dashboard" : ""}`}
+      className={`dashboard-shell min-h-screen bg-background text-stone-900 ${isDarkMode ? "dark-dashboard" : ""}`}
     >
       <DashboardSidebar
         activeView={activeView}
@@ -906,7 +906,7 @@ export default function Dashboard() {
         onSignOut={() => void handleSignOut()}
       />
       <div
-        className={`min-h-screen bg-[#f7f5fb] transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
+        className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
         <header className="border-b border-violet-100 bg-white/90">
           {activeView === "overview" ? (
@@ -997,7 +997,7 @@ export default function Dashboard() {
                   {activeView === "overview" && (
                     <div
                       id="dashboard-home"
-                      className="scroll-mt-24 rounded-[28px] bg-gradient-to-br from-[#38245f] to-[#694a9d] p-5 text-white shadow-lg shadow-violet-200/40 sm:p-7"
+                      className="scroll-mt-24 rounded-[28px] bg-primary p-5 text-white shadow-lg shadow-violet-200/40 sm:p-7"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div>
