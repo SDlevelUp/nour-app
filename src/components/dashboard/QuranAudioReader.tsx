@@ -317,7 +317,7 @@ export function QuranAudioReader({
   };
 
   return (
-    <section className="mt-6 rounded-3xl border border-violet-100 bg-[#fbf9ff] p-4 sm:p-6">
+    <section className="mt-6 rounded-3xl border border-[#DCE5DC] bg-white p-4 sm:p-6">
       <div className="flex items-center gap-3">
         <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-800">
           <Volume2 className="size-5" />
