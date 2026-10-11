@@ -923,7 +923,7 @@ export default function Dashboard() {
         </header>
 
         <div
-          className={`mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] px-4 pb-12 pt-6 sm:px-6 xl:px-8 ${activeView === "overview" ? "bg-background" : "mt-3 rounded-t-3xl border border-b-0 border-violet-100 bg-white sm:mt-4"}`}
+          className="mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] bg-background px-4 pb-12 pt-6 sm:px-6 xl:px-8"
         >
           <div
             className={`grid items-start gap-6 xl:gap-8 ${activeView === "settings" ? "xl:grid-cols-[minmax(0,1fr)_360px]" : "xl:grid-cols-1"}`}
