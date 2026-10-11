@@ -96,13 +96,13 @@ const defaultReminders: ReminderPreferences = {
 };
 const morningMessages = [
   "Le moment des invocations du matin est arrivé.",
-  "Pensez à votre séquence d’invocations du matin.",
-  "Vos invocations du matin sont disponibles dans votre routine.",
+  "Pense à ta séquence d’invocations du matin.",
+  "Tes invocations du matin sont disponibles dans ta routine.",
 ];
 const eveningMessages = [
   "Le moment des invocations du soir est arrivé.",
-  "Pensez à votre séquence d’invocations du soir.",
-  "Vos invocations du soir sont disponibles dans votre routine.",
+  "Pense à ta séquence d’invocations du soir.",
+  "Tes invocations du soir sont disponibles dans ta routine.",
 ];
 
 const cycleSymptoms: { key: CycleSymptom; label: string }[] = [
@@ -481,7 +481,7 @@ export default function Dashboard() {
           enabled: reminders.morning,
           at: reminders.morningTime,
           messages: morningMessages,
-          title: "Un instant pour vous",
+          title: "Un instant pour toi",
         },
         {
           key: "evening",
@@ -530,7 +530,7 @@ export default function Dashboard() {
           : Notification.permission;
       if (permission !== "granted") {
         toast.message(
-          "Autorisez les notifications dans votre navigateur pour activer ce rappel.",
+          "Autorise les notifications dans ton navigateur pour activer ce rappel.",
         );
         return;
       }
@@ -549,7 +549,7 @@ export default function Dashboard() {
       await saveCycleDay({ date, isPeriodDay, symptoms, note });
       return true;
     } catch {
-      toast.error("Impossible d’enregistrer cette journée. Réessayez.");
+      toast.error("Impossible d’enregistrer cette journée. Réessaie.");
       return false;
     } finally {
       setIsSavingCycleDay(false);
@@ -595,7 +595,7 @@ export default function Dashboard() {
     const startDate = format(selectedRange.from, "yyyy-MM-dd");
     const endDate = format(selectedRange.to, "yyyy-MM-dd");
     if (differenceInCalendarDays(selectedRange.to, selectedRange.from) > 59) {
-      toast.error("Sélectionnez une plage de 60 jours maximum.");
+      toast.error("Sélectionne une plage de 60 jours maximum.");
       return;
     }
     if (!editingPeriodRange) {
@@ -640,7 +640,7 @@ export default function Dashboard() {
         );
       }
     } catch {
-      toast.error("Impossible d’enregistrer cette plage. Réessayez.");
+      toast.error("Impossible d’enregistrer cette plage. Réessaie.");
     } finally {
       setIsSavingCycleDay(false);
     }
@@ -676,7 +676,7 @@ export default function Dashboard() {
       }
       await setLateAlertsEnabled({ enabled });
     } catch {
-      toast.error("Impossible d’enregistrer votre préférence de notification.");
+      toast.error("Impossible d’enregistrer ta préférence de notification.");
     } finally {
       setIsSavingLateAlerts(false);
     }
@@ -692,7 +692,7 @@ export default function Dashboard() {
         invocationId: currentInvocation.id,
       });
     } catch {
-      toast.error("Impossible d’enregistrer cette récitation. Réessayez.");
+      toast.error("Impossible d’enregistrer cette récitation. Réessaie.");
     } finally {
       setIsSavingAdhkar(false);
     }
@@ -708,7 +708,7 @@ export default function Dashboard() {
         invocationId: currentInvocation.id,
       });
     } catch {
-      toast.error("Récitez toutes les répétitions avant de passer à la suite.");
+      toast.error("Récite toutes les répétitions avant de passer à la suite.");
     } finally {
       setIsSavingAdhkar(false);
     }
@@ -728,7 +728,7 @@ export default function Dashboard() {
     if (notifiedLateCycle.current === alertKey) return;
     notifiedLateCycle.current = alertKey;
     new Notification("Petit rappel de suivi", {
-      body: "La date estimée de vos règles est passée. Les cycles peuvent varier : consultez votre calendrier quand vous le souhaitez.",
+      body: "La date estimée de tes règles est passée. Les cycles peuvent varier : consulte ton calendrier quand tu le souhaites.",
       tag: `nour-cycle-late-${alertKey}`,
     });
   }, [
@@ -783,7 +783,7 @@ export default function Dashboard() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Impossible d’enregistrer la note. Réessayez.",
+          : "Impossible d’enregistrer la note. Réessaie.",
       );
     } finally {
       setIsSavingPersonalNote(false);
@@ -945,7 +945,7 @@ export default function Dashboard() {
             <div className="min-w-0">
               <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
                 {prayer.times
-                  ? "Horaires calculés pour votre position"
+                  ? "Horaires calculés pour ta position"
                   : "Horaires locaux · à configurer"}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -1133,7 +1133,7 @@ export default function Dashboard() {
                       <div className="mt-4 rounded-3xl border border-stone-200 bg-white p-4 sm:p-6">
                         {adhkarProgress === undefined ? (
                           <p className="py-10 text-center text-sm text-muted-foreground">
-                            Chargement de votre routine…
+                            Chargement de ta routine…
                           </p>
                         ) : currentInvocation ? (
                           <>
@@ -1204,7 +1204,7 @@ export default function Dashboard() {
                             </div>
                             {!isInvocationComplete && (
                               <p className="mt-3 text-center text-xs text-muted-foreground">
-                                Marquez chaque récitation ; vous pourrez
+                                Marque chaque récitation ; tu pourras
                                 continuer une fois le nombre demandé atteint.
                               </p>
                             )}
@@ -1215,7 +1215,7 @@ export default function Dashboard() {
                               Routine terminée, bravo
                             </h3>
                             <p className="mt-2 text-sm text-muted-foreground">
-                              Vous avez terminé les invocations{" "}
+                              Tu as terminé les invocations{" "}
                               {adhkarSession === "morning"
                                 ? "du matin"
                                 : "du soir"}{" "}
@@ -1254,7 +1254,7 @@ export default function Dashboard() {
                           {periodStarts.length}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          d’après votre calendrier
+                          d’après ton calendrier
                         </p>
                       </CardContent>
                     </Card>
@@ -1274,17 +1274,17 @@ export default function Dashboard() {
                         </h2>
                       </div>
                       <span className="hidden text-xs text-muted-foreground sm:inline">
-                        Privé · enregistré sur votre compte
+                        Privé · enregistré sur ton compte
                       </span>
                     </div>
 
                     {isPeriodLate && expectedNextPeriod && (
                       <div className="mb-5 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
                         <p className="font-semibold">
-                          Votre cycle est peut-être un peu en retard
+                          Ton cycle a peut-être un peu de retard
                         </p>
                         <p className="mt-1 leading-6">
-                          D’après les journées que vous avez notées, la date
+                          D’après les journées que tu as notées, la date
                           estimée était le{" "}
                           {format(expectedNextPeriod, "d MMMM", { locale: fr })}
                           . Les cycles varient naturellement ; cette estimation
@@ -1372,13 +1372,13 @@ export default function Dashboard() {
                               })}
                         </p>
                         <h3 className="mt-2 font-serif text-xl">
-                          Votre période
+                          Ta période
                         </h3>
 
                         <p className="mt-2 text-xs leading-5 text-muted-foreground">
                           {editingPeriodRange
-                            ? "Choisissez les nouvelles dates de début et de fin dans le calendrier."
-                            : "Choisissez les dates de début et de fin dans le calendrier."}
+                            ? "Choisis les nouvelles dates de début et de fin dans le calendrier."
+                            : "Choisis les dates de début et de fin dans le calendrier."}
                         </p>
 
                         {selectedPeriodRun && !editingPeriodRange && (
@@ -1536,7 +1536,7 @@ export default function Dashboard() {
                               [selectedDayKey]: event.target.value,
                             }))
                           }
-                          placeholder="Ajoutez ici une note que vous souhaitez retrouver plus tard…"
+                          placeholder="Ajoute ici une note que tu veux retrouver plus tard…"
                           className="mt-2 min-h-24 resize-y rounded-2xl border-stone-200 bg-stone-50 text-base md:text-base"
                         />
                         <div className="mt-2 flex items-center justify-between gap-3">
@@ -1559,7 +1559,7 @@ export default function Dashboard() {
                           aria-live="polite"
                         >
                           {cycleDays === undefined
-                            ? "Chargement de votre calendrier…"
+                            ? "Chargement de ton calendrier…"
                             : isSavingCycleDay
                               ? "Enregistrement…"
                               : "Les notes restent dans le suivi du cycle et sont enregistrées pour la date sélectionnée."}
@@ -1593,7 +1593,7 @@ export default function Dashboard() {
                           </div>
                           {expectedNextPeriod === null && (
                             <p className="mt-3 text-xs text-muted-foreground">
-                              Notez plusieurs cycles pour que l’application
+                              Note plusieurs cycles pour que l’application
                               puisse proposer une estimation personnalisée.
                             </p>
                           )}
@@ -1760,9 +1760,9 @@ export default function Dashboard() {
 
                     {cycleDays?.length === 0 && (
                       <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-                        Votre calendrier est vide pour le moment. Sélectionnez
-                        une date pour commencer ; vous pourrez modifier ou
-                        retirer vos entrées à tout moment.
+                        Ton calendrier est vide pour le moment. Sélectionne
+                        une date pour commencer ; tu pourras modifier ou
+                        retirer tes entrées à tout moment.
                       </p>
                     )}
                   </div>
@@ -1905,7 +1905,7 @@ export default function Dashboard() {
                     </div>
                     {visiblePersonalNotes === undefined ? (
                       <p className="mt-4 text-base text-stone-500">
-                        Chargement de vos notes…
+                        Chargement de tes notes…
                       </p>
                     ) : visiblePersonalNotes.length === 0 ? (
                       <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-base leading-6 text-stone-600">
@@ -2145,9 +2145,9 @@ export default function Dashboard() {
                   Réglages
                 </h1>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Choisissez votre méthode de calcul et autorisez la position de
-                  votre appareil pour afficher les horaires de prière locaux.
-                  Vous trouverez aussi ici les réglages des rappels.
+                  Choisis ta méthode de calcul et autorise l’accès à ta position
+                  sur ton appareil pour afficher les horaires de prière locaux.
+                  Tu trouveras aussi ici les réglages des rappels.
                 </p>
               </section>
             )}
@@ -2166,15 +2166,15 @@ export default function Dashboard() {
                           Horaires de prière
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Calcul gratuit selon votre position
+                          Calcul gratuit selon ta position
                         </p>
                       </div>
                     </div>
 
                     <p className="mt-4 text-xs leading-5 text-stone-600">
-                      Votre position est enregistrée sur cet appareil et envoyée
+                      Ta position est enregistrée sur cet appareil et envoyée
                       à AlAdhan pour calculer les horaires. Elle n’est pas
-                      enregistrée dans votre compte Nour.
+                      enregistrée dans ton compte Nour.
                     </p>
 
                     <div className="mt-4 space-y-3">
@@ -2265,7 +2265,7 @@ export default function Dashboard() {
                       >
                         AlAdhan
                       </a>
-                      . Ils peuvent différer des horaires de votre mosquée.
+                      . Ils peuvent différer des horaires de ta mosquée.
                     </p>
                   </CardContent>
                 </Card>
@@ -2326,7 +2326,7 @@ export default function Dashboard() {
           <footer className="mt-10 flex flex-col gap-2 border-t border-stone-200 pt-5 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
             <span>nour. · Suivi quotidien personnel</span>
             <span>
-              Votre calendrier est enregistré sur votre compte ; les préférences
+              Ton calendrier est enregistré sur ton compte ; tes préférences
               de rappel sont enregistrées sur cet appareil.
             </span>
           </footer>

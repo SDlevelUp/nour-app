@@ -34,7 +34,7 @@ export const recordRepetition = mutation({
   handler: async (ctx, { date, session, invocationId }) => {
     assertDate(date);
     const userId = await getAuthUserId(ctx);
-    if (userId === null) throw new Error("Vous devez être connecté pour enregistrer.");
+    if (userId === null) throw new Error("Connecte-toi pour enregistrer.");
 
     const sequence = adhkarBySession[session];
     const existing = await ctx.db
@@ -77,7 +77,7 @@ export const advance = mutation({
   handler: async (ctx, { date, session, invocationId }) => {
     assertDate(date);
     const userId = await getAuthUserId(ctx);
-    if (userId === null) throw new Error("Vous devez être connecté pour enregistrer.");
+    if (userId === null) throw new Error("Connecte-toi pour enregistrer.");
 
     const sequence = adhkarBySession[session];
     const existing = await ctx.db
@@ -94,7 +94,7 @@ export const advance = mutation({
       currentInvocation.id !== invocationId ||
       existing.repetitionCount < currentInvocation.repetitions
     ) {
-      throw new Error("Récitez toutes les répétitions avant de passer à la suite.");
+      throw new Error("Récite toutes les répétitions avant de passer à la suite.");
     }
 
     await ctx.db.patch(existing._id, {

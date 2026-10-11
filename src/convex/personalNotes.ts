@@ -34,7 +34,7 @@ export const add = mutation({
   handler: async (ctx, { content, title, urgent, color }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connectée pour enregistrer une note.");
+      throw new Error("Connecte-toi pour enregistrer une note.");
 
     const trimmedContent = content.trim();
     if (!trimmedContent) throw new Error("La note ne peut pas être vide.");
@@ -70,7 +70,7 @@ export const update = mutation({
   handler: async (ctx, { noteId, title, content, urgent, color }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null) {
-      throw new Error("Vous devez être connectée pour modifier une note.");
+      throw new Error("Connecte-toi pour modifier une note.");
     }
     const note = await ctx.db.get(noteId);
     if (!note || note.userId !== userId) {
@@ -105,7 +105,7 @@ export const reorder = mutation({
   handler: async (ctx, { noteIds, archived }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null) {
-      throw new Error("Vous devez être connectée pour déplacer les notes.");
+      throw new Error("Connecte-toi pour déplacer les notes.");
     }
     const uniqueIds = new Set(noteIds);
     if (uniqueIds.size !== noteIds.length || noteIds.length > 2000) {
@@ -123,7 +123,7 @@ export const reorder = mutation({
       targetNotes.length !== noteIds.length ||
       noteIds.some((noteId) => !targetNotes.some((note) => note._id === noteId))
     ) {
-      throw new Error("La liste des notes a changé. Réessayez.");
+      throw new Error("La liste des notes a changé. Réessaie.");
     }
 
     await Promise.all(
@@ -161,7 +161,7 @@ export const setArchived = mutation({
   handler: async (ctx, { noteId, archived }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connectée pour modifier cette note.");
+      throw new Error("Connecte-toi pour modifier cette note.");
 
     const note = await ctx.db.get(noteId);
     if (!note || note.userId !== userId) {
@@ -177,7 +177,7 @@ export const remove = mutation({
   handler: async (ctx, { noteId }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connectée pour supprimer cette note.");
+      throw new Error("Connecte-toi pour supprimer cette note.");
 
     const note = await ctx.db.get(noteId);
     if (!note || note.userId !== userId) {

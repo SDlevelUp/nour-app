@@ -220,10 +220,10 @@ export function usePrayerTimes() {
           isLoading: false,
           error:
             error.code === error.PERMISSION_DENIED
-              ? "Autorisez la localisation dans votre navigateur pour afficher les horaires."
+              ? "Autorise la localisation dans ton navigateur pour afficher les horaires."
               : error.code === error.TIMEOUT
-                ? "La demande de localisation a expiré. Réessayez."
-                : "La position n’a pas pu être déterminée. Réessayez.",
+                ? "La demande de localisation a expiré. Réessaie."
+                : "La position n’a pas pu être déterminée. Réessaie.",
         }));
       },
       { enableHighAccuracy: false, maximumAge: 300_000, timeout: 15_000 },

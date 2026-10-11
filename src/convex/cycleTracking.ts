@@ -59,7 +59,7 @@ export const saveDay = mutation({
     }
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     const existing = await ctx.db
       .query("cycleDays")
@@ -109,7 +109,7 @@ export const setPeriodRange = mutation({
 
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     for (let offset = 0; offset < days; offset += 1) {
       const date = new Date(start.getTime() + offset * 86_400_000)
@@ -174,7 +174,7 @@ export const updatePeriodRange = mutation({
 
     const userId = await getAuthUserId(ctx);
     if (userId === null) {
-      throw new Error("Vous devez être connecté pour modifier cette période.");
+      throw new Error("Connecte-toi pour modifier cette période.");
     }
 
     const newDates = new Set<string>();
@@ -246,7 +246,7 @@ export const setLateAlertsEnabled = mutation({
   handler: async (ctx, { enabled }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     const existing = await ctx.db
       .query("cycleSettings")

@@ -68,7 +68,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       setError(
         error instanceof Error
           ? error.message
-          : "Impossible d’envoyer le code de vérification. Réessayez.",
+          : "Impossible d’envoyer le code de vérification. Réessaie.",
       );
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       setError(
         error instanceof Error
           ? error.message
-          : "La connexion avec Google a échoué. Réessayez.",
+          : "La connexion avec Google a échoué. Réessaie.",
       );
       setIsLoading(false);
     }
@@ -144,12 +144,12 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     </button>
                   </div>
                   <CardTitle className="text-xl">
-                    Bienvenue dans votre espace
+                    Bienvenue dans ton espace
                   </CardTitle>
                   <CardDescription>
                     {isDemoMode
-                      ? "Mode test : commencez sans créer de compte."
-                      : "Connectez-vous ou créez votre espace avec Google ou par e-mail"}
+                      ? "Mode test : commence sans créer de compte."
+                      : "Connecte-toi ou crée ton espace avec Google ou par e-mail"}
                   </CardDescription>
                 </CardHeader>
                 {!isDemoMode && (
@@ -270,7 +270,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             ) : (
               <>
                 <CardHeader className="text-center mt-4">
-                  <CardTitle>Vérifiez votre e-mail</CardTitle>
+                  <CardTitle>Vérifie ton e-mail</CardTitle>
                   <CardDescription>
                     Nous avons envoyé un code à {step.email}
                   </CardDescription>
@@ -315,7 +315,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       </p>
                     )}
                     <p className="text-sm text-muted-foreground text-center mt-4">
-                      Vous n’avez pas reçu de code ?{" "}
+                      Tu n’as pas reçu de code ?{" "}
                       <Button
                         type="button"
                         variant="link"
