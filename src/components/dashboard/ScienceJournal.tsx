@@ -6,6 +6,7 @@ import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LearningModule } from "@/components/dashboard/LearningModule";
 
 function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
@@ -437,6 +438,8 @@ export function ScienceJournal() {
           </ol>
         )}
       </section>
+
+      <LearningModule />
 
       <form
         onSubmit={(event) => void saveEntry(event)}

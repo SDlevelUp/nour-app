@@ -126,6 +126,28 @@ const schema = defineSchema(
       position: v.number(),
       createdAt: v.number(),
     }).index("by_user_position", ["userId", "position"]),
+
+    scienceLearningItems: defineTable({
+      userId: v.id("users"),
+      kind: v.union(v.literal("matn"), v.literal("hadith")),
+      title: v.string(),
+      status: v.union(
+        v.literal("to-learn"),
+        v.literal("learning"),
+        v.literal("memorized"),
+      ),
+      portions: v.array(v.string()),
+      reviewDate: v.optional(v.string()),
+      arabic: v.optional(v.string()),
+      transliteration: v.optional(v.string()),
+      translation: v.optional(v.string()),
+      narrator: v.optional(v.string()),
+      collection: v.optional(v.string()),
+      number: v.optional(v.string()),
+      grade: v.optional(v.string()),
+      gradingSource: v.optional(v.string()),
+      createdAt: v.number(),
+    }).index("by_user_createdAt", ["userId", "createdAt"]),
   },
   {
     schemaValidation: false,
