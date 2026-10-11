@@ -6,7 +6,7 @@ import {
   Headphones,
   MoonStar,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
@@ -110,6 +110,9 @@ export function DailyPlanner({
     readPlannerActivities(today),
   );
   const [view, setView] = useState<"day" | "week">("day");
+  const [isAddingActivity, setIsAddingActivity] = useState(false);
+  const [newActivityTitle, setNewActivityTitle] = useState("");
+  const [newActivityTime, setNewActivityTime] = useState("12:00");
   const journalActivities = [
     ...(quranSessions ?? []).map((session) => ({
       id: `quran-session-${session._id}`,
@@ -147,6 +150,26 @@ export function DailyPlanner({
     },
     [today],
   );
+
+  const addTodayActivity = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const title = newActivityTitle.trim();
+    if (!title) return;
+
+    updateTodayActivities([
+      ...activities,
+      {
+        id: `custom-${Date.now()}`,
+        time: newActivityTime,
+        title,
+        detail: "À ton initiative",
+        kind: "custom",
+      },
+    ]);
+    setNewActivityTitle("");
+    setNewActivityTime("12:00");
+    setIsAddingActivity(false);
+  };
 
   return (
     <section
@@ -195,6 +218,60 @@ export function DailyPlanner({
           </button>
         ))}
       </div>
+
+      {view === "day" && (
+        <button
+          type="button"
+          onClick={() => setIsAddingActivity((open) => !open)}
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
+          aria-expanded={isAddingActivity}
+        >
+          <BookOpen className="size-3.5" />
+          {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
+        </button>
+      )}
+
+      {view === "day" && isAddingActivity && (
+        <form
+          onSubmit={addTodayActivity}
+          className="mt-3 grid gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 p-4 sm:grid-cols-[minmax(0,1fr)_130px_auto_auto] sm:items-end"
+        >
+          <label className="text-xs font-medium text-foreground">
+            Ce que je souhaite faire
+            <input
+              value={newActivityTitle}
+              onChange={(event) => setNewActivityTitle(event.target.value)}
+              placeholder="Ex. Lire quelques pages"
+              maxLength={100}
+              required
+              className="mt-1.5 h-10 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+            />
+          </label>
+          <label className="text-xs font-medium text-foreground">
+            Heure
+            <input
+              type="time"
+              value={newActivityTime}
+              onChange={(event) => setNewActivityTime(event.target.value)}
+              required
+              className="mt-1.5 h-10 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+            />
+          </label>
+          <button
+            type="submit"
+            className="h-10 rounded-xl bg-violet-800 px-4 text-xs font-semibold text-white transition hover:bg-violet-900"
+          >
+            Ajouter
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAddingActivity(false)}
+            className="h-10 rounded-xl px-3 text-xs font-medium text-muted-foreground transition hover:bg-white"
+          >
+            Annuler
+          </button>
+        </form>
+      )}
 
       {view === "week" ? (
         <WeeklyPlanner onTodayActivitiesChange={updateTodayActivities} />

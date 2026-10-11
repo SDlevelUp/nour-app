@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  QuranAudioReader,
+  type QuranPlaybackProgress,
+} from "@/components/dashboard/QuranAudioReader";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { BookOpen, Loader2, Plus, Trash2 } from "lucide-react";
@@ -22,6 +26,7 @@ export function QuranJournal() {
   const [pagesOrVerses, setPagesOrVerses] = useState("");
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingAudioProgress, setIsSavingAudioProgress] = useState(false);
   const [pendingDelete, setPendingDelete] =
     useState<Id<"quranReadingLogs"> | null>(null);
 
@@ -48,6 +53,36 @@ export function QuranJournal() {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const saveAudioProgress = async (
+    progress: QuranPlaybackProgress,
+  ): Promise<boolean> => {
+    setIsSavingAudioProgress(true);
+    try {
+      await addEntry({
+        date: todayKey(),
+        time: new Intl.DateTimeFormat("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        }).format(new Date()),
+        passage: `${progress.surah} · récitation suivie`,
+        pagesOrVerses: `Versets ${progress.startAyah} à ${progress.lastCompletedAyah}`,
+        notes: `Récitateur : ${progress.reciter}`,
+      });
+      toast.success("Ta progression d’écoute a été ajoutée au journal.");
+      return true;
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Impossible d’enregistrer cette progression.",
+      );
+      return false;
+    } finally {
+      setIsSavingAudioProgress(false);
     }
   };
 
@@ -90,6 +125,11 @@ export function QuranJournal() {
       <p className="mt-3 text-base leading-6 text-stone-600">
         Note les passages lus et reprends ta lecture là où tu l’as laissée.
       </p>
+
+      <QuranAudioReader
+        isSavingProgress={isSavingAudioProgress}
+        onSaveProgress={saveAudioProgress}
+      />
 
       <form
         onSubmit={(event) => void saveEntry(event)}
