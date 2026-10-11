@@ -50,6 +50,47 @@ type ReminderPreferences = {
 
 type CycleSymptom = Doc<"cycleDays">["symptoms"][number];
 type StickyNoteColor = "yellow" | "pink" | "blue" | "green" | "lavender";
+type PersonalNoteDraft = {
+  title: string;
+  content: string;
+  urgent: boolean;
+  color: StickyNoteColor;
+};
+
+function personalNoteDraftKey(userId: string) {
+  return `nour-personal-note-draft:${userId}`;
+}
+
+function readPersonalNoteDraft(userId: string): PersonalNoteDraft {
+  const emptyDraft: PersonalNoteDraft = {
+    title: "",
+    content: "",
+    urgent: false,
+    color: "yellow",
+  };
+  try {
+    const stored = localStorage.getItem(personalNoteDraftKey(userId));
+    if (!stored) return emptyDraft;
+    const value = JSON.parse(stored) as Partial<PersonalNoteDraft>;
+    const validColors: StickyNoteColor[] = [
+      "yellow",
+      "pink",
+      "blue",
+      "green",
+      "lavender",
+    ];
+    return {
+      title: typeof value.title === "string" ? value.title : "",
+      content: typeof value.content === "string" ? value.content : "",
+      urgent: value.urgent === true,
+      color: validColors.includes(value.color as StickyNoteColor)
+        ? (value.color as StickyNoteColor)
+        : "yellow",
+    };
+  } catch {
+    return emptyDraft;
+  }
+}
 
 const stickyNoteColors: {
   value: StickyNoteColor;
@@ -165,6 +206,9 @@ export default function Dashboard() {
   const [personalNoteUrgent, setPersonalNoteUrgent] = useState(false);
   const [personalNoteColor, setPersonalNoteColor] =
     useState<StickyNoteColor>("yellow");
+  const [personalNoteDraftOwner, setPersonalNoteDraftOwner] = useState<
+    string | null
+  >(null);
   const [editingPersonalNote, setEditingPersonalNote] =
     useState<Id<"personalNotes"> | null>(null);
   const [editNoteTitle, setEditNoteTitle] = useState("");
@@ -368,6 +412,50 @@ export default function Dashboard() {
       entry.isPeriodDay &&
       entry.date.startsWith(format(calendarMonth, "yyyy-MM")),
   ).length;
+
+  useEffect(() => {
+    if (!user?._id) {
+      setPersonalNoteDraftOwner(null);
+      return;
+    }
+
+    const draft = readPersonalNoteDraft(user._id);
+    setPersonalNoteTitle(draft.title);
+    setPersonalNoteDraft(draft.content);
+    setPersonalNoteUrgent(draft.urgent);
+    setPersonalNoteColor(draft.color);
+    setPersonalNoteDraftOwner(user._id);
+  }, [user?._id]);
+
+  useEffect(() => {
+    if (!user?._id || personalNoteDraftOwner !== user._id) return;
+
+    const key = personalNoteDraftKey(user._id);
+    const isEmpty =
+      !personalNoteTitle &&
+      !personalNoteDraft &&
+      !personalNoteUrgent &&
+      personalNoteColor === "yellow";
+    if (isEmpty) {
+      localStorage.removeItem(key);
+      return;
+    }
+
+    const draft: PersonalNoteDraft = {
+      title: personalNoteTitle,
+      content: personalNoteDraft,
+      urgent: personalNoteUrgent,
+      color: personalNoteColor,
+    };
+    localStorage.setItem(key, JSON.stringify(draft));
+  }, [
+    personalNoteColor,
+    personalNoteDraft,
+    personalNoteDraftOwner,
+    personalNoteTitle,
+    personalNoteUrgent,
+    user?._id,
+  ]);
 
   useEffect(() => {
     localStorage.setItem("nour-reminders", JSON.stringify(reminders));
