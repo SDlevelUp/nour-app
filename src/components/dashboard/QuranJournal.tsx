@@ -5,6 +5,7 @@ import {
   QuranAudioReader,
   type QuranPlaybackProgress,
 } from "@/components/dashboard/QuranAudioReader";
+import type { QuranResumePosition } from "@/components/dashboard/quranPlaybackResume";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
@@ -15,7 +16,11 @@ function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
 }
 
-export function QuranJournal() {
+export function QuranJournal({
+  resumePosition = null,
+}: {
+  resumePosition?: QuranResumePosition | null;
+}) {
   const entries = useQuery(api.quranProgress.list, {});
   const addEntry = useMutation(api.quranProgress.add);
   const removeEntry = useMutation(api.quranProgress.remove);
@@ -125,6 +130,7 @@ export function QuranJournal() {
       <QuranAudioReader
         isSavingProgress={isSavingAudioProgress}
         onSaveProgress={saveAudioProgress}
+        resumePosition={resumePosition}
       />
 
       <form

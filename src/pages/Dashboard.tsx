@@ -11,6 +11,12 @@ import {
 } from "@/components/dashboard/dashboardNavigation";
 import { DailyPlanner } from "@/components/dashboard/DailyPlanner";
 import { QuranJournal } from "@/components/dashboard/QuranJournal";
+import {
+  quranResumeEvent,
+  readQuranResumePosition,
+  resumePositionFromReadingLog,
+  type QuranResumePosition,
+} from "@/components/dashboard/quranPlaybackResume";
 import { ScienceJournal } from "@/components/dashboard/ScienceJournal";
 import { usePrayerTimes } from "@/hooks/use-prayer-times";
 import { api } from "@/convex/_generated/api";
@@ -136,6 +142,11 @@ export default function Dashboard() {
     readStored("nour-dark-mode", false),
   );
   const [adhkarSession, setAdhkarSession] = useState<AdhkarSession>("morning");
+  const [quranResumePosition, setQuranResumePosition] = useState(
+    readQuranResumePosition,
+  );
+  const [quranResumeRequest, setQuranResumeRequest] =
+    useState<QuranResumePosition | null>(null);
   const [clock, setClock] = useState(() => Date.now());
   const [isSavingAdhkar, setIsSavingAdhkar] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() =>
@@ -217,6 +228,9 @@ export default function Dashboard() {
   const adhkarSequence = adhkarBySession[adhkarSession];
   const currentInvocation = adhkarSequence[sessionProgress?.currentIndex ?? 0];
   const latestQuranEntry = quranEntries?.[0];
+  const quranResumeTarget =
+    quranResumePosition ??
+    (latestQuranEntry ? resumePositionFromReadingLog(latestQuranEntry) : null);
   const currentMinutes =
     new Date(clock).getHours() * 60 + new Date(clock).getMinutes();
   const asrMinutes = prayer.times
@@ -672,6 +686,17 @@ export default function Dashboard() {
     return () => window.clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const updateQuranResumePosition = (event: Event) => {
+      setQuranResumePosition(
+        (event as CustomEvent<QuranResumePosition>).detail,
+      );
+    };
+    window.addEventListener(quranResumeEvent, updateQuranResumePosition);
+    return () =>
+      window.removeEventListener(quranResumeEvent, updateQuranResumePosition);
+  }, []);
+
   const savePersonalNote = async () => {
     setIsSavingPersonalNote(true);
     try {
@@ -996,20 +1021,30 @@ export default function Dashboard() {
                             Reprendre ma lecture
                           </h2>
                           <p className="mt-2 text-sm leading-5 text-[#405348]">
-                            {latestQuranEntry?.passage ??
+                            {quranResumeTarget?.surah ??
+                              latestQuranEntry?.passage ??
                               "Aucune lecture récente pour le moment."}
                           </p>
-                          {latestQuranEntry?.pagesOrVerses && (
+                          {quranResumeTarget ? (
+                            <p className="mt-1 text-xs text-[#52675A]">
+                              Verset {quranResumeTarget.ayah}
+                            </p>
+                          ) : latestQuranEntry?.pagesOrVerses ? (
                             <p className="mt-1 text-xs text-[#52675A]">
                               {latestQuranEntry.pagesOrVerses}
                             </p>
-                          )}
+                          ) : null}
                           <button
                             type="button"
-                            onClick={() => navigateToView("quran")}
+                            onClick={() => {
+                              setQuranResumeRequest(quranResumeTarget);
+                              navigateToView("quran");
+                            }}
                             className="mt-4 rounded-xl border border-[#5D7C65] px-4 py-2 text-sm font-semibold text-[#35533D] transition hover:bg-[#F1F5EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
                           >
-                            {latestQuranEntry ? "Reprendre" : "Ouvrir Al-Quran"}
+                            {quranResumeTarget
+                              ? "Reprendre"
+                              : "Ouvrir Al-Quran"}
                           </button>
                         </article>
                       </section>
@@ -1023,7 +1058,9 @@ export default function Dashboard() {
                     />
                   )}
 
-                  {activeView === "quran" && <QuranJournal />}
+                  {activeView === "quran" && (
+                    <QuranJournal resumePosition={quranResumeRequest} />
+                  )}
 
                   {activeView === "science" && <ScienceJournal />}
 

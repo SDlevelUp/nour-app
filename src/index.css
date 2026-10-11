@@ -673,4 +673,8 @@
     font-weight: 500;
     letter-spacing: 0;
   }
+
+  .quran-verse {
+    font-family: "Noto Naskh Arabic", serif;
+  }
 }
