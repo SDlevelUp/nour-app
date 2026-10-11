@@ -53,6 +53,8 @@ const schema = defineSchema(
     cycleSettings: defineTable({
       userId: v.id("users"),
       lateAlertsEnabled: v.boolean(),
+      qadaRamadanTotal: v.optional(v.number()),
+      qadaRamadanCompleted: v.optional(v.number()),
     }).index("by_user", ["userId"]),
 
     personalNotes: defineTable({

@@ -232,6 +232,9 @@ export default function Dashboard() {
     null,
   );
   const [isSavingLateAlerts, setIsSavingLateAlerts] = useState(false);
+  const [qadaRamadanTotal, setQadaRamadanTotal] = useState("0");
+  const [qadaRamadanCompleted, setQadaRamadanCompleted] = useState("0");
+  const [isSavingQadaRamadan, setIsSavingQadaRamadan] = useState(false);
   const [reminders, setReminders] = useState<ReminderPreferences>(() =>
     readStored("nour-reminders", defaultReminders),
   );
@@ -262,6 +265,9 @@ export default function Dashboard() {
   const updatePeriodRange = useMutation(api.cycleTracking.updatePeriodRange);
   const setLateAlertsEnabled = useMutation(
     api.cycleTracking.setLateAlertsEnabled,
+  );
+  const setQadaRamadanProgress = useMutation(
+    api.cycleTracking.setQadaRamadanProgress,
   );
   const addPersonalNote = useMutation(api.personalNotes.add);
   const editPersonalNote = useMutation(api.personalNotes.update);
@@ -500,6 +506,15 @@ export default function Dashboard() {
   }, [isDarkMode]);
 
   useEffect(() => {
+    if (!cycleSettings) return;
+    setQadaRamadanTotal(String(cycleSettings.qadaRamadanTotal ?? 0));
+    setQadaRamadanCompleted(String(cycleSettings.qadaRamadanCompleted ?? 0));
+  }, [
+    cycleSettings?.qadaRamadanCompleted,
+    cycleSettings?.qadaRamadanTotal,
+  ]);
+
+  useEffect(() => {
     if (!("Notification" in window) || Notification.permission !== "granted")
       return;
     const checkReminders = () => {
@@ -713,6 +728,23 @@ export default function Dashboard() {
     }
   };
 
+  const saveQadaRamadan = async () => {
+    setIsSavingQadaRamadan(true);
+    try {
+      await setQadaRamadanProgress({
+        total: Number(qadaRamadanTotal),
+        completed: Number(qadaRamadanCompleted),
+      });
+      toast.success("Suivi mis à jour.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible d’enregistrer ce suivi.",
+      );
+    } finally {
+      setIsSavingQadaRamadan(false);
+    }
+  };
+
   const recordCurrentAdhkarRepetition = async () => {
     if (!currentInvocation) return;
     setIsSavingAdhkar(true);
@@ -759,7 +791,7 @@ export default function Dashboard() {
     if (notifiedLateCycle.current === alertKey) return;
     notifiedLateCycle.current = alertKey;
     new Notification("Petit rappel de suivi", {
-      body: "La date estimée de tes règles est passée. Les cycles peuvent varier : consulte ton calendrier quand tu le souhaites.",
+        body: "Ton rappel de suivi est disponible dans Nour.",
       tag: `nour-cycle-late-${alertKey}`,
     });
   }, [
@@ -1715,10 +1747,11 @@ export default function Dashboard() {
                             : "Enregistrer cette plage de règles"}
                         </button>
 
-                        <p className="mt-5 text-sm font-medium">
-                          Observations personnelles (facultatif)
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                        <details className="mt-5 rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                          <summary className="cursor-pointer text-sm font-medium">
+                            Observations personnelles (facultatif)
+                          </summary>
+                          <div className="mt-3 flex flex-wrap gap-2">
                           {cycleSymptoms.map(({ key, label }) => {
                             const selected =
                               selectedEntry?.symptoms.includes(key) ?? false;
@@ -1741,7 +1774,8 @@ export default function Dashboard() {
                               </button>
                             );
                           })}
-                        </div>
+                          </div>
+                        </details>
 
                         <label
                           htmlFor="cycle-personal-note"
@@ -1792,7 +1826,11 @@ export default function Dashboard() {
                               : "Les notes restent dans le suivi du cycle et sont enregistrées pour la date sélectionnée."}
                         </p>
 
-                        <div className="mt-5 border-t border-border/70 pt-4">
+                        <details className="mt-5 border-t border-border/70 pt-4">
+                          <summary className="cursor-pointer text-sm font-medium">
+                            Estimations et rappels du cycle (facultatif)
+                          </summary>
+                          <div className="mt-3">
                           <div className="flex items-center justify-between gap-3">
                             <div>
                               <p className="text-sm font-medium">
@@ -1824,9 +1862,27 @@ export default function Dashboard() {
                               puisse proposer une estimation personnalisée.
                             </p>
                           )}
-                        </div>
+                          </div>
+                        </details>
                       </div>
                     </div>
+
+                    <section className="mt-5 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5" aria-labelledby="qada-heading">
+                      <h3 id="qada-heading" className="font-serif text-xl font-semibold">Suivi personnel du qada Ramadan</h3>
+                      <p className="mt-1 text-sm text-stone-600">TODO — les règles de détermination et de rattrapage sont à valider par une personne de science.</p>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <label className="text-sm">Jours à rattraper
+                          <Input type="number" min="0" max="10000" step="1" value={qadaRamadanTotal} onChange={(event) => setQadaRamadanTotal(event.target.value)} className="mt-1" />
+                        </label>
+                        <label className="text-sm">Jours effectués
+                          <Input type="number" min="0" max={qadaRamadanTotal || 0} step="1" value={qadaRamadanCompleted} onChange={(event) => setQadaRamadanCompleted(event.target.value)} className="mt-1" />
+                        </label>
+                      </div>
+                      <p className="mt-3 text-sm text-stone-600">Restants : {Math.max(0, Number(qadaRamadanTotal) - Number(qadaRamadanCompleted))}</p>
+                      <Button type="button" className="mt-3 bg-emerald-900 text-white hover:bg-emerald-800" disabled={cycleSettings === undefined || isSavingQadaRamadan || !Number.isInteger(Number(qadaRamadanTotal)) || !Number.isInteger(Number(qadaRamadanCompleted)) || Number(qadaRamadanCompleted) > Number(qadaRamadanTotal)} onClick={() => void saveQadaRamadan()}>
+                        {isSavingQadaRamadan ? "Enregistrement…" : "Enregistrer"}
+                      </Button>
+                    </section>
 
                     <div className="mt-5 grid gap-4 lg:grid-cols-2">
                       <section
@@ -1905,16 +1961,16 @@ export default function Dashboard() {
                         )}
                       </section>
 
-                      <section
+                      <details
                         aria-labelledby="cycle-symptoms-heading"
                         className="min-w-0 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5"
                       >
-                        <h3
+                        <summary
                           id="cycle-symptoms-heading"
-                          className="font-serif text-xl font-semibold"
+                          className="cursor-pointer font-serif text-xl font-semibold"
                         >
-                          Symptômes notés
-                        </h3>
+                          Symptômes notés (facultatif)
+                        </summary>
                         <p className="mt-1 text-sm text-stone-500">
                           Retrouve les symptômes associés à chaque date.
                         </p>
@@ -1982,7 +2038,7 @@ export default function Dashboard() {
                               ))}
                           </ul>
                         )}
-                      </section>
+                      </details>
                     </div>
 
                     {cycleDays?.length === 0 && (
