@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /auth
+
+Sitemap: https://muslim-dhikr-companion-main.vercel.app/sitemap.xml

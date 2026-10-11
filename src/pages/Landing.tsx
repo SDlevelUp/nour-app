@@ -3,14 +3,6 @@ import {
   MoonStar,
 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const practices = [
   {
@@ -152,7 +144,6 @@ const howSteps = [
 ];
 
 export default function Landing() {
-  const navigate = useNavigate();
   const [isDarkMode] = useState(() => {
     try {
       return localStorage.getItem("nour-dark-mode") === "true";
@@ -165,7 +156,6 @@ export default function Landing() {
     day: "numeric",
     month: "long",
   }).format(new Date());
-  const openDashboard = () => navigate("/auth?returnTo=%2Fdashboard");
 
   return (
     <MotionConfig reducedMotion="user">
@@ -173,9 +163,8 @@ export default function Landing() {
         className={`landing-page min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300 ${isDarkMode ? "landing-dark" : ""}`}
       >
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
-        <button
-          type="button"
-          onClick={() => navigate("/")}
+        <a
+          href="/"
           className="flex items-center gap-2.5"
           aria-label="Nour, accueil"
         >
@@ -185,7 +174,7 @@ export default function Landing() {
           <span className="text-xl font-semibold tracking-tight">
             nour<span className="text-primary">.</span>
           </span>
-        </button>
+        </a>
 
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a className="transition hover:text-primary" href="#bienfaits">
@@ -199,18 +188,17 @@ export default function Landing() {
           </a>
         </nav>
 
-        <button
-          type="button"
-          onClick={openDashboard}
+        <a
+          href="/auth?returnTo=%2Fdashboard"
           className="group inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/75 px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:bg-white"
         >
           Mon espace
-        </button>
+        </a>
       </header>
 
       <section className="landing-hero relative mx-auto flex max-w-6xl flex-col items-center gap-12 px-5 pb-16 pt-16 text-center sm:px-8 sm:pb-24 sm:pt-20">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
           className="relative z-10 flex w-full flex-col items-center"
@@ -224,13 +212,12 @@ export default function Landing() {
             doux, pensé pour la vraie vie - et pour ton propre rythme.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={openDashboard}
+            <a
+              href="/auth?returnTo=%2Fdashboard"
               className="group inline-flex items-center gap-3 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
             >
               Entrer dans mon espace
-            </button>
+            </a>
             <a
               href="#fonctionnalites"
               className="inline-flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground transition hover:text-primary"
@@ -241,7 +228,7 @@ export default function Landing() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 22, rotate: 1.5 }}
+          initial={false}
           animate={{ opacity: 1, y: 0, rotate: 0 }}
           transition={{ duration: 0.65, delay: 0.1 }}
           className="relative z-10 mx-auto w-full max-w-3xl"
@@ -282,7 +269,7 @@ export default function Landing() {
                 {previewEvents.map((event, index) => (
                   <motion.div
                     key={event.title}
-                    initial={{ opacity: 0, x: 14 }}
+                    initial={false}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.35, delay: 0.22 + index * 0.09 }}
                     className={`grid grid-cols-[48px_1fr] items-stretch gap-2.5 rounded-2xl border p-2.5 sm:grid-cols-[58px_1fr] sm:gap-3 sm:p-3 ${event.tone}`}
@@ -318,7 +305,7 @@ export default function Landing() {
           {practices.map(({ label, detail }, index) => (
             <motion.div
               key={label}
-              initial={{ opacity: 0, y: 8 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.07 }}
@@ -338,7 +325,7 @@ export default function Landing() {
         className="landing-steps relative mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24"
       >
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.5 }}
@@ -357,7 +344,7 @@ export default function Landing() {
           {howSteps.map(({ eyebrow, title, detail, use, previewTitle, previewDetail }, index) => {
             const copy = (
               <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -18 : 18 }}
+                initial={false}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.55, ease: "easeOut" }}
@@ -376,7 +363,7 @@ export default function Landing() {
             );
             const preview = (
               <motion.div
-                initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.55, delay: 0.08, ease: "easeOut" }}
@@ -444,7 +431,7 @@ export default function Landing() {
               {productFeatures.map(({ title, text }, index) => (
                 <motion.div
                   key={title}
-                  initial={{ opacity: 0, x: -12 }}
+                  initial={false}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.35, delay: index * 0.06 }}
@@ -532,7 +519,7 @@ export default function Landing() {
           {productModules.map(({ label }, index) => (
             <motion.div
               key={label}
-              initial={{ opacity: 0, y: 8 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: index * 0.04 }}
@@ -559,26 +546,18 @@ export default function Landing() {
           </h2>
         </div>
 
-        <Accordion
-          type="single"
-          collapsible
-          className="rounded-[24px] border border-white/80 bg-white/75 p-3 shadow-xl shadow-violet-200/20 backdrop-blur-sm"
-        >
+        <div className="rounded-[24px] border border-white/80 bg-white/75 p-3 shadow-xl shadow-violet-200/20 backdrop-blur-sm">
           {faqs.map(({ question, answer }) => (
-            <AccordionItem
-              key={question}
-              value={question}
-              className="rounded-2xl border-b-0 px-2"
-            >
-              <AccordionTrigger className="text-left text-base font-medium text-foreground">
+            <details key={question} className="rounded-2xl px-2 py-3">
+              <summary className="cursor-pointer text-left text-base font-medium text-foreground">
                 {question}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm leading-6 text-muted-foreground">
+              </summary>
+              <p className="pt-2 text-sm leading-6 text-muted-foreground">
                 {answer}
-              </AccordionContent>
-            </AccordionItem>
+              </p>
+            </details>
           ))}
-        </Accordion>
+        </div>
       </section>
 
       <section className="landing-cta mx-5 mb-10 flex flex-col items-center justify-between gap-6 rounded-[34px] border border-white/80 bg-white/55 px-6 py-14 text-center shadow-xl shadow-violet-200/20 backdrop-blur-sm sm:mx-auto sm:max-w-6xl sm:px-10 sm:py-16">
@@ -590,13 +569,12 @@ export default function Landing() {
             Le lien ne se mesure pas au nombre de cases cochées.
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={openDashboard}
+        <a
+          href="/auth?returnTo=%2Fdashboard"
           className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5"
         >
           Continuer vers mon espace
-        </button>
+        </a>
       </section>
 
       <footer className="border-t border-violet-100 px-5 py-6 text-center text-sm text-muted-foreground">
