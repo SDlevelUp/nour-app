@@ -10,7 +10,6 @@ import {
   type DashboardView,
 } from "@/components/dashboard/dashboardNavigation";
 import { DailyPlanner } from "@/components/dashboard/DailyPlanner";
-import { readPlannerActivities } from "@/components/dashboard/plannerActivities";
 import { QuranJournal } from "@/components/dashboard/QuranJournal";
 import {
   quranResumeEvent,
@@ -56,6 +55,7 @@ type PersonalNoteDraft = {
   content: string;
   urgent: boolean;
   color: StickyNoteColor;
+  isTask: boolean;
 };
 
 function personalNoteDraftKey(userId: string) {
@@ -68,6 +68,7 @@ function readPersonalNoteDraft(userId: string): PersonalNoteDraft {
     content: "",
     urgent: false,
     color: "yellow",
+    isTask: false,
   };
   try {
     const stored = localStorage.getItem(personalNoteDraftKey(userId));
@@ -87,6 +88,7 @@ function readPersonalNoteDraft(userId: string): PersonalNoteDraft {
       color: validColors.includes(value.color as StickyNoteColor)
         ? (value.color as StickyNoteColor)
         : "yellow",
+      isTask: value.isTask === true,
     };
   } catch {
     return emptyDraft;
@@ -210,6 +212,7 @@ export default function Dashboard() {
   const [personalNoteUrgent, setPersonalNoteUrgent] = useState(false);
   const [personalNoteColor, setPersonalNoteColor] =
     useState<StickyNoteColor>("yellow");
+  const [personalNoteIsTask, setPersonalNoteIsTask] = useState(false);
   const [personalNoteDraftOwner, setPersonalNoteDraftOwner] = useState<
     string | null
   >(null);
@@ -222,9 +225,9 @@ export default function Dashboard() {
   const [draggedNoteId, setDraggedNoteId] =
     useState<Id<"personalNotes"> | null>(null);
   const [isSavingPersonalNote, setIsSavingPersonalNote] = useState(false);
-  const [notesSection, setNotesSection] = useState<"active" | "archived">(
-    "active",
-  );
+  const [notesSection, setNotesSection] = useState<
+    "active" | "todo" | "done" | "archived"
+  >("active");
   const [pendingNoteAction, setPendingNoteAction] = useState<string | null>(
     null,
   );
@@ -265,6 +268,9 @@ export default function Dashboard() {
   const reorderPersonalNotes = useMutation(api.personalNotes.reorder);
   const markPersonalNotesRead = useMutation(api.personalNotes.markAllRead);
   const setPersonalNoteArchived = useMutation(api.personalNotes.setArchived);
+  const setPersonalTaskCompleted = useMutation(
+    api.personalNotes.setTaskCompleted,
+  );
   const removePersonalNote = useMutation(api.personalNotes.remove);
   const recordAdhkarRepetition = useMutation(
     api.adhkarProgress.recordRepetition,
@@ -309,7 +315,14 @@ export default function Dashboard() {
     currentRepetitionCount >= currentInvocation.repetitions;
   const records = cycleDays ?? [];
   const selectedDayKey = format(selectedDate, "yyyy-MM-dd");
-  const todayActivities = readPlannerActivities(today).slice(0, 3);
+  const todayTasks = (personalNotes ?? [])
+    .filter(
+      (note) =>
+        note.isTask === true &&
+        note.completed !== true &&
+        note.archived !== true,
+    )
+    .slice(0, 3);
   const selectedEntry = records.find((entry) => entry.date === selectedDayKey);
   const noteDraft = noteDrafts[selectedDayKey] ?? selectedEntry?.note ?? "";
   const periodDates = records
@@ -405,7 +418,12 @@ export default function Dashboard() {
     ?.filter((note) =>
       notesSection === "archived"
         ? note.archived === true
-        : note.archived !== true,
+        : note.archived !== true &&
+          (notesSection === "todo"
+            ? note.isTask === true && note.completed !== true
+            : notesSection === "done"
+              ? note.isTask === true && note.completed === true
+              : true),
     )
     .sort(
       (first, second) =>
@@ -429,6 +447,7 @@ export default function Dashboard() {
     setPersonalNoteDraft(draft.content);
     setPersonalNoteUrgent(draft.urgent);
     setPersonalNoteColor(draft.color);
+    setPersonalNoteIsTask(draft.isTask);
     setPersonalNoteDraftOwner(user._id);
   }, [user?._id]);
 
@@ -440,7 +459,8 @@ export default function Dashboard() {
       !personalNoteTitle &&
       !personalNoteDraft &&
       !personalNoteUrgent &&
-      personalNoteColor === "yellow";
+      personalNoteColor === "yellow" &&
+      !personalNoteIsTask;
     if (isEmpty) {
       localStorage.removeItem(key);
       return;
@@ -451,12 +471,14 @@ export default function Dashboard() {
       content: personalNoteDraft,
       urgent: personalNoteUrgent,
       color: personalNoteColor,
+      isTask: personalNoteIsTask,
     };
     localStorage.setItem(key, JSON.stringify(draft));
   }, [
     personalNoteColor,
     personalNoteDraft,
     personalNoteDraftOwner,
+    personalNoteIsTask,
     personalNoteTitle,
     personalNoteUrgent,
     user?._id,
@@ -798,11 +820,13 @@ export default function Dashboard() {
         title: personalNoteTitle || undefined,
         urgent: personalNoteUrgent,
         color: personalNoteColor,
+        isTask: personalNoteIsTask,
       });
       setPersonalNoteDraft("");
       setPersonalNoteTitle("");
       setPersonalNoteUrgent(false);
       setPersonalNoteColor("yellow");
+      setPersonalNoteIsTask(false);
       toast.success("Note enregistrée.");
     } catch (error) {
       toast.error(
@@ -841,6 +865,7 @@ export default function Dashboard() {
   const reorderPersonalNote = async (targetNoteId: Id<"personalNotes">) => {
     if (!draggedNoteId || draggedNoteId === targetNoteId) return;
     const archived = notesSection === "archived";
+    if (notesSection === "todo" || notesSection === "done") return;
     const notes = (personalNotes ?? [])
       .filter((note) => (note.archived === true) === archived)
       .sort(
@@ -882,6 +907,24 @@ export default function Dashboard() {
         error instanceof Error
           ? error.message
           : "Impossible de modifier cette note.",
+      );
+    } finally {
+      setPendingNoteAction(null);
+    }
+  };
+
+  const updatePersonalTaskCompletion = async (
+    noteId: Id<"personalNotes">,
+    completed: boolean,
+  ) => {
+    setPendingNoteAction(noteId);
+    try {
+      await setPersonalTaskCompleted({ noteId, completed });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Impossible de mettre à jour cette tâche.",
       );
     } finally {
       setPendingNoteAction(null);
@@ -1150,34 +1193,44 @@ export default function Dashboard() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => navigateToView("salah")}
+                          onClick={() => navigateToView("notes")}
                           className="rounded-xl border border-[#DCE5DC] px-3 py-2 text-sm font-medium text-[#35533D] transition hover:bg-[#EEF4EE]"
                         >
-                          Modifier dans Planning
+                          Gérer les tâches
                         </button>
                       </div>
                       <p className="mt-4 rounded-xl bg-[#EEF4EE] px-3 py-2 text-sm text-[#405348]">
                         Rappel du jour : TODO — contenu validé à sélectionner.
                       </p>
-                      {todayActivities.length > 0 ? (
+                      {todayTasks.length > 0 ? (
                         <ul className="mt-4 space-y-2">
-                          {todayActivities.map((activity) => (
+                          {todayTasks.map((task) => (
                             <li
-                              key={activity.id}
-                              className="rounded-xl border border-[#E7EDE6] px-4 py-3"
+                              key={task._id}
+                              className="flex items-start gap-3 rounded-xl border border-[#E7EDE6] px-4 py-3"
                             >
+                              <input
+                                type="checkbox"
+                                checked={task.completed === true}
+                                disabled={pendingNoteAction === task._id}
+                                onChange={(event) =>
+                                  void updatePersonalTaskCompletion(
+                                    task._id,
+                                    event.target.checked,
+                                  )
+                                }
+                                aria-label={`Marquer « ${task.title || task.content.split("\n")[0]} » comme terminée`}
+                                className="mt-0.5 size-4 accent-[#5F7F68]"
+                              />
                               <p className="text-sm font-medium text-[#26362A]">
-                                {activity.title}
-                              </p>
-                              <p className="mt-1 text-xs text-[#52675A]">
-                                {activity.time} · {activity.detail}
+                                {task.title || task.content.split("\n")[0]}
                               </p>
                             </li>
                           ))}
                         </ul>
                       ) : (
                         <p className="mt-4 text-sm text-[#52675A]">
-                          Ajoute les activités que tu souhaites dans ton planning.
+                          Aucune tâche pour aujourd’hui. Ajoute-en une dans Notes.
                         </p>
                       )}
                     </section>
@@ -1995,6 +2048,17 @@ export default function Dashboard() {
                       placeholder="Écris ton idée ou ton rappel…"
                       className="mt-1.5 min-h-28 resize-y rounded-2xl border-stone-200 bg-white text-base md:text-base"
                     />
+                    <label className="mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
+                      <input
+                        type="checkbox"
+                        checked={personalNoteIsTask}
+                        onChange={(event) =>
+                          setPersonalNoteIsTask(event.target.checked)
+                        }
+                        className="size-4 accent-[#5F7F68]"
+                      />
+                      Ajouter aussi à mes tâches
+                    </label>
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                       <fieldset>
                         <legend className="mb-2 text-[15px] font-medium text-stone-700">
@@ -2013,16 +2077,16 @@ export default function Dashboard() {
                           ))}
                         </div>
                       </fieldset>
-                      <label className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[15px] font-medium text-rose-800">
+                      <label className="inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
                         <input
                           type="checkbox"
                           checked={personalNoteUrgent}
                           onChange={(event) =>
                             setPersonalNoteUrgent(event.target.checked)
                           }
-                          className="size-4 accent-rose-700"
+                          className="size-4 accent-[#5F7F68]"
                         />
-                        Urgent
+                        Importante
                       </label>
                     </div>
                     <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -2041,7 +2105,9 @@ export default function Dashboard() {
                       >
                         {isSavingPersonalNote
                           ? "Enregistrement…"
-                          : "Ajouter un post-it"}
+                          : personalNoteIsTask
+                            ? "Ajouter à mes tâches"
+                            : "Ajouter un post-it"}
                       </Button>
                     </div>
                   </form>
@@ -2051,12 +2117,18 @@ export default function Dashboard() {
                       <h2 className="text-base font-semibold text-stone-900">
                         {notesSection === "active"
                           ? "Mes notes"
-                          : "Notes archivées"}
+                          : notesSection === "todo"
+                            ? "À faire"
+                            : notesSection === "done"
+                              ? "Faites"
+                              : "Notes archivées"}
                       </h2>
                       <div className="flex rounded-xl border border-stone-200 bg-stone-50 p-1">
                         {(
                           [
                             { id: "active", label: "Notes" },
+                            { id: "todo", label: "À faire" },
+                            { id: "done", label: "Faites" },
                             { id: "archived", label: "Archivées" },
                           ] as const
                         ).map(({ id, label }) => (
@@ -2084,7 +2156,11 @@ export default function Dashboard() {
                       <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-base leading-6 text-stone-600">
                         {notesSection === "archived"
                           ? "Aucune note archivée pour le moment."
-                          : "Aucun post-it pour le moment. Ajoute ta première note juste au-dessus."}
+                          : notesSection === "todo"
+                            ? "Aucune tâche à faire."
+                            : notesSection === "done"
+                              ? "Aucune tâche terminée pour le moment."
+                              : "Aucun post-it pour le moment. Ajoute ta première note juste au-dessus."}
                       </p>
                     ) : (
                       <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2102,7 +2178,11 @@ export default function Dashboard() {
                           return (
                             <li
                               key={note._id}
-                              draggable={!isEditing}
+                              draggable={
+                                !isEditing &&
+                                (notesSection === "active" ||
+                                  notesSection === "archived")
+                              }
                               onDragStart={(event) => {
                                 setDraggedNoteId(note._id);
                                 event.dataTransfer.effectAllowed = "move";
@@ -2172,9 +2252,9 @@ export default function Dashboard() {
                                             event.target.checked,
                                           )
                                         }
-                                        className="size-4 accent-rose-700"
+                                        className="size-4 accent-[#5F7F68]"
                                       />
-                                      Urgent
+                                      Importante
                                     </label>
                                   </div>
                                   <div className="flex justify-end gap-2">
@@ -2218,11 +2298,37 @@ export default function Dashboard() {
                                       })}
                                     </time>
                                   </div>
-                                  {note.urgent && (
-                                    <span className="relative z-10 mt-3 inline-flex rounded-full bg-rose-700 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                                      Urgent
-                                    </span>
-                                  )}
+                                  <div className="relative z-10 mt-3 flex items-center justify-between gap-3">
+                                    {note.isTask === true && (
+                                      <label className="inline-flex items-center gap-2 text-sm text-stone-700">
+                                        <input
+                                          type="checkbox"
+                                          checked={note.completed === true}
+                                          disabled={pendingNoteAction === note._id}
+                                          onChange={(event) =>
+                                            void updatePersonalTaskCompletion(
+                                              note._id,
+                                              event.target.checked,
+                                            )
+                                          }
+                                          aria-label={
+                                            note.completed
+                                              ? "Marquer comme à faire"
+                                              : "Marquer comme terminée"
+                                          }
+                                          className="size-4 accent-[#5F7F68]"
+                                        />
+                                        Tâche
+                                      </label>
+                                    )}
+                                    {note.urgent && (
+                                      <span
+                                        aria-label="Importante"
+                                        title="Importante"
+                                        className="ml-auto size-2 rounded-full bg-[#8A744C]"
+                                      />
+                                    )}
+                                  </div>
                                   <h3 className="relative z-10 mt-3 wrap-break-words font-serif text-xl font-semibold leading-6 text-stone-900">
                                     {noteTitle}
                                   </h3>

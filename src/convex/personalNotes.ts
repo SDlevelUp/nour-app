@@ -30,8 +30,9 @@ export const add = mutation({
     title: v.optional(v.string()),
     urgent: v.optional(v.boolean()),
     color: v.optional(noteColorValidator),
+    isTask: v.optional(v.boolean()),
   },
-  handler: async (ctx, { content, title, urgent, color }) => {
+  handler: async (ctx, { content, title, urgent, color, isTask }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
       throw new Error("Connecte-toi pour enregistrer une note.");
@@ -53,6 +54,8 @@ export const add = mutation({
       createdAt: Date.now(),
       isUnread: true,
       urgent: urgent ?? false,
+      isTask: isTask ?? false,
+      completed: false,
       color: color ?? "yellow",
       position: Date.now(),
     });
@@ -169,6 +172,25 @@ export const setArchived = mutation({
     }
 
     await ctx.db.patch(noteId, { archived });
+  },
+});
+
+export const setTaskCompleted = mutation({
+  args: {
+    noteId: v.id("personalNotes"),
+    completed: v.boolean(),
+  },
+  handler: async (ctx, { noteId, completed }) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null)
+      throw new Error("Connecte-toi pour modifier cette tâche.");
+
+    const note = await ctx.db.get(noteId);
+    if (!note || note.userId !== userId || note.isTask !== true) {
+      throw new Error("Cette tâche est introuvable.");
+    }
+
+    await ctx.db.patch(noteId, { completed });
   },
 });
 

@@ -63,6 +63,8 @@ const schema = defineSchema(
       isUnread: v.boolean(),
       archived: v.optional(v.boolean()),
       urgent: v.optional(v.boolean()),
+      isTask: v.optional(v.boolean()),
+      completed: v.optional(v.boolean()),
       color: v.optional(
         v.union(
           v.literal("yellow"),
