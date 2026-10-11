@@ -110,6 +110,20 @@ const schema = defineSchema(
     })
       .index("by_user_createdAt", ["userId", "createdAt"])
       .index("by_user_date", ["userId", "date"]),
+
+    scienceBooks: defineTable({
+      userId: v.id("users"),
+      title: v.string(),
+      author: v.string(),
+      notes: v.optional(v.string()),
+      status: v.union(
+        v.literal("to-read"),
+        v.literal("in-progress"),
+        v.literal("read"),
+      ),
+      position: v.number(),
+      createdAt: v.number(),
+    }).index("by_user_position", ["userId", "position"]),
   },
   {
     schemaValidation: false,
