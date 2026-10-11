@@ -61,6 +61,7 @@ export function QuranAudioReader({
 }) {
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [reciters, setReciters] = useState<Reciter[]>([]);
+  const [basmala, setBasmala] = useState("");
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [selectedReciter, setSelectedReciter] = useState("ar.alafasy");
   const [surahData, setSurahData] = useState<SurahAudio | null>(null);
@@ -93,10 +94,12 @@ export function QuranAudioReader({
         `${API}/edition?format=audio&language=ar&type=versebyverse`,
         controller.signal,
       ),
+      fetchApi<Ayah>(`${API}/ayah/1/ar.alafasy`, controller.signal),
     ])
-      .then(([surahList, reciterList]) => {
+      .then(([surahList, reciterList, basmalaAyah]) => {
         setSurahs(surahList);
         setReciters(reciterList);
+        setBasmala(basmalaAyah.text.replace(/^\uFEFF/, "").trim());
       })
       .catch((cause: unknown) => {
         if (!controller.signal.aborted) {
@@ -267,6 +270,13 @@ export function QuranAudioReader({
   const activeAyah = surahData?.ayahs.find(
     (ayah) => ayah.numberInSurah === currentAyah,
   );
+  const shouldShowBasmala =
+    currentAyah === 1 && selectedSurah !== 1 && selectedSurah !== 9 && !!basmala;
+  const rawAyahText = activeAyah?.text.replace(/^\uFEFF/, "").trim() ?? "";
+  const displayAyahText =
+    shouldShowBasmala && rawAyahText.startsWith(basmala)
+      ? rawAyahText.slice(basmala.length).trim()
+      : rawAyahText;
   const handleEnded = () => {
     if (repeatCount === 0 || repeatNumber < repeatCount) {
       setRepeatNumber((count) => count + 1);
@@ -440,12 +450,21 @@ export function QuranAudioReader({
               {repeatCount === 0 ? "Boucle" : `${repeatNumber}/${repeatCount}`}
             </span>
           </div>
+          {shouldShowBasmala && (
+            <p
+              lang="ar"
+              dir="rtl"
+              className="quran-verse mt-5 text-center text-2xl leading-[2] text-stone-700 sm:text-3xl"
+            >
+              {basmala}
+            </p>
+          )}
           <p
             lang="ar"
             dir="rtl"
             className="quran-verse mt-5 text-right text-3xl leading-[2] text-stone-900 sm:text-4xl"
           >
-            {activeAyah.text.replace(/^\uFEFF/, "")}
+            {displayAyahText}
           </p>
           <audio
             ref={audioRef}
