@@ -183,6 +183,9 @@ export default function Dashboard() {
     readStored("nour-dark-mode", false),
   );
   const [adhkarSession, setAdhkarSession] = useState<AdhkarSession>("morning");
+  const [showAdhkarTransliteration, setShowAdhkarTransliteration] =
+    useState(true);
+  const [showAdhkarTranslation, setShowAdhkarTranslation] = useState(true);
   const [quranResumePosition, setQuranResumePosition] = useState(
     readQuranResumePosition,
   );
@@ -1244,18 +1247,64 @@ export default function Dashboard() {
                             >
                               {currentInvocation.arabic}
                             </div>
+                            <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
+                              <label className="inline-flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={showAdhkarTransliteration}
+                                  onChange={(event) =>
+                                    setShowAdhkarTransliteration(
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+                                Translittération
+                              </label>
+                              <label className="inline-flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={showAdhkarTranslation}
+                                  onChange={(event) =>
+                                    setShowAdhkarTranslation(
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+                                Traduction
+                              </label>
+                            </div>
                             <h3 className="study-prose mt-5 text-xl">
                               {currentInvocation.title}
                             </h3>
-                            <p className="study-prose mt-2 text-sm italic text-muted-foreground">
-                              {currentInvocation.transliteration}
-                            </p>
-                            <p className="study-prose mt-3 text-sm text-foreground">
-                              {currentInvocation.meaning}
-                            </p>
-                            <p className="mt-3 text-[10px] text-muted-foreground">
-                              Source : {currentInvocation.source}
-                            </p>
+                            {showAdhkarTransliteration && (
+                              <p className="study-prose mt-2 text-sm italic text-muted-foreground">
+                                {currentInvocation.transliteration}
+                              </p>
+                            )}
+                            {showAdhkarTranslation && (
+                              <p className="study-prose mt-3 text-sm text-foreground">
+                                {currentInvocation.meaning}
+                              </p>
+                            )}
+                            <details className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">
+                              <summary className="cursor-pointer font-medium text-stone-800">
+                                Preuve
+                              </summary>
+                              <dl className="mt-3 space-y-1.5">
+                                <div>
+                                  <dt className="inline font-medium">Référence indiquée : </dt>
+                                  <dd className="inline">{currentInvocation.source} — à vérifier dans l’édition retenue.</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Rapporteur : </dt>
+                                  <dd className="inline">TODO — à vérifier par une personne de science.</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Degré et source de classification : </dt>
+                                  <dd className="inline">TODO — à vérifier par une personne de science.</dd>
+                                </div>
+                              </dl>
+                            </details>
 
                             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                               <Button

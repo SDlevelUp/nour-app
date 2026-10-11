@@ -69,6 +69,8 @@ export function QuranAudioReader({
   const [endAyah, setEndAyah] = useState(1);
   const [currentAyah, setCurrentAyah] = useState(1);
   const [repeatCount, setRepeatCount] = useState(1);
+  const [showTransliteration, setShowTransliteration] = useState(true);
+  const [showTranslation, setShowTranslation] = useState(true);
   const [repeatNumber, setRepeatNumber] = useState(1);
   const [lastCompletedAyah, setLastCompletedAyah] = useState(0);
   const [isProgressSaved, setIsProgressSaved] = useState(false);
@@ -465,6 +467,39 @@ export function QuranAudioReader({
             className="quran-verse mt-5 text-right text-3xl leading-[2] text-stone-900 sm:text-4xl"
           >
             {displayAyahText}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showTransliteration}
+                onChange={(event) =>
+                  setShowTransliteration(event.target.checked)
+                }
+              />
+              Translittération
+            </label>
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showTranslation}
+                onChange={(event) => setShowTranslation(event.target.checked)}
+              />
+              Traduction française
+            </label>
+          </div>
+          {showTransliteration && (
+            <p className="mt-2 text-sm text-stone-500">
+              TODO — translittération à valider.
+            </p>
+          )}
+          {showTranslation && (
+            <p className="mt-2 text-sm text-stone-500">
+              TODO — traduction française et édition à valider.
+            </p>
+          )}
+          <p className="mt-2 text-xs text-stone-500">
+            Source : {selectedSurahData?.englishName} {selectedSurah} : {currentAyah}
           </p>
           <audio
             ref={audioRef}
