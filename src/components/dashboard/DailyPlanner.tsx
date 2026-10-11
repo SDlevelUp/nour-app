@@ -1,11 +1,3 @@
-import {
-  BookOpen,
-  CalendarDays,
-  Clock3,
-  GraduationCap,
-  Headphones,
-  MoonStar,
-} from "lucide-react";
 import { useCallback, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -25,7 +17,6 @@ type PlannerEvent = {
   title: string;
   detail: string;
   kind: "prayer" | PlannerActivity["kind"];
-  icon: typeof MoonStar;
 };
 
 function getPlannerEvents(
@@ -39,7 +30,6 @@ function getPlannerEvents(
       title: "Fajr & Adhkar du matin",
       detail: "Prière selon son horaire local, puis invocations du matin",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.dhuhr ?? "13:00",
@@ -47,7 +37,6 @@ function getPlannerEvents(
       title: "Dhuhr",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.asr ?? "16:30",
@@ -55,7 +44,6 @@ function getPlannerEvents(
       title: "Asr & Adhkar du soir",
       detail: "Prière selon son horaire local, puis invocations du soir",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.maghrib ?? "19:00",
@@ -63,7 +51,6 @@ function getPlannerEvents(
       title: "Maghrib",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.isha ?? "20:00",
@@ -71,19 +58,9 @@ function getPlannerEvents(
       title: "Isha",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
   ];
-  const activityEvents = activities.map((activity) => ({
-    ...activity,
-    icon:
-      activity.kind === "science" || activity.kind === "science-session"
-        ? GraduationCap
-        : activity.kind === "listening"
-          ? Headphones
-          : BookOpen,
-  }));
-  return [...prayerEvents, ...activityEvents].sort((a, b) =>
+  return [...prayerEvents, ...activities].sort((a, b) =>
     a.time.localeCompare(b.time),
   );
 }
@@ -186,7 +163,6 @@ export function DailyPlanner({
           </h2>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[10px] text-stone-600">
-          <Clock3 className="size-3.5" />
           {prayerTimes ? "Horaires locaux calculés" : "Horaires indicatifs"}
         </span>
       </div>
@@ -198,10 +174,10 @@ export function DailyPlanner({
       >
         {(
           [
-            { id: "day", label: "Jour", icon: Clock3 },
-            { id: "week", label: "Semaine", icon: CalendarDays },
+            { id: "day", label: "Jour" },
+            { id: "week", label: "Semaine" },
           ] as const
-        ).map(({ id, label, icon: Icon }) => (
+        ).map(({ id, label }) => (
           <button
             key={id}
             type="button"
@@ -213,7 +189,6 @@ export function DailyPlanner({
                 : "text-stone-500 hover:text-stone-800"
             }`}
           >
-            <Icon className="size-3.5" />
             {label}
           </button>
         ))}
@@ -226,7 +201,6 @@ export function DailyPlanner({
           className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
           aria-expanded={isAddingActivity}
         >
-          <BookOpen className="size-3.5" />
           {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
         </button>
       )}
@@ -285,7 +259,6 @@ export function DailyPlanner({
 
           {isExcusePeriod && (
             <div className="mt-4 flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-950">
-              <Headphones className="size-4 shrink-0" />
               <span>
                 Période d'indisponibilité active. Focus sur l'écoute du Coran et
                 l'étude de la science.
@@ -315,7 +288,6 @@ export function DailyPlanner({
                         title,
                         detail,
                         kind,
-                        icon: Icon,
                       }) => (
                         <article
                           key={`${kind}-${title}`}
@@ -331,7 +303,6 @@ export function DailyPlanner({
                             <span className="mt-0.5 text-[10px] font-semibold tabular-nums text-stone-600">
                               {displayTime ?? time}
                             </span>
-                            <Icon className="mt-0.5 size-4 shrink-0 text-stone-600" />
                             <div>
                               <h3 className="text-xs font-semibold text-stone-900 sm:text-sm">
                                 {title}

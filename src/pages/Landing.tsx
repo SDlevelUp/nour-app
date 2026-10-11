@@ -1,17 +1,6 @@
 import { MotionConfig, motion } from "framer-motion";
 import {
-  ArrowDownRight,
-  ArrowRight,
-  Bell,
-  BookMarked,
-  BookOpen,
-  CalendarClock,
-  CalendarDays,
-  Check,
-  GraduationCap,
-  Heart,
   MoonStar,
-  Sun,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -25,17 +14,14 @@ import {
 
 const practices = [
   {
-    icon: MoonStar,
     label: "Dhikr",
     detail: "Un instant de rappel, à ton rythme.",
   },
   {
-    icon: Sun,
     label: "Adhkars",
     detail: "Les invocations du matin et du soir.",
   },
   {
-    icon: Heart,
     label: "Bienveillance",
     detail: "Rien à rattraper, rien à prouver.",
   },
@@ -43,38 +29,33 @@ const practices = [
 
 const productFeatures = [
   {
-    icon: CalendarClock,
     title: "Prières & planning",
     text: "Retrouve tes horaires et les repères de ta journée dans un espace clair.",
   },
   {
-    icon: MoonStar,
     title: "Adhkar du matin et du soir",
     text: "Suis les invocations pas à pas et reprends ta routine à ton rythme.",
   },
   {
-    icon: BookMarked,
     title: "Journal Al-Qur’an",
     text: "Note les passages lus et retrouve où tu en étais dans ta lecture.",
   },
   {
-    icon: Heart,
     title: "Suivi des périodes",
     text: "Garde tes repères de cycle et adapte l’affichage de ton planning.",
   },
   {
-    icon: GraduationCap,
     title: "Science bénéfique",
     text: "Note ce que tu apprends et conserve la source associée à chaque note.",
   },
 ];
 
 const productModules = [
-  { icon: CalendarDays, label: "Planning", tone: "bg-[#EEF5E9]" },
-  { icon: MoonStar, label: "Adhkar", tone: "bg-[#F2ECFB]" },
-  { icon: BookOpen, label: "Al-Qur’an", tone: "bg-[#F7F2E7]" },
-  { icon: Heart, label: "Périodes", tone: "bg-[#EEF5E9]" },
-  { icon: GraduationCap, label: "Science bénéfique", tone: "bg-[#F2ECFB]" },
+  { label: "Planning" },
+  { label: "Adhkar" },
+  { label: "Al-Qur’an" },
+  { label: "Périodes" },
+  { label: "Science bénéfique" },
 ];
 
 const faqs = [
@@ -133,7 +114,6 @@ const previewEvents = [
 
 const howSteps = [
   {
-    icon: BookOpen,
     eyebrow: "01 · Adhkar",
     title: "Retrouve les invocations du matin et du soir",
     detail:
@@ -143,7 +123,6 @@ const howSteps = [
     previewDetail: "Invocation 3 sur 8",
   },
   {
-    icon: Sun,
     eyebrow: "02 · Planning",
     title: "Rassemble tes repères pour la journée",
     detail:
@@ -153,7 +132,6 @@ const howSteps = [
     previewDetail: "Fajr · Dhuhr · Asr · Maghrib",
   },
   {
-    icon: Heart,
     eyebrow: "03 · À ton rythme",
     title: "Adapte ton espace à ta situation",
     detail:
@@ -163,7 +141,6 @@ const howSteps = [
     previewDetail: "Planning adapté à ta situation",
   },
   {
-    icon: Bell,
     eyebrow: "04 · Petits pas",
     title: "Reprends quand tu le souhaites",
     detail:
@@ -228,7 +205,6 @@ export default function Landing() {
           className="group inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/75 px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:bg-white"
         >
           Mon espace
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
         </button>
       </header>
 
@@ -254,13 +230,12 @@ export default function Landing() {
               className="group inline-flex items-center gap-3 rounded-xl bg-violet-800 px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
             >
               Entrer dans mon espace
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </button>
             <a
               href="#fonctionnalites"
               className="inline-flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground transition hover:text-primary"
             >
-              Découvrir Nour <ArrowDownRight className="size-4" />
+              Découvrir Nour
             </a>
           </div>
         </motion.div>
@@ -295,7 +270,6 @@ export default function Landing() {
                     key={name}
                     className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-white px-2.5 py-1.5 text-xs text-primary"
                   >
-                    <MoonStar className="size-3 text-primary" />
                     {name}
                     <span className="tabular-nums text-muted-foreground">
                       {time}
@@ -328,7 +302,6 @@ export default function Landing() {
                           {event.detail}
                         </span>
                       </span>
-                      <Check className="ml-auto size-4 shrink-0 text-primary/70" />
                     </div>
                   </motion.div>
                 ))}
@@ -342,7 +315,7 @@ export default function Landing() {
       </section>
       <section id="bienfaits" className="border-y border-white/70 bg-white/55 backdrop-blur">
         <div className="mx-auto grid max-w-6xl divide-y divide-violet-100 px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0">
-          {practices.map(({ icon: Icon, label, detail }, index) => (
+          {practices.map(({ label, detail }, index) => (
             <motion.div
               key={label}
               initial={{ opacity: 0, y: 8 }}
@@ -351,9 +324,6 @@ export default function Landing() {
               transition={{ delay: index * 0.07 }}
               className="flex items-center gap-3 py-5 md:px-6 md:py-6 first:md:pl-0 last:md:pr-0"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-white text-primary">
-                <Icon className="size-4" />
-              </span>
               <div>
                 <p className="text-sm font-semibold">{label}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{detail}</p>
@@ -384,7 +354,7 @@ export default function Landing() {
         </motion.div>
 
         <div className="landing-timeline relative space-y-7 sm:space-y-10">
-          {howSteps.map(({ icon: Icon, eyebrow, title, detail, use, previewTitle, previewDetail }, index) => {
+          {howSteps.map(({ eyebrow, title, detail, use, previewTitle, previewDetail }, index) => {
             const copy = (
               <motion.div
                 initial={{ opacity: 0, x: index % 2 === 0 ? -18 : 18 }}
@@ -413,9 +383,6 @@ export default function Landing() {
                 className="landing-step-preview rounded-[24px] border border-white/90 bg-white/75 p-4 shadow-xl shadow-violet-300/15 backdrop-blur sm:p-5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-violet-100/80 text-violet-800">
-                    <Icon className="size-5" />
-                  </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-foreground">
                       {previewTitle}
@@ -441,16 +408,6 @@ export default function Landing() {
                 <div className={index % 2 === 0 ? "sm:col-start-1" : "sm:col-start-3 sm:row-start-1"}>
                   {copy}
                 </div>
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: 0.1 }}
-                  className="landing-step-node absolute left-0 top-5 z-10 hidden size-11 items-center justify-center rounded-2xl border border-white bg-white text-violet-800 shadow-md shadow-violet-200/40 sm:static sm:col-start-2 sm:row-start-1 sm:flex"
-                  aria-hidden="true"
-                >
-                  <Icon className="size-5" />
-                </motion.span>
                 <div className={index % 2 === 0 ? "sm:col-start-3 sm:row-start-1" : "sm:col-start-1 sm:row-start-1"}>
                   {preview}
                 </div>
@@ -484,7 +441,7 @@ export default function Landing() {
               Ta pratique, tes repères, au même endroit.
             </h3>
             <div className="mt-7 space-y-5">
-              {productFeatures.map(({ icon: Icon, title, text }, index) => (
+              {productFeatures.map(({ title, text }, index) => (
                 <motion.div
                   key={title}
                   initial={{ opacity: 0, x: -12 }}
@@ -493,9 +450,6 @@ export default function Landing() {
                   transition={{ duration: 0.35, delay: index * 0.06 }}
                   className="flex items-start gap-3.5"
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white bg-white/85 text-violet-800 shadow-sm">
-                    <Icon className="size-[18px]" />
-                  </span>
                   <div>
                     <h4 className="text-base font-semibold text-foreground">
                       {title}
@@ -512,9 +466,6 @@ export default function Landing() {
           <div className="landing-product-window rounded-[26px] border border-white bg-white/90 p-3 shadow-2xl shadow-violet-300/25 sm:p-4">
             <div className="flex items-center justify-between gap-3 border-b border-violet-100 px-2 pb-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex size-8 items-center justify-center rounded-lg bg-violet-800 text-white">
-                  <MoonStar className="size-4" />
-                </span>
                 <span className="text-sm font-bold tracking-tight text-foreground">
                   nour
                 </span>
@@ -530,7 +481,6 @@ export default function Landing() {
                 <p className="text-lg font-semibold sm:text-xl">
                   Salam, bienvenue
                 </p>
-                <MoonStar className="size-5 shrink-0 text-[#DCCAF8]" />
               </div>
               <p className="mt-1 text-xs text-white/75">
                 Un endroit pour retrouver tes repères, à ton rythme.
@@ -540,7 +490,6 @@ export default function Landing() {
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="rounded-xl border border-[#E8E1EF] bg-[#F8F5FC] p-3 sm:col-span-2">
                 <div className="flex items-center gap-2 text-violet-800">
-                  <CalendarClock className="size-4" />
                   <p className="text-xs font-semibold">Horaires de prière</p>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -552,24 +501,24 @@ export default function Landing() {
                 </div>
               </div>
               <div className="rounded-xl border border-[#DFEBDD] bg-[#F1F7EF] p-3">
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-[#48694C]">
-                  <Sun className="size-4" /> Routine du jour
+                <p className="text-xs font-semibold text-[#48694C]">
+                  Routine du jour
                 </p>
                 <p className="mt-2 text-[11px] leading-4 text-[#6E806F]">
                   Adhkar du matin et du soir
                 </p>
               </div>
               <div className="rounded-xl border border-[#E8E1EF] bg-white p-3 sm:col-span-2">
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-violet-800">
-                  <BookOpen className="size-4" /> Journal Al-Qur’an
+                <p className="text-xs font-semibold text-violet-800">
+                  Journal Al-Qur’an
                 </p>
                 <p className="mt-2 text-[11px] leading-4 text-muted-foreground">
                   Note ta lecture et retrouve le passage où tu t’es arrêtée.
                 </p>
               </div>
               <div className="rounded-xl border border-[#DFEBDD] bg-[#F1F7EF] p-3">
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-[#48694C]">
-                  <Heart className="size-4" /> Mes repères
+                <p className="text-xs font-semibold text-[#48694C]">
+                  Mes repères
                 </p>
                 <p className="mt-2 text-[11px] leading-4 text-[#6E806F]">
                   Cycle et planning adapté
@@ -580,7 +529,7 @@ export default function Landing() {
         </div>
 
         <div className="landing-module-strip mt-5 grid grid-cols-2 gap-2 rounded-[24px] border border-white/90 bg-white/75 p-3 shadow-md shadow-violet-200/15 backdrop-blur-sm sm:grid-cols-3 sm:p-4 lg:grid-cols-5">
-          {productModules.map(({ icon: Icon, label, tone }, index) => (
+          {productModules.map(({ label }, index) => (
             <motion.div
               key={label}
               initial={{ opacity: 0, y: 8 }}
@@ -589,9 +538,6 @@ export default function Landing() {
               transition={{ duration: 0.3, delay: index * 0.04 }}
               className="flex items-center gap-2.5 rounded-2xl px-2 py-2 sm:justify-center sm:gap-3 sm:px-3 sm:py-3"
             >
-              <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-                <Icon className="size-4 text-violet-800" />
-              </span>
               <span className="text-xs font-semibold text-foreground sm:text-sm">
                 {label}
               </span>
@@ -650,7 +596,6 @@ export default function Landing() {
           className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5"
         >
           Continuer vers mon espace
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
         </button>
       </section>
 

@@ -29,23 +29,9 @@ import {
 } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
-  Bell,
-  Check,
-  ChevronRight,
-  Clock3,
-  LocateFixed,
   Archive,
   ArchiveRestore,
-  BookOpen,
-  CalendarDays,
-  GripVertical,
-  LogOut,
-  MapPin,
   MoonStar,
-  Pencil,
-  Plus,
-  StickyNote,
-  Sun,
   Trash2,
 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
@@ -192,7 +178,6 @@ function QuranHabitTracker({
           </h2>
         </div>
         <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100/80 text-violet-800">
-          <BookOpen className="size-5" />
         </span>
       </div>
 
@@ -210,7 +195,7 @@ function QuranHabitTracker({
               className={`mx-auto mt-2 flex size-8 items-center justify-center rounded-full text-[11px] font-semibold ${day.completed ? "bg-violet-700 text-white" : "bg-violet-50 text-violet-700"}`}
               aria-label={`${day.date}, ${day.completed ? "lecture notée" : "aucune lecture notée"}`}
             >
-              {day.completed ? <Check className="size-4" /> : day.date}
+              {day.date}
             </span>
           </div>
         ))}
@@ -241,7 +226,7 @@ function QuranHabitTracker({
         onClick={() => onNavigate("quran")}
         className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-violet-800 transition hover:text-violet-950"
       >
-        Ajouter une lecture <ChevronRight className="size-3.5" />
+        Ajouter une lecture
       </button>
     </section>
   );
@@ -975,7 +960,6 @@ export default function Dashboard() {
                     key={name}
                     className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
                   >
-                    <Clock3 className="size-3.5 shrink-0 text-emerald-800" />
                     <span className="inline-flex items-center gap-2.5">
                       <span className="font-medium">{name}</span>
                       <span className="tabular-nums text-stone-500">
@@ -994,7 +978,6 @@ export default function Dashboard() {
               className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
               aria-label="Se déconnecter"
             >
-              <LogOut className="size-4" />
               Quitter
             </Button>
           </div>
@@ -1024,7 +1007,6 @@ export default function Dashboard() {
                           </h1>
                           <p className="mt-1.5 text-sm text-violet-100">{dailyReminder}</p>
                         </div>
-                        <MoonStar className="size-7 shrink-0 text-violet-100" />
                       </div>
                     </div>
                   )}
@@ -1032,7 +1014,7 @@ export default function Dashboard() {
                   {activeView === "overview" && (
                     <section aria-label="Tes repères quotidiens" className="grid gap-3 sm:grid-cols-2">
                       <button type="button" onClick={() => navigateToView("salah")} className="rounded-2xl border border-violet-100 bg-[#f7f4fb] p-4 text-left transition hover:border-violet-200 hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-violet-800"><Clock3 className="size-4" /> Horaires de prière</span>
+                        <span className="text-sm font-semibold text-violet-800">Horaires de prière</span>
                         <span className="mt-4 flex flex-wrap gap-2">
                           {[
                             { name: "Fajr", time: prayer.times?.fajr },
@@ -1047,18 +1029,18 @@ export default function Dashboard() {
                       </button>
 
                       <button type="button" onClick={() => openAdhkarSession("morning")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-emerald-900"><Sun className="size-4" /> Routine du jour</span>
+                        <span className="text-sm font-semibold text-emerald-900">Routine du jour</span>
                         <span className="mt-3 block text-sm text-stone-600">Adhkar du matin et du soir</span>
                         <span className="mt-1 block text-xs text-stone-500">{completedMorningAdhkar}/{adhkarBySession.morning.length} matin · {completedEveningAdhkar}/{adhkarBySession.evening.length} soir</span>
                       </button>
 
                       <button type="button" onClick={() => navigateToView("quran")} className="rounded-2xl border border-violet-100 bg-white p-4 text-left transition hover:border-violet-200 hover:bg-violet-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-violet-800"><BookOpen className="size-4" /> Journal Al-Qur’an</span>
+                        <span className="text-sm font-semibold text-violet-800">Journal Al-Qur’an</span>
                         <span className="mt-3 block text-sm text-stone-600">Note ta lecture et retrouve le passage où tu t’es arrêtée.</span>
                       </button>
 
                       <button type="button" onClick={() => navigateToView("periods")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-emerald-900"><CalendarDays className="size-4" /> Mes repères</span>
+                        <span className="text-sm font-semibold text-emerald-900">Mes repères</span>
                         <span className="mt-3 block text-sm text-stone-600">{currentPeriodDay !== null ? `Jour ${currentPeriodDay} · suivi personnel` : currentCycleDay !== null && currentCycleDay <= 60 ? `Jour ${currentCycleDay} du cycle` : "Cycle et planning adapté"}</span>
                         <span className="mt-1 block text-xs text-stone-500">{isExcusePeriod ? "Mode Al-‘Udhr actif" : "Tes informations restent personnelles"}</span>
                       </button>
@@ -1104,7 +1086,6 @@ export default function Dashboard() {
                               Ouvrir les invocations du matin et du soir
                             </h2>
                           </div>
-                          <Sun className="size-5 text-emerald-800" />
                         </div>
                       </summary>
 
@@ -1114,15 +1095,13 @@ export default function Dashboard() {
                             {
                               id: "morning",
                               label: "Invocations du matin",
-                              icon: Sun,
                             },
                             {
                               id: "evening",
                               label: "Invocations du soir",
-                              icon: MoonStar,
                             },
                           ] as const
-                        ).map(({ id, label, icon: Icon }) => {
+                        ).map(({ id, label }) => {
                           const progress = adhkarProgress?.find(
                             (entry) => entry.session === id,
                           );
@@ -1142,7 +1121,6 @@ export default function Dashboard() {
                                   : "text-muted-foreground hover:text-foreground"
                               }`}
                             >
-                              <Icon className="size-4 shrink-0" />
                               <span className="truncate">{label}</span>
                               <span className="shrink-0 text-[10px]">
                                 {completed}/{adhkarBySession[id].length}
@@ -1207,7 +1185,6 @@ export default function Dashboard() {
                               >
                                 {isInvocationComplete ? (
                                   <>
-                                    <Check className="mr-2 size-4" />
                                     Invocation terminée
                                   </>
                                 ) : (
@@ -1223,7 +1200,6 @@ export default function Dashboard() {
                                 className="min-h-11 flex-1 rounded-full bg-[#523B46] text-white hover:bg-[#3D2A34]"
                               >
                                 Invocation suivante
-                                <ChevronRight className="ml-2 size-4" />
                               </Button>
                             </div>
                             {!isInvocationComplete && (
@@ -1235,9 +1211,6 @@ export default function Dashboard() {
                           </>
                         ) : (
                           <div className="py-8 text-center">
-                            <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                              <Check className="size-6" />
-                            </span>
                             <h3 className="mt-4 font-serif text-2xl">
                               Routine terminée, bravo
                             </h3>
@@ -1697,7 +1670,7 @@ export default function Dashboard() {
                                   aria-label={`Supprimer la note du ${format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}`}
                                   className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-rose-100 hover:text-rose-700 disabled:opacity-50"
                                 >
-                                  <Trash2 className="size-4" />
+                                  Supprimer
                                 </button>
                               </li>
                             ))}
@@ -1803,7 +1776,6 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900">
-                      <StickyNote className="size-5" />
                     </span>
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
@@ -1894,7 +1866,6 @@ export default function Dashboard() {
                         }
                         className="rounded-xl bg-[#523B46] text-[15px] text-white hover:bg-[#3D2A34]"
                       >
-                        <Plus className="mr-2 size-4" />
                         {isSavingPersonalNote
                           ? "Enregistrement…"
                           : "Ajouter un post-it"}
@@ -2073,10 +2044,6 @@ export default function Dashboard() {
                                         dateStyle: "medium",
                                       })}
                                     </time>
-                                    <GripVertical
-                                      className="size-4 shrink-0 text-stone-500/70"
-                                      aria-hidden="true"
-                                    />
                                   </div>
                                   {note.urgent && (
                                     <span className="relative z-10 mt-3 inline-flex rounded-full bg-rose-700 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
@@ -2106,7 +2073,6 @@ export default function Dashboard() {
                                       }}
                                       className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-stone-700 hover:bg-white/50 disabled:opacity-50"
                                     >
-                                      <Pencil className="size-3.5" />
                                       Modifier
                                     </button>
                                     <div className="flex items-center gap-1">
@@ -2194,7 +2160,6 @@ export default function Dashboard() {
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
                       <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                        <MapPin className="size-4" />
                       </span>
                       <div>
                         <p className="text-sm font-semibold">
@@ -2256,7 +2221,6 @@ export default function Dashboard() {
                         disabled={prayer.isLoading}
                         className="gap-2"
                       >
-                        <LocateFixed className="size-4" />
                         {prayer.isLoading
                           ? "Recherche…"
                           : prayer.preferences.coordinates
@@ -2313,7 +2277,6 @@ export default function Dashboard() {
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3">
                       <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                        <Bell className="size-4" />
                       </span>
                       <div>
                         <p className="text-sm font-semibold">Rappels</p>
@@ -2337,7 +2300,6 @@ export default function Dashboard() {
                         onToggle={(value) =>
                           void updateReminder("morning", value)
                         }
-                        icon={<Sun className="size-4" />}
                       />
                       <div className="border-t border-border/70" />
                       <ReminderRow
@@ -2353,7 +2315,6 @@ export default function Dashboard() {
                         onToggle={(value) =>
                           void updateReminder("evening", value)
                         }
-                        icon={<MoonStar className="size-4" />}
                       />
                     </div>
                   </CardContent>
@@ -2381,22 +2342,18 @@ function ReminderRow({
   enabled,
   onTimeChange,
   onToggle,
-  icon,
 }: {
   label: string;
   time: string;
   enabled: boolean;
   onTimeChange: (value: string) => void;
   onToggle: (value: boolean) => void;
-  icon: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-stone-500">{icon}</span>
       <div className="min-w-0 flex-1">
         <label className="text-xs font-medium">{label}</label>
         <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock3 className="size-3" />
           <input
             type="time"
             value={time}

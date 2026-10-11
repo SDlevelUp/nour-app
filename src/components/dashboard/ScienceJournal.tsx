@@ -3,13 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import {
-  ExternalLink,
-  GraduationCap,
-  Loader2,
-  Plus,
-  Trash2,
-} from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -85,10 +78,7 @@ export function ScienceJournal() {
       id="dashboard-science"
       className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
     >
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900">
-          <GraduationCap className="size-5" />
-        </span>
+      <div>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
             Suivi d’étude
@@ -201,11 +191,6 @@ export function ScienceJournal() {
             disabled={isSaving}
             className="gap-2 bg-emerald-900 text-[15px] text-white hover:bg-emerald-800"
           >
-            {isSaving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Plus className="size-4" />
-            )}
             Ajouter la séance
           </Button>
         </div>
@@ -263,7 +248,7 @@ export function ScienceJournal() {
                         rel="noreferrer"
                         className="mt-2 inline-flex items-center gap-1 text-[15px] font-medium text-emerald-800 underline underline-offset-2"
                       >
-                        Ouvrir le cours <ExternalLink className="size-3" />
+                        Ouvrir le cours
                       </a>
                     )}
                     {entry.notes && (
@@ -277,13 +262,9 @@ export function ScienceJournal() {
                     onClick={() => void deleteEntry(entry._id)}
                     disabled={pendingDelete === entry._id}
                     aria-label={`Supprimer la séance ${entry.title}`}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-stone-500 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                    className="shrink-0 rounded-lg px-2 py-1 text-sm text-stone-500 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
                   >
-                    {pendingDelete === entry._id ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="size-4" />
-                    )}
+                    {pendingDelete === entry._id ? "Suppression…" : "Supprimer"}
                   </button>
                 </div>
               </li>
