@@ -936,7 +936,7 @@ export default function Dashboard() {
                 <>
                   {activeView === "overview" && (
                     <div id="dashboard-home" className="scroll-mt-24 space-y-5">
-                      <section className="rounded-3xl border border-[#E7E1D6] bg-[#FAF7F0] px-5 py-6 sm:px-8 sm:py-8">
+                      <section className="rounded-3xl border border-[#DCE5DC] bg-[#EEF4EE] px-5 py-6 sm:px-8 sm:py-8">
                         <h1
                           className="text-xl font-semibold leading-snug text-[#26362A] sm:text-2xl"
                           dir="rtl"
