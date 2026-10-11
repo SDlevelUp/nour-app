@@ -139,17 +139,6 @@ const defaultReminders: ReminderPreferences = {
   morningTime: "06:30",
   eveningTime: "19:30",
 };
-const morningMessages = [
-  "Le moment des invocations du matin est arrivé.",
-  "Pense à ta séquence d’invocations du matin.",
-  "Tes invocations du matin sont disponibles dans ta routine.",
-];
-const eveningMessages = [
-  "Le moment des invocations du soir est arrivé.",
-  "Pense à ta séquence d’invocations du soir.",
-  "Tes invocations du soir sont disponibles dans ta routine.",
-];
-
 const cycleSymptoms: { key: CycleSymptom; label: string }[] = [
   { key: "bloating", label: "Ballonnements" },
   { key: "cramps", label: "Crampes" },
@@ -526,24 +515,20 @@ export default function Dashboard() {
           key: "morning",
           enabled: reminders.morning,
           at: reminders.morningTime,
-          messages: morningMessages,
           title: "Un instant pour toi",
         },
         {
           key: "evening",
           enabled: reminders.evening,
           at: reminders.eveningTime,
-          messages: eveningMessages,
           title: "Une pause en douceur",
         },
       ];
-      moments.forEach(({ key, enabled, at, messages, title }) => {
+      moments.forEach(({ key, enabled, at, title }) => {
         if (enabled && time === at && firedToday.current[key] !== date) {
           firedToday.current[key] = date;
-          const messageIndex =
-            (now.getDate() + (key === "evening" ? 1 : 0)) % messages.length;
           new Notification(title, {
-            body: messages[messageIndex],
+            body: "Ton rappel Nour est disponible.",
             tag: `nour-${key}-${date}`,
           });
         }
@@ -2612,7 +2597,7 @@ export default function Dashboard() {
                       <div>
                         <p className="text-sm font-semibold">Rappels</p>
                         <p className="text-xs text-muted-foreground">
-                          Notifications du navigateur
+                          Rappels discrets, sans détail personnel.
                         </p>
                       </div>
                     </div>
@@ -2648,6 +2633,12 @@ export default function Dashboard() {
                         }
                       />
                     </div>
+                    <p className="mt-4 text-xs leading-5 text-stone-500">
+                      Les rappels locaux fonctionnent lorsque Nour est ouverte.
+                      Sur iPhone, les notifications écran verrouillé nécessitent
+                      l’installation sur l’écran d’accueil et un service Web
+                      Push côté serveur, qui n’est pas encore configuré.
+                    </p>
                   </CardContent>
                 </Card>
               </aside>
