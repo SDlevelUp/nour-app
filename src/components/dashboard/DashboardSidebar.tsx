@@ -1,9 +1,15 @@
 import {
+  BookOpen,
+  CalendarClock,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
-  CalendarDays,
+  GraduationCap,
+  LayoutDashboard,
   LogOut,
   MoonStar,
+  Settings,
+  StickyNote,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { dashboardNavigation, type DashboardView } from "./dashboardNavigation";
