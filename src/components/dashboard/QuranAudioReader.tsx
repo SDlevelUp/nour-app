@@ -38,6 +38,22 @@ type Ayah = {
 
 type SurahAudio = Surah & { ayahs: Ayah[] };
 
+type QuranJson = {
+  sourates: {
+    position: number;
+    nom: string;
+    nom_phonetique: string;
+    englishNameTranslation: string;
+    revelation: string;
+    versets: {
+      position: number;
+      text: string;
+      position_ds_sourate: number;
+      text_arabe: string;
+    }[];
+  }[];
+};
+
 export type QuranPlaybackProgress = {
   surah: string;
   startAyah: number;
@@ -68,7 +84,7 @@ export function QuranAudioReader({
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [selectedReciter, setSelectedReciter] = useState("ar.alafasy");
   const [surahData, setSurahData] = useState<SurahAudio | null>(null);
-  const [translationData, setTranslationData] = useState<SurahAudio | null>(null);
+  const [quranJsonData, setQuranJsonData] = useState<QuranJson | null>(null);
   const [transliterationData, setTransliterationData] = useState<SurahAudio | null>(null);
   const [startAyah, setStartAyah] = useState(1);
   const [endAyah, setEndAyah] = useState(1);
@@ -103,15 +119,16 @@ export function QuranAudioReader({
       ),
       fetchApi<Ayah>(`${API}/ayah/1/ar.alafasy`, controller.signal),
       fetchApi<SurahAudio>(`${API}/surah/1/ar.alafasy`, controller.signal),
-      fetchApi<SurahAudio>(`${API}/surah/1/fr.hamidullah`, controller.signal),
       fetchApi<SurahAudio>(`${API}/surah/1/en.transliteration`, controller.signal),
+      fetch("https://raw.githubusercontent.com/mehdi-stark/Coran-Quran/master/quran.json", { signal: controller.signal }),
     ])
-      .then(([surahList, reciterList, basmalaAyah, audioData, translationData, transliterationData]) => {
+      .then(async ([surahList, reciterList, basmalaAyah, audioData, transliterationData, quranResponse]) => {
+        const quranJson = await quranResponse.json() as QuranJson;
         setSurahs(surahList);
         setReciters(reciterList);
         setBasmala(basmalaAyah.text.replace(/^\uFEFF/, "").trim());
         setSurahData(audioData);
-        setTranslationData(translationData);
+        setQuranJsonData(quranJson);
         setTransliterationData(transliterationData);
         setStartAyah(1);
         setEndAyah(audioData.numberOfAyahs);
@@ -143,12 +160,10 @@ export function QuranAudioReader({
     setIsProgressSaved(false);
     Promise.all([
       fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/${selectedReciter}`, controller.signal),
-      fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/fr.hamidullah`, controller.signal),
       fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/en.transliteration`, controller.signal),
     ])
-      .then(([audioData, translationData, transliterationData]) => {
+      .then(([audioData, transliterationData]) => {
         setSurahData(audioData);
-        setTranslationData(translationData);
         setTransliterationData(transliterationData);
         const pendingResume = pendingResumeRef.current;
         if (
@@ -170,7 +185,7 @@ export function QuranAudioReader({
           hasInteractedRef.current = true;
         } else {
           setStartAyah(1);
-          setEndAyah(data.numberOfAyahs);
+          setEndAyah(audioData.numberOfAyahs);
           setCurrentAyah(1);
         }
         setRepeatNumber(1);
@@ -473,7 +488,7 @@ export function QuranAudioReader({
             <p
               lang="ar"
               dir="rtl"
-              className="quran-verse mt-5 text-center text-2xl leading-[2] text-stone-700 sm:text-3xl"
+              className="quran-verse mt-5 text-center text-2xl leading-loose text-stone-700 sm:text-3xl"
             >
               {basmala}
             </p>
@@ -481,9 +496,9 @@ export function QuranAudioReader({
           <p
             lang="ar"
             dir="rtl"
-            className="quran-verse mt-5 text-right text-3xl leading-[2] text-stone-900 sm:text-4xl"
+            className="quran-verse mt-5 text-right text-3xl leading-loose text-stone-900 sm:text-4xl"
           >
-            {displayAyahText}
+            {quranJsonData?.sourates[selectedSurah-1]?.versets.find(v => v.position_ds_sourate === currentAyah)?.text_arabe ?? displayAyahText}
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
             <label className="inline-flex items-center gap-2">
@@ -494,7 +509,7 @@ export function QuranAudioReader({
                   setShowTransliteration(event.target.checked)
                 }
               />
-              Translittération
+              Phonétique
             </label>
             <label className="inline-flex items-center gap-2">
               <input
@@ -507,12 +522,12 @@ export function QuranAudioReader({
           </div>
           {showTransliteration && (
             <p className="mt-2 text-sm text-stone-700">
-              {transliterationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Translittération non disponible."}
+              {transliterationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Phonétique non disponible."}
             </p>
           )}
           {showTranslation && (
             <p className="mt-2 text-sm text-stone-700">
-              {translationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Traduction non disponible."}
+              {quranJsonData?.sourates[selectedSurah-1]?.versets.find(v => v.position_ds_sourate === currentAyah)?.text ?? "Traduction non disponible."}
             </p>
           )}
           <p className="mt-2 text-xs text-stone-500">
