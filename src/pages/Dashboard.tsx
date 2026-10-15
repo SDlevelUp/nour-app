@@ -165,6 +165,7 @@ function todayKey() {
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const isAnonymousUser = user?.isAnonymous === true;
   const prayer = usePrayerTimes();
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [isExcusePeriod, setIsExcusePeriod] = useState(false);
@@ -788,7 +789,7 @@ export default function Dashboard() {
 
   const navigateToView = (view: DashboardView) => {
     setActiveView(view);
-    if (view === "notes" && hasUnreadNotes) {
+    if (view === "notes" && hasUnreadNotes && !isAnonymousUser) {
       void markPersonalNotesRead({}).catch(() => {
         toast.error("Impossible de mettre à jour les notifications de notes.");
       });
@@ -830,6 +831,12 @@ export default function Dashboard() {
   }, []);
 
   const savePersonalNote = async () => {
+    if (isAnonymousUser) {
+      toast.error(
+        "Connecte-toi avec ton email ou Google pour enregistrer tes notes. Les sessions anonymes ne permettent pas de sauvegarder les données.",
+      );
+      return;
+    }
     setIsSavingPersonalNote(true);
     try {
       await addPersonalNote({
@@ -844,6 +851,10 @@ export default function Dashboard() {
       setPersonalNoteUrgent(false);
       setPersonalNoteColor("yellow");
       setPersonalNoteIsTask(false);
+      // Nettoyer le localStorage après sauvegarde réussie
+      if (user?._id) {
+        localStorage.removeItem(personalNoteDraftKey(user._id));
+      }
       toast.success("Note enregistrée.");
     } catch (error) {
       toast.error(
@@ -857,6 +868,12 @@ export default function Dashboard() {
   };
 
   const savePersonalNoteEdits = async (noteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error(
+        "Connecte-toi avec ton email ou Google pour modifier tes notes.",
+      );
+      return;
+    }
     setPendingNoteAction(noteId);
     try {
       await editPersonalNote({
@@ -880,6 +897,10 @@ export default function Dashboard() {
   };
 
   const reorderPersonalNote = async (targetNoteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour réorganiser tes notes.");
+      return;
+    }
     if (!draggedNoteId || draggedNoteId === targetNoteId) return;
     const archived = notesSection === "archived";
     if (notesSection === "todo" || notesSection === "done") return;
@@ -915,6 +936,10 @@ export default function Dashboard() {
     noteId: Id<"personalNotes">,
     archived: boolean,
   ) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour archiver/restaurer tes notes.");
+      return;
+    }
     setPendingNoteAction(noteId);
     try {
       await setPersonalNoteArchived({ noteId, archived });
@@ -934,6 +959,10 @@ export default function Dashboard() {
     noteId: Id<"personalNotes">,
     completed: boolean,
   ) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour mettre à jour tes tâches.");
+      return;
+    }
     setPendingNoteAction(noteId);
     try {
       await setPersonalTaskCompleted({ noteId, completed });
@@ -949,6 +978,10 @@ export default function Dashboard() {
   };
 
   const deletePersonalNote = async (noteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour supprimer tes notes.");
+      return;
+    }
     if (
       !window.confirm(
         "Supprimer définitivement cette note ? Cette action est irréversible.",
@@ -2053,6 +2086,15 @@ export default function Dashboard() {
                       </h1>
                     </div>
                   </div>
+
+                  {isAnonymousUser && (
+                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+                      <p className="text-sm font-medium">
+                        ⚠️ Connecte-toi avec ton email ou Google pour sauvegarder tes notes.
+                        Les données enregistrées avec une session anonyme seront perdues à la déconnexion.
+                      </p>
+                    </div>
+                  )}
 
                   <form
                     className="mt-5 rounded-3xl border border-stone-200 bg-[#F5F2EE] p-4 sm:p-5"
