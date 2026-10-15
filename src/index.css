@@ -133,32 +133,11 @@
   --border: #e5e2d8;
   --ring: var(--nour-sage-dark);
   font-family: "Urbanist", ui-sans-serif, system-ui, sans-serif;
-  background-image:
-    radial-gradient(ellipse at 12% 8%, rgba(191, 216, 196, 0.5), transparent 34rem),
-    radial-gradient(ellipse at 88% 17%, rgba(145, 128, 155, 0.4), transparent 34rem),
-    linear-gradient(180deg, var(--nour-cream) 0%, var(--nour-cream) 48%, var(--nour-cream) 100%);
+  background-color: var(--nour-cream);
 }
 
 .landing-page::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  content: "";
-  opacity: 0.94;
-  filter: blur(22px);
-  animation: landing-cloud-drift 36s ease-in-out infinite alternate;
-  background:
-    radial-gradient(ellipse 19% 2.6% at 8% 17%, rgba(255,255,255,.98) 0 30%, rgba(255,255,255,.72) 52%, transparent 100%),
-    radial-gradient(ellipse 23% 3.2% at 20% 18%, rgba(255,255,255,.96) 0 28%, rgba(255,255,255,.68) 54%, transparent 100%),
-    radial-gradient(ellipse 20% 2.8% at 91% 20%, rgba(255,255,255,.98) 0 30%, rgba(255,255,255,.72) 52%, transparent 100%),
-    radial-gradient(ellipse 24% 3.4% at 78% 21%, rgba(255,255,255,.96) 0 28%, rgba(255,255,255,.66) 54%, transparent 100%),
-    radial-gradient(ellipse 22% 3.4% at 9% 45%, rgba(255,255,255,.96) 0 29%, rgba(255,255,255,.68) 54%, transparent 100%),
-    radial-gradient(ellipse 25% 3.8% at 92% 48%, rgba(255,255,255,.98) 0 28%, rgba(255,255,255,.7) 54%, transparent 100%),
-    radial-gradient(ellipse 22% 3.2% at 12% 70%, rgba(255,255,255,.96) 0 28%, rgba(255,255,255,.68) 54%, transparent 100%),
-    radial-gradient(ellipse 25% 3.7% at 90% 75%, rgba(255,255,255,.98) 0 27%, rgba(255,255,255,.7) 54%, transparent 100%),
-    radial-gradient(ellipse 23% 3.5% at 13% 91%, rgba(255,255,255,.96) 0 28%, rgba(255,255,255,.68) 54%, transparent 100%),
-    radial-gradient(ellipse 25% 4% at 88% 94%, rgba(255,255,255,.98) 0 28%, rgba(255,255,255,.7) 54%, transparent 100%);
+  display: none;
 }
 
 .landing-page > * {
@@ -172,18 +151,7 @@
 }
 
 .landing-cta::before {
-  position: absolute;
-  z-index: 0;
-  inset: -24%;
-  pointer-events: none;
-  content: "";
-  opacity: 0.9;
-  filter: blur(24px);
-  background:
-    radial-gradient(ellipse 30% 38% at 12% 52%, rgba(255,255,255,.98) 0 28%, rgba(255,255,255,.68) 53%, transparent 100%),
-    radial-gradient(ellipse 32% 42% at 30% 70%, rgba(255,255,255,.95) 0 27%, rgba(255,255,255,.64) 53%, transparent 100%),
-    radial-gradient(ellipse 34% 40% at 84% 43%, rgba(255,255,255,.98) 0 28%, rgba(255,255,255,.68) 53%, transparent 100%),
-    radial-gradient(ellipse 30% 38% at 68% 72%, rgba(255,255,255,.95) 0 27%, rgba(255,255,255,.64) 53%, transparent 100%);
+  display: none;
 }
 
 .landing-cta > * {
