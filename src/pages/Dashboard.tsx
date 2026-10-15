@@ -127,9 +127,9 @@ const stickyNoteColors: {
   },
   {
     value: "lavender",
-    label: "Prune",
+    label: "Rouge",
     card: "note-color-lavender",
-    swatch: "bg-[#8B707D]",
+    swatch: "bg-red-400",
   },
 ];
 
