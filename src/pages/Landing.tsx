@@ -284,7 +284,6 @@ export default function Landing() {
                         <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                           {event.detail}
                         </span>
-                      </span>
                     </div>
                   </motion.div>
                 ))}
