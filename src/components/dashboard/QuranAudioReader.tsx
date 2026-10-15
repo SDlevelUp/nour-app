@@ -19,6 +19,7 @@ type Surah = {
   name: string;
   englishName: string;
   numberOfAyahs: number;
+  revelationType?: "meccan" | "medinan";
 };
 
 type Reciter = {
@@ -31,6 +32,8 @@ type Ayah = {
   numberInSurah: number;
   text: string;
   audio: string;
+  transliteration?: string;
+  translation?: string;
 };
 
 type SurahAudio = Surah & { ayahs: Ayah[] };
@@ -489,17 +492,18 @@ export function QuranAudioReader({
             </label>
           </div>
           {showTransliteration && (
-            <p className="mt-2 text-sm text-stone-500">
-              TODO — translittération à valider.
+            <p className="mt-2 text-sm text-stone-700">
+              {activeAyah?.transliteration ?? "TODO — translittération à valider (source : Muhammad Hamidullah)."}
             </p>
           )}
           {showTranslation && (
-            <p className="mt-2 text-sm text-stone-500">
-              TODO — traduction française et édition à valider.
+            <p className="mt-2 text-sm text-stone-700">
+              {activeAyah?.translation ?? "TODO — traduction française (Muhammad Hamidullah) à valider."}
             </p>
           )}
           <p className="mt-2 text-xs text-stone-500">
-            Source : {selectedSurahData?.englishName} {selectedSurah} : {currentAyah}
+            Source : Al Qur'an, {selectedSurahData?.englishName} {selectedSurah} : {currentAyah}
+            {selectedSurahData?.revelationType ? ` (${selectedSurahData.revelationType === "meccan" ? "Mecquoise" : "Médinoise"})` : ""}
           </p>
           <audio
             ref={audioRef}
@@ -557,7 +561,7 @@ export function QuranAudioReader({
         </div>
       )}
       <p className="mt-3 text-[11px] leading-5 text-stone-500">
-        Audio fourni par AlQuran Cloud. La répétition et le suivi sont gérés
+        Audio fourni par Al Qur'an Cloud. La répétition et le suivi sont gérés
         dans Nour.
       </p>
     </section>
