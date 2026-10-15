@@ -111,7 +111,7 @@ const stickyNoteColors: {
     value: "mauve",
     label: "Mauve",
     card: "note-color-mauve",
-    swatch: "bg-[#91809B]",
+    swatch: "bg-[#cfbcdb]",
   },
   {
     value: "blue",
