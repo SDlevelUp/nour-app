@@ -99,7 +99,7 @@
 .note-color-mauve { background-color: var(--nour-mauve-soft); border-color: var(--nour-mauve); }
 .note-color-blue { background-color: var(--nour-sage-soft); border-color: var(--nour-sage); }
 .note-color-green { background-color: var(--nour-sage); border-color: var(--nour-sage-dark); }
-.note-color-lavender { background-color: #d8cbd8; border-color: var(--nour-mauve); }
+.note-color-lavender { background-color: var(--nour-mauve-soft); border-color: var(--nour-mauve); }
 
 .dark {
   --background: #202922;
