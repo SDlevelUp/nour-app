@@ -95,11 +95,11 @@
 }
 
 /* Note colors - sticky notes */
-.note-color-yellow { background-color: var(--nour-cream); border-color: #e5e2d8; }
+.note-color-yellow { background-color: #fef3c7; border-color: #fde68a; }
 .note-color-mauve { background-color: var(--nour-mauve-soft); border-color: var(--nour-mauve); }
 .note-color-blue { background-color: var(--nour-sage-soft); border-color: var(--nour-sage); }
 .note-color-green { background-color: var(--nour-sage); border-color: var(--nour-sage-dark); }
-.note-color-lavender { background-color: var(--nour-mauve-soft); border-color: var(--nour-mauve); }
+.note-color-lavender { background-color: #f3e8ff; border-color: #c084fc; }
 
 .dark {
   --background: #202922;
