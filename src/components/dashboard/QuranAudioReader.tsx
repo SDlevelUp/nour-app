@@ -69,6 +69,7 @@ export function QuranAudioReader({
   const [selectedReciter, setSelectedReciter] = useState("ar.alafasy");
   const [surahData, setSurahData] = useState<SurahAudio | null>(null);
   const [translationData, setTranslationData] = useState<SurahAudio | null>(null);
+  const [transliterationData, setTransliterationData] = useState<SurahAudio | null>(null);
   const [startAyah, setStartAyah] = useState(1);
   const [endAyah, setEndAyah] = useState(1);
   const [currentAyah, setCurrentAyah] = useState(1);
@@ -134,27 +135,29 @@ export function QuranAudioReader({
     Promise.all([
       fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/${selectedReciter}`, controller.signal),
       fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/fr.hamidullah`, controller.signal),
+      fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/en.transliteration`, controller.signal),
     ])
-      .then(([audioData, translationData]) => {
+      .then(([audioData, translationData, transliterationData]) => {
         setSurahData(audioData);
         setTranslationData(translationData);
+        setTransliterationData(transliterationData);
         const pendingResume = pendingResumeRef.current;
         if (
           pendingResume &&
-          pendingResume.surahNumber === data.number &&
+          pendingResume.surahNumber === audioData.number &&
           pendingResume.reciterIdentifier === selectedReciter
         ) {
           const ayah = Math.min(
             Math.max(pendingResume.ayah, 1),
-            data.numberOfAyahs,
+            audioData.numberOfAyahs,
           );
           setStartAyah(ayah);
           setEndAyah(
-            Math.min(Math.max(pendingResume.endAyah, ayah), data.numberOfAyahs),
+            Math.min(Math.max(pendingResume.endAyah, ayah), audioData.numberOfAyahs),
           );
           setCurrentAyah(ayah);
           pendingResumeRef.current = null;
-          appliedResumeRef.current = `${data.number}:${ayah}:${selectedReciter}`;
+          appliedResumeRef.current = `${audioData.number}:${ayah}:${selectedReciter}`;
           hasInteractedRef.current = true;
         } else {
           setStartAyah(1);
@@ -495,7 +498,7 @@ export function QuranAudioReader({
           </div>
           {showTransliteration && (
             <p className="mt-2 text-sm text-stone-700">
-              {activeAyah?.transliteration ?? "TODO — translittération à valider (source : Muhammad Hamidullah)."}
+              {transliterationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Translittération non disponible."}
             </p>
           )}
           {showTranslation && (
