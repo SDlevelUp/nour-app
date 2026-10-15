@@ -100,36 +100,42 @@ const stickyNoteColors: {
   label: string;
   card: string;
   swatch: string;
+  indicator: string;
 }[] = [
   {
     value: "yellow",
     label: "Jaune",
     card: "note-color-yellow",
     swatch: "bg-amber-300",
+    indicator: "bg-amber-300",
   },
   {
     value: "mauve",
     label: "Mauve",
     card: "note-color-mauve",
     swatch: "bg-[#91809B]",
+    indicator: "bg-[#91809B]",
   },
   {
     value: "blue",
     label: "Bleu",
     card: "note-color-blue",
     swatch: "bg-sky-300",
+    indicator: "bg-sky-300",
   },
   {
     value: "green",
     label: "Vert",
     card: "note-color-green",
     swatch: "bg-emerald-300",
+    indicator: "bg-emerald-300",
   },
   {
     value: "lavender",
     label: "Prune",
     card: "note-color-lavender",
     swatch: "bg-[#8B707D]",
+    indicator: "bg-[#8B707D]",
   },
 ];
 
@@ -2278,6 +2284,10 @@ export default function Dashboard() {
                               }}
                               className={`group relative min-h-56 list-none rounded-sm border p-4 shadow-[2px_5px_12px_rgba(70,50,30,0.12)] transition duration-200 hover:-translate-y-1 hover:rotate-0 hover:shadow-[4px_9px_18px_rgba(70,50,30,0.17)] ${noteColor.card} ${draggedNoteId === note._id ? "scale-95 opacity-40" : ""} ${!isEditing && !note.archived ? "cursor-grab active:cursor-grabbing" : ""}`}
                             >
+                              <span
+                                aria-hidden="true"
+                                className={`absolute -top-1 -left-1 size-3 rounded-full ${noteColor.indicator} shadow-[1px_2px_4px_rgba(0,0,0,0.15)]`}
+                              />
                               {isEditing ? (
                                 <form
                                   className="relative z-10 space-y-3"
