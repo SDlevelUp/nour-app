@@ -1631,8 +1631,7 @@ export default function Dashboard() {
                           }}
                           className="mx-auto w-full max-w-md"
                         />
-                        <div className="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
-                          <span className="size-3 rounded-full bg-rose-200" />
+                        <div className="pb-2 text-center text-xs text-muted-foreground">
                           Règles déjà notées
                         </div>
                       </div>
@@ -2075,16 +2074,13 @@ export default function Dashboard() {
                   id="dashboard-notes"
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900"></span>
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                        Espace personnel
-                      </p>
-                      <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
-                        Notes
-                      </h1>
-                    </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+                      Espace personnel
+                    </p>
+                    <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
+                      Notes
+                    </h1>
                   </div>
 
                   {isAnonymousUser && (
@@ -2282,7 +2278,6 @@ export default function Dashboard() {
                               }}
                               className={`group relative min-h-56 list-none rounded-sm border p-4 shadow-[2px_5px_12px_rgba(70,50,30,0.12)] transition duration-200 hover:-translate-y-1 hover:rotate-0 hover:shadow-[4px_9px_18px_rgba(70,50,30,0.17)] ${noteColor.card} ${draggedNoteId === note._id ? "scale-95 opacity-40" : ""} ${!isEditing && !note.archived ? "cursor-grab active:cursor-grabbing" : ""}`}
                             >
-                              <span className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full border border-white/70 bg-white/65 shadow-sm" />
                               {isEditing ? (
                                 <form
                                   className="relative z-10 space-y-3"
@@ -2518,17 +2513,12 @@ export default function Dashboard() {
               <aside className="grid items-start gap-5 md:grid-cols-2">
                 <Card className="rounded-3xl border border-stone-200 bg-white shadow-none">
                   <CardContent className="p-5">
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800"></span>
-                      <div>
-                        <p className="text-sm font-semibold">
-                          Horaires de prière
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Calcul gratuit selon ta position
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-sm font-semibold">
+                      Horaires de prière
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Calcul gratuit selon ta position
+                    </p>
 
                     <p className="mt-4 text-xs leading-5 text-stone-600">
                       Ta position est enregistrée sur cet appareil et envoyée à
@@ -2634,14 +2624,11 @@ export default function Dashboard() {
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white shadow-none"
                 >
                   <CardContent className="p-5">
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800"></span>
-                      <div>
-                        <p className="text-sm font-semibold">Rappels</p>
-                        <p className="text-xs text-muted-foreground">
-                          Rappels discrets, sans détail personnel.
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-sm font-semibold">Rappels</p>
+                      <p className="text-xs text-muted-foreground">
+                        Rappels discrets, sans détail personnel.
+                      </p>
                     </div>
 
                     <div className="mt-5 space-y-4">

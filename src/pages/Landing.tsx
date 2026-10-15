@@ -277,11 +277,7 @@ export default function Landing() {
                     <span className="pt-1 text-xs font-semibold tabular-nums text-primary">
                       {event.time}
                     </span>
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span
-                        className={`size-2.5 shrink-0 rounded-full ${event.marker}`}
-                      />
-                      <span className="min-w-0">
+                    <div className="min-w-0">
                         <span className="block truncate text-sm font-semibold text-foreground">
                           {event.title}
                         </span>
