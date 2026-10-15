@@ -1054,7 +1054,7 @@ export default function Dashboard() {
                     year: "numeric",
                   }).format(new Date())}
                 </p>
-                <p className="mt-1 text-[14px] leading-5 text-stone-500">
+                <p className="mt-1 text-[14px] leading-5 text-left text-stone-500">
                   {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
                     day: "numeric",
                     month: "long",
