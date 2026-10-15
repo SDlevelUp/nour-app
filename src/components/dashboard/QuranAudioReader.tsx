@@ -427,7 +427,7 @@ export function QuranAudioReader({
       {error && (
         <p
           role="alert"
-          className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-800"
+          className="mt-4 rounded-xl bg-mauve-50 p-3 text-sm text-mauve-800"
         >
           {error}
         </p>

@@ -70,7 +70,7 @@ const schema = defineSchema(
       color: v.optional(
         v.union(
           v.literal("yellow"),
-          v.literal("pink"),
+          v.literal("mauve"),
           v.literal("blue"),
           v.literal("green"),
           v.literal("lavender"),

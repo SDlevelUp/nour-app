@@ -4,7 +4,7 @@ import { mutation, query } from "./_generated/server";
 
 const noteColorValidator = v.union(
   v.literal("yellow"),
-  v.literal("pink"),
+  v.literal("mauve"),
   v.literal("blue"),
   v.literal("green"),
   v.literal("lavender"),

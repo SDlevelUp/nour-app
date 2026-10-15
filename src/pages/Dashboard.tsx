@@ -49,7 +49,7 @@ type ReminderPreferences = {
 };
 
 type CycleSymptom = Doc<"cycleDays">["symptoms"][number];
-type StickyNoteColor = "yellow" | "pink" | "blue" | "green" | "lavender";
+type StickyNoteColor = "yellow" | "mauve" | "blue" | "green" | "lavender";
 type PersonalNoteDraft = {
   title: string;
   content: string;
@@ -76,7 +76,7 @@ function readPersonalNoteDraft(userId: string): PersonalNoteDraft {
     const value = JSON.parse(stored) as Partial<PersonalNoteDraft>;
     const validColors: StickyNoteColor[] = [
       "yellow",
-      "pink",
+      "mauve",
       "blue",
       "green",
       "lavender",
@@ -108,9 +108,9 @@ const stickyNoteColors: {
     swatch: "bg-amber-300",
   },
   {
-    value: "pink",
+    value: "mauve",
     label: "Mauve",
-    card: "border-[#E0D8E3] bg-[#F0EBF2]",
+    card: "border-[#91809B] bg-[#E8DFE8]",
     swatch: "bg-[#91809B]",
   },
   {
@@ -1627,7 +1627,7 @@ export default function Dashboard() {
                           modifiers={{ period: periodDates }}
                           modifiersClassNames={{
                             period:
-                              "bg-rose-100 font-semibold text-rose-800 hover:bg-rose-200",
+                              "bg-mauve-100 font-semibold text-mauve-800 hover:bg-mauve-200",
                           }}
                           className="mx-auto w-full max-w-md"
                         />
@@ -1757,7 +1757,7 @@ export default function Dashboard() {
                             !selectedRange.to
                           }
                           onClick={() => void saveSelectedPeriodRange()}
-                          className="mt-4 w-full rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-left text-sm font-medium text-rose-900 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="mt-4 w-full rounded-2xl border border-mauve-200 bg-mauve-50 px-4 py-3 text-left text-sm font-medium text-mauve-900 transition hover:bg-mauve-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           {editingPeriodRange
                             ? "Enregistrer les nouvelles dates"
@@ -1968,7 +1968,7 @@ export default function Dashboard() {
                                   onClick={() => void deleteCycleNote(entry)}
                                   disabled={isSavingCycleDay}
                                   aria-label={`Supprimer la note du ${format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}`}
-                                  className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-rose-100 hover:text-rose-700 disabled:opacity-50"
+                                  className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-mauve-100 hover:text-mauve-700 disabled:opacity-50"
                                 >
                                   Supprimer
                                 </button>
@@ -2042,7 +2042,7 @@ export default function Dashboard() {
                                       {entry.symptoms.map((symptom) => (
                                         <span
                                           key={symptom}
-                                          className="rounded-full bg-rose-50 px-2.5 py-1 text-sm text-rose-800"
+                                          className="rounded-full bg-mauve-50 px-2.5 py-1 text-sm text-mauve-800"
                                         >
                                           {cycleSymptoms.find(
                                             (item) => item.key === symptom,
@@ -2321,7 +2321,7 @@ export default function Dashboard() {
                                         />
                                       ))}
                                     </div>
-                                    <label className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-800">
+                                    <label className="inline-flex items-center gap-1.5 text-sm font-medium text-mauve-800">
                                       <input
                                         type="checkbox"
                                         checked={editNoteUrgent}
@@ -2472,7 +2472,7 @@ export default function Dashboard() {
                                         }
                                         aria-label="Supprimer définitivement ce post-it"
                                         title="Supprimer"
-                                        className="inline-flex size-8 items-center justify-center rounded-lg text-stone-700 hover:bg-rose-100 hover:text-rose-800 disabled:opacity-50"
+                                        className="inline-flex size-8 items-center justify-center rounded-lg text-stone-700 hover:bg-mauve-100 hover:text-mauve-800 disabled:opacity-50"
                                       >
                                         <Trash2 className="size-4" />
                                       </button>

@@ -55,12 +55,12 @@
   --radius: 0.75rem;
   --nour-cream: #faf7f0;
   --nour-sage: #bfd8c4;
-  --nour-sage-dark: #5d7c65;
+  --nour-sage-dark: #5f7f68;
   --nour-sage-hover: #496650;
   --nour-sage-soft: #e8f0e7;
   --nour-mauve: #91809b;
   --nour-mauve-text: #69596e;
-  --nour-mauve-soft: #f0ebf2;
+  --nour-mauve-soft: #e8dfe8;
   --background: var(--nour-cream);
   --foreground: #27352b;
   --card: #fffefa;
@@ -135,8 +135,8 @@
   font-family: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   background-image:
     radial-gradient(ellipse at 12% 8%, rgba(191, 216, 196, 0.5), transparent 34rem),
-    radial-gradient(ellipse at 88% 17%, rgba(240, 235, 242, 0.62), transparent 34rem),
-    linear-gradient(180deg, var(--nour-cream) 0%, #fffefa 48%, #f3f5ef 100%);
+    radial-gradient(ellipse at 88% 17%, rgba(145, 128, 155, 0.4), transparent 34rem),
+    linear-gradient(180deg, var(--nour-cream) 0%, var(--nour-cream) 48%, var(--nour-cream) 100%);
 }
 
 .landing-page::before {
@@ -221,7 +221,7 @@
 }
 
 .landing-product-layout {
-  background: linear-gradient(128deg, rgba(238, 246, 235, 0.94), rgba(245, 239, 252, 0.96));
+  background: linear-gradient(128deg, rgba(191, 216, 196, 0.4), rgba(238, 246, 235, 0.94));
 }
 
 .landing-product-window {
@@ -368,6 +368,22 @@
   background-color: var(--nour-sage-soft) !important;
 }
 
+.dashboard-shell:not(.dark-dashboard) [class*="bg-mauve-50"],
+.dashboard-shell:not(.dark-dashboard) [class*="bg-mauve-100"],
+.dashboard-shell:not(.dark-dashboard) [class*="bg-mauve-200"] {
+  background-color: var(--nour-mauve-soft) !important;
+}
+
+.dashboard-shell:not(.dark-dashboard) [class*="text-mauve-700"],
+.dashboard-shell:not(.dark-dashboard) [class*="text-mauve-800"],
+.dashboard-shell:not(.dark-dashboard) [class*="text-mauve-900"] {
+  color: var(--nour-mauve-text) !important;
+}
+
+.dashboard-shell:not(.dark-dashboard) [class*="border-mauve-200"] {
+  border-color: var(--border) !important;
+}
+
 .dashboard-shell:not(.dark-dashboard) [class*="text-stone-900"],
 .dashboard-shell:not(.dark-dashboard) [class*="text-stone-800"],
 .dashboard-shell:not(.dark-dashboard) [class*="text-stone-700"] {
@@ -482,7 +498,10 @@
 .dashboard-shell.dark-dashboard [class*="bg-emerald-50"],
 .dashboard-shell.dark-dashboard [class*="bg-amber-50"],
 .dashboard-shell.dark-dashboard [class*="bg-rose-50"],
-.dashboard-shell.dark-dashboard [class*="bg-rose-100"] {
+.dashboard-shell.dark-dashboard [class*="bg-rose-100"],
+.dashboard-shell.dark-dashboard [class*="bg-mauve-50"],
+.dashboard-shell.dark-dashboard [class*="bg-mauve-100"],
+.dashboard-shell.dark-dashboard [class*="bg-mauve-200"] {
   background-color: #38453b !important;
 }
 
@@ -517,6 +536,7 @@
 .dashboard-shell.dark-dashboard [class*="text-emerald-"],
 .dashboard-shell.dark-dashboard [class*="text-primary"],
 .dashboard-shell.dark-dashboard [class*="text-rose-"],
+.dashboard-shell.dark-dashboard [class*="text-mauve-"],
 .dashboard-shell.dark-dashboard [class*="text-amber-"] {
   color: #cbbdd0 !important;
 }
