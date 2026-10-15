@@ -101,6 +101,12 @@
 .note-color-green { background-color: #5FE9B5; border-color: #3ad49a; }
 .note-color-lavender { background-color: #FF6467; border-color: #e64a4f; }
 
+/* Checkbox accent color */
+.dashboard-shell input[type="checkbox"],
+.dashboard-shell .dark-dashboard input[type="checkbox"] {
+  accent-color: #000000;
+}
+
 .dark {
   --background: #202922;
   --foreground: #f5f4ed;
