@@ -2634,12 +2634,10 @@ export default function Dashboard() {
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white shadow-none"
                 >
                   <CardContent className="p-5">
-                    <div>
-                      <p className="text-sm font-semibold">Rappels</p>
-                      <p className="text-xs text-muted-foreground">
-                        Rappels discrets, sans détail personnel.
-                      </p>
-                    </div>
+                    <p className="text-sm font-semibold">Rappels</p>
+                    <p className="text-xs text-muted-foreground">
+                      Rappels discrets, sans détail personnel.
+                    </p>
 
                     <div className="mt-5 space-y-4">
                       <ReminderRow
