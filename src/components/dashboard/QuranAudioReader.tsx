@@ -68,6 +68,7 @@ export function QuranAudioReader({
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [selectedReciter, setSelectedReciter] = useState("ar.alafasy");
   const [surahData, setSurahData] = useState<SurahAudio | null>(null);
+  const [translationData, setTranslationData] = useState<SurahAudio | null>(null);
   const [startAyah, setStartAyah] = useState(1);
   const [endAyah, setEndAyah] = useState(1);
   const [currentAyah, setCurrentAyah] = useState(1);
@@ -130,12 +131,13 @@ export function QuranAudioReader({
     setIsPlaying(false);
     setLastCompletedAyah(0);
     setIsProgressSaved(false);
-    fetchApi<SurahAudio>(
-      `${API}/surah/${selectedSurah}/${selectedReciter}`,
-      controller.signal,
-    )
-      .then((data) => {
-        setSurahData(data);
+    Promise.all([
+      fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/${selectedReciter}`, controller.signal),
+      fetchApi<SurahAudio>(`${API}/surah/${selectedSurah}/fr.hamidullah`, controller.signal),
+    ])
+      .then(([audioData, translationData]) => {
+        setSurahData(audioData);
+        setTranslationData(translationData);
         const pendingResume = pendingResumeRef.current;
         if (
           pendingResume &&
@@ -498,7 +500,7 @@ export function QuranAudioReader({
           )}
           {showTranslation && (
             <p className="mt-2 text-sm text-stone-700">
-              {activeAyah?.translation ?? "TODO — traduction française (Muhammad Hamidullah) à valider."}
+              {translationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Traduction non disponible."}
             </p>
           )}
           <p className="mt-2 text-xs text-stone-500">
