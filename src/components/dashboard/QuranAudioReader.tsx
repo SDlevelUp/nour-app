@@ -102,11 +102,20 @@ export function QuranAudioReader({
         controller.signal,
       ),
       fetchApi<Ayah>(`${API}/ayah/1/ar.alafasy`, controller.signal),
+      fetchApi<SurahAudio>(`${API}/surah/1/ar.alafasy`, controller.signal),
+      fetchApi<SurahAudio>(`${API}/surah/1/fr.hamidullah`, controller.signal),
+      fetchApi<SurahAudio>(`${API}/surah/1/en.transliteration`, controller.signal),
     ])
-      .then(([surahList, reciterList, basmalaAyah]) => {
+      .then(([surahList, reciterList, basmalaAyah, audioData, translationData, transliterationData]) => {
         setSurahs(surahList);
         setReciters(reciterList);
         setBasmala(basmalaAyah.text.replace(/^\uFEFF/, "").trim());
+        setSurahData(audioData);
+        setTranslationData(translationData);
+        setTransliterationData(transliterationData);
+        setStartAyah(1);
+        setEndAyah(audioData.numberOfAyahs);
+        setCurrentAyah(1);
       })
       .catch((cause: unknown) => {
         if (!controller.signal.aborted) {
@@ -124,7 +133,7 @@ export function QuranAudioReader({
   }, []);
 
   useEffect(() => {
-    if (!reciters.some((reciter) => reciter.identifier === selectedReciter))
+    if (!reciters.length || !reciters.some((reciter) => reciter.identifier === selectedReciter))
       return;
     const controller = new AbortController();
     setIsLoading(true);
