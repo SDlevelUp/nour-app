@@ -104,31 +104,31 @@ const stickyNoteColors: {
   {
     value: "yellow",
     label: "Jaune",
-    card: "border-amber-200 bg-amber-100",
+    card: "note-color-yellow",
     swatch: "bg-amber-300",
   },
   {
     value: "mauve",
     label: "Mauve",
-    card: "border-[#91809B] bg-[#E8DFE8]",
+    card: "note-color-mauve",
     swatch: "bg-[#91809B]",
   },
   {
     value: "blue",
     label: "Bleu",
-    card: "border-sky-200 bg-sky-100",
+    card: "note-color-blue",
     swatch: "bg-sky-300",
   },
   {
     value: "green",
     label: "Vert",
-    card: "border-emerald-200 bg-emerald-100",
+    card: "note-color-green",
     swatch: "bg-emerald-300",
   },
   {
     value: "lavender",
     label: "Prune",
-    card: "border-[#D8CBD0] bg-[#F3EFEC]",
+    card: "note-color-lavender",
     swatch: "bg-[#8B707D]",
   },
 ];
