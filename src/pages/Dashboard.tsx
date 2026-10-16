@@ -1111,9 +1111,7 @@ export default function Dashboard() {
         <div
           className="mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] bg-background px-4 pb-12 pt-6 sm:px-6 xl:px-8"
         >
-          <div
-            className={`grid items-start gap-6 xl:gap-8 ${activeView === "settings" ? "xl:grid-cols-[minmax(0,1fr)_360px]" : "xl:grid-cols-1"}`}
-          >
+          <div className="grid items-start gap-6 xl:gap-8 xl:grid-cols-1">
             <section className="min-w-0 space-y-4">
               {(activeView === "overview" ||
                 activeView === "salah" ||
