@@ -273,7 +273,7 @@ export function DailyPlanner({
             </div>
           )}
 
-          <div className="mt-5 overflow-hidden rounded-2xl border border-stone-100">
+          <div className="mt-5 overflow-hidden rounded-2xl bg-white">
             {eventHours.map((hour) => {
               const events = visiblePlannerEvents.filter(
                 (event) => Number(event.time.slice(0, 2)) === hour,
@@ -282,9 +282,9 @@ export function DailyPlanner({
               return (
                 <div
                   key={hour}
-                  className="grid min-h-19 grid-cols-[56px_minmax(0,1fr)] border-b border-stone-100 last:border-b-0 sm:grid-cols-[72px_minmax(0,1fr)]"
+                  className="grid min-h-19 grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[72px_minmax(0,1fr)]"
                 >
-                  <div className="border-r border-stone-100 px-2 pt-3 text-right text-[10px] font-semibold tabular-nums text-stone-400 sm:px-4">
+                  <div className="px-2 pt-3 text-center text-[10px] font-semibold tabular-nums text-stone-400 sm:px-4">
                     {String(hour).padStart(2, "0")}:00
                   </div>
                   <div className="space-y-1 p-1.5 sm:p-2">
@@ -292,19 +292,19 @@ export function DailyPlanner({
                       ({ time, displayTime, title, detail, kind }) => (
                         <article
                           key={`${kind}-${title}`}
-                          className={`rounded-xl border px-3 py-3 ${
+                          className={`rounded-xl px-3 py-3 ${
                             kind === "prayer"
-                              ? "border-stone-200 bg-[#F5F2EE]"
+                              ? "bg-[#F5F2EE]"
                               : kind.endsWith("-session")
-                                ? "border-emerald-200 bg-emerald-50/50"
-                                : "border-stone-200 bg-white"
+                                ? "bg-emerald-50/50"
+                                : "bg-white"
                           }`}
                         >
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start justify-center gap-3">
                             <span className="mt-0.5 text-[10px] font-semibold tabular-nums text-stone-600">
                               {displayTime ?? time}
                             </span>
-                            <div>
+                            <div className="text-center">
                               <h3 className="text-xs font-semibold text-stone-900 sm:text-sm">
                                 {title}
                               </h3>
