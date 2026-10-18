@@ -25,10 +25,11 @@ Copier `.env.example` en `.env` et le remplir avant de lancer. Autres scripts : 
 ## Architecture
 
 - `src/pages/` : `Landing`, `Auth`, `Dashboard`, `NotFound` ; routes déclarées dans `src/main.tsx`.
-- `src/components/dashboard/` : vues du tableau de bord (aperçu, planning, Coran, science, cycle, notes, rappels).
+- `src/components/dashboard/` : vues du tableau de bord (aperçu, planning jour/semaine, lecteur audio du Coran, journaux Coran et science, module d'apprentissage, cycle, notes, rappels).
 - `src/components/RequireAuth.tsx` : protection des routes connectées.
 - `src/hooks/` : `use-auth`, `use-prayer-times`, `use-mobile`.
-- `src/convex/` : schéma (`schema.ts`), auth (`auth.ts`, `auth.config.ts`, `auth/emailOtp.ts`), et données par compte (`adhkarProgress`, `quranProgress`, `scienceProgress`, `cycleTracking`, `personalNotes`, `users`). Textes des adhkar dans `adhkarData.ts`.
+- `src/convex/` : schéma (`schema.ts`), auth (`auth.ts`, `auth.config.ts`, `auth/emailOtp.ts`), et données par compte (`adhkarProgress`, `quranProgress`, `scienceProgress`, `scienceBooks`, `scienceLearning`, `cycleTracking`, `personalNotes`, `users`). Textes des adhkar dans `adhkarData.ts`.
+- `scripts/prerender-landing.mjs` : pré-rendu de la landing page pour le SEO, lancé à la fin de `build` (avec `public/robots.txt` et `public/sitemap.xml`).
 - `src/convex/_generated/` : à garder dans git (nécessaire au build Vercel).
 - Données stockées dans le navigateur (pas dans Convex) : raccourcis de l'aperçu, activités du planning, position et réglages de calcul des prières.
 
@@ -50,11 +51,13 @@ Côté Convex (`npx convex env set`) :
 
 ## Feuille de route
 
-- Branche ouverte sur GitHub : `fix/icons-point-8` [À CONFIRMER : contenu et statut].
+- [À CONFIRMER : prochaines fonctionnalités prévues].
+- La branche `fix/icons-point-8` est fusionnée dans `main` (PR #1) ; elle existe encore sur GitHub et peut être supprimée si elle ne sert plus.
 
 ## Journal
 
 - 2026-10-18 : repo cloné dans `Desktop\nour-app` ; `.env` retiré du suivi git (commit `2260268`, poussé sur `main`) ; création de ce fichier.
+- 2026-10-18 : PR #1 (`fix/icons-point-8`) fusionnée sur GitHub : palette crème et sauge, lecteur audio du Coran, module d'apprentissage, journal science avec liste de lecture, pré-rendu SEO de la landing ; ce fichier mis à jour en conséquence.
 
 ## Problèmes connus
 
