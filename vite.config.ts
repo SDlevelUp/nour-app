@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(process.cwd(), "./src"),
     },
     dedupe: ["react", "react/jsx-runtime", "react-dom", "react-dom/client"],
   },
@@ -17,6 +17,10 @@ export default defineConfig({
     sourcemap: false,
     // Optimize chunk splitting
     rollupOptions: {
+      input: {
+        landing: "index.html",
+        app: "app.html",
+      },
       output: {
         // Manual chunk splitting for better caching and lazy loading
         manualChunks: {

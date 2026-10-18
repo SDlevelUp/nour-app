@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,12 @@ import {
 } from "@/components/dashboard/dashboardNavigation";
 import { DailyPlanner } from "@/components/dashboard/DailyPlanner";
 import { QuranJournal } from "@/components/dashboard/QuranJournal";
+import {
+  quranResumeEvent,
+  readQuranResumePosition,
+  resumePositionFromReadingLog,
+  type QuranResumePosition,
+} from "@/components/dashboard/quranPlaybackResume";
 import { ScienceJournal } from "@/components/dashboard/ScienceJournal";
 import { usePrayerTimes } from "@/hooks/use-prayer-times";
 import { api } from "@/convex/_generated/api";
@@ -28,26 +34,7 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import {
-  Bell,
-  Check,
-  ChevronRight,
-  Clock3,
-  LocateFixed,
-  Archive,
-  ArchiveRestore,
-  BookOpen,
-  CalendarDays,
-  GripVertical,
-  LogOut,
-  MapPin,
-  MoonStar,
-  Pencil,
-  Plus,
-  StickyNote,
-  Sun,
-  Trash2,
-} from "lucide-react";
+import { Archive, ArchiveRestore, MoonStar, Trash2 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -62,7 +49,51 @@ type ReminderPreferences = {
 };
 
 type CycleSymptom = Doc<"cycleDays">["symptoms"][number];
-type StickyNoteColor = "yellow" | "pink" | "blue" | "green" | "lavender";
+type StickyNoteColor = "yellow" | "mauve" | "blue" | "green" | "lavender";
+type PersonalNoteDraft = {
+  title: string;
+  content: string;
+  urgent: boolean;
+  color: StickyNoteColor;
+  isTask: boolean;
+};
+
+function personalNoteDraftKey(userId: string) {
+  return `nour-personal-note-draft:${userId}`;
+}
+
+function readPersonalNoteDraft(userId: string): PersonalNoteDraft {
+  const emptyDraft: PersonalNoteDraft = {
+    title: "",
+    content: "",
+    urgent: false,
+    color: "yellow",
+    isTask: false,
+  };
+  try {
+    const stored = localStorage.getItem(personalNoteDraftKey(userId));
+    if (!stored) return emptyDraft;
+    const value = JSON.parse(stored) as Partial<PersonalNoteDraft>;
+    const validColors: StickyNoteColor[] = [
+      "yellow",
+      "mauve",
+      "blue",
+      "green",
+      "lavender",
+    ];
+    return {
+      title: typeof value.title === "string" ? value.title : "",
+      content: typeof value.content === "string" ? value.content : "",
+      urgent: value.urgent === true,
+      color: validColors.includes(value.color as StickyNoteColor)
+        ? (value.color as StickyNoteColor)
+        : "yellow",
+      isTask: value.isTask === true,
+    };
+  } catch {
+    return emptyDraft;
+  }
+}
 
 const stickyNoteColors: {
   value: StickyNoteColor;
@@ -73,32 +104,32 @@ const stickyNoteColors: {
   {
     value: "yellow",
     label: "Jaune",
-    card: "border-amber-200 bg-amber-100",
-    swatch: "bg-amber-300",
+    card: "note-color-yellow",
+    swatch: "bg-[#FFD230]",
   },
   {
-    value: "pink",
-    label: "Rose",
-    card: "border-rose-200 bg-rose-100",
-    swatch: "bg-rose-300",
+    value: "mauve",
+    label: "Mauve",
+    card: "note-color-mauve",
+    swatch: "bg-[#cfbcdb]",
   },
   {
     value: "blue",
     label: "Bleu",
-    card: "border-sky-200 bg-sky-100",
-    swatch: "bg-sky-300",
+    card: "note-color-blue",
+    swatch: "bg-[#73D4FF]",
   },
   {
     value: "green",
     label: "Vert",
-    card: "border-emerald-200 bg-emerald-100",
-    swatch: "bg-emerald-300",
+    card: "note-color-green",
+    swatch: "bg-[#5FE9B5]",
   },
   {
     value: "lavender",
-    label: "Prune",
-    card: "border-[#D8CBD0] bg-[#F3EFEC]",
-    swatch: "bg-[#8B707D]",
+    label: "Rouge",
+    card: "note-color-lavender",
+    swatch: "bg-[#FF6467]",
   },
 ];
 
@@ -108,17 +139,6 @@ const defaultReminders: ReminderPreferences = {
   morningTime: "06:30",
   eveningTime: "19:30",
 };
-const morningMessages = [
-  "Le moment des invocations du matin est arrivé.",
-  "Pensez à votre séquence d’invocations du matin.",
-  "Vos invocations du matin sont disponibles dans votre routine.",
-];
-const eveningMessages = [
-  "Le moment des invocations du soir est arrivé.",
-  "Pensez à votre séquence d’invocations du soir.",
-  "Vos invocations du soir sont disponibles dans votre routine.",
-];
-
 const cycleSymptoms: { key: CycleSymptom; label: string }[] = [
   { key: "bloating", label: "Ballonnements" },
   { key: "cramps", label: "Crampes" },
@@ -142,114 +162,10 @@ function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
 }
 
-const dailyEncouragements = [
-  "Quelques versets aujourd’hui, à ton rythme.",
-  "Pense à noter ta lecture pour la retrouver demain.",
-  "Choisis une petite action bénéfique à inscrire à ton planning.",
-  "Prends un instant pour les adhkars du matin ou du soir.",
-  "Tu peux reprendre là où tu t’es arrêtée, sans chercher à rattraper.",
-  "Garde une place dans ta journée pour ce qui compte.",
-  "Une petite étape compte aussi.",
-];
-
-function QuranHabitTracker({
-  today,
-  onNavigate,
-}: {
-  today: string;
-  onNavigate: (view: DashboardView) => void;
-}) {
-  const weekStart = format(subDays(parseISO(today), 6), "yyyy-MM-dd");
-  const readings = useQuery(api.quranProgress.forPlanner, {
-    fromDate: weekStart,
-    toDate: today,
-  });
-  const readingDates = new Set(readings?.map((reading) => reading.date) ?? []);
-  const days = Array.from({ length: 7 }, (_, index) => {
-    const date = subDays(parseISO(today), 6 - index);
-    const key = format(date, "yyyy-MM-dd");
-    return {
-      key,
-      label: format(date, "EEEEE", { locale: fr }),
-      date: format(date, "d"),
-      completed: readingDates.has(key),
-    };
-  });
-  const completedDays = days.filter((day) => day.completed).length;
-
-  return (
-    <section
-      aria-label="Habitude de lecture du Coran"
-      className="h-fit rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            Habitude de la semaine
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-foreground">
-            Lecture du Coran
-          </h2>
-        </div>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100/80 text-violet-800">
-          <BookOpen className="size-5" />
-        </span>
-      </div>
-
-      <p className="mt-2 text-xs leading-5 text-muted-foreground">
-        Chaque jour où tu notes une lecture apparaît ici.
-      </p>
-
-      <div className="mt-5 grid grid-cols-7 gap-1.5" role="list" aria-label="Sept derniers jours">
-        {days.map((day) => (
-          <div key={day.key} role="listitem" className="text-center">
-            <span className="block text-[10px] font-medium uppercase text-muted-foreground">
-              {day.label}
-            </span>
-            <span
-              className={`mx-auto mt-2 flex size-8 items-center justify-center rounded-full text-[11px] font-semibold ${day.completed ? "bg-violet-700 text-white" : "bg-violet-50 text-violet-700"}`}
-              aria-label={`${day.date}, ${day.completed ? "lecture notée" : "aucune lecture notée"}`}
-            >
-              {day.completed ? <Check className="size-4" /> : day.date}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex items-center justify-between text-xs">
-        <span className="font-semibold text-foreground">
-          {readings === undefined ? "Chargement…" : `${completedDays}/7 jours avec une lecture`}
-        </span>
-        <span className="text-muted-foreground">À ton rythme</span>
-      </div>
-      <div
-        className="mt-2 h-1.5 overflow-hidden rounded-full bg-violet-100"
-        role="progressbar"
-        aria-label="Jours de lecture cette semaine"
-        aria-valuemin={0}
-        aria-valuemax={7}
-        aria-valuenow={completedDays}
-      >
-        <div
-          className="h-full rounded-full bg-violet-600 transition-[width] duration-500"
-          style={{ width: `${(completedDays / 7) * 100}%` }}
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => onNavigate("quran")}
-        className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-violet-800 transition hover:text-violet-950"
-      >
-        Ajouter une lecture <ChevronRight className="size-3.5" />
-      </button>
-    </section>
-  );
-}
-
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const isAnonymousUser = user?.isAnonymous === true;
   const prayer = usePrayerTimes();
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [isExcusePeriod, setIsExcusePeriod] = useState(false);
@@ -260,6 +176,15 @@ export default function Dashboard() {
     readStored("nour-dark-mode", false),
   );
   const [adhkarSession, setAdhkarSession] = useState<AdhkarSession>("morning");
+  const [showAdhkarTransliteration, setShowAdhkarTransliteration] =
+    useState(true);
+  const [showAdhkarTranslation, setShowAdhkarTranslation] = useState(true);
+  const [quranResumePosition, setQuranResumePosition] = useState(
+    readQuranResumePosition,
+  );
+  const [quranResumeRequest, setQuranResumeRequest] =
+    useState<QuranResumePosition | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
   const [isSavingAdhkar, setIsSavingAdhkar] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() =>
     startOfMonth(new Date()),
@@ -277,6 +202,10 @@ export default function Dashboard() {
   const [personalNoteUrgent, setPersonalNoteUrgent] = useState(false);
   const [personalNoteColor, setPersonalNoteColor] =
     useState<StickyNoteColor>("yellow");
+  const [personalNoteIsTask, setPersonalNoteIsTask] = useState(false);
+  const [personalNoteDraftOwner, setPersonalNoteDraftOwner] = useState<
+    string | null
+  >(null);
   const [editingPersonalNote, setEditingPersonalNote] =
     useState<Id<"personalNotes"> | null>(null);
   const [editNoteTitle, setEditNoteTitle] = useState("");
@@ -286,13 +215,16 @@ export default function Dashboard() {
   const [draggedNoteId, setDraggedNoteId] =
     useState<Id<"personalNotes"> | null>(null);
   const [isSavingPersonalNote, setIsSavingPersonalNote] = useState(false);
-  const [notesSection, setNotesSection] = useState<"active" | "archived">(
-    "active",
-  );
+  const [notesSection, setNotesSection] = useState<
+    "active" | "todo" | "done" | "archived"
+  >("active");
   const [pendingNoteAction, setPendingNoteAction] = useState<string | null>(
     null,
   );
   const [isSavingLateAlerts, setIsSavingLateAlerts] = useState(false);
+  const [qadaRamadanTotal, setQadaRamadanTotal] = useState("0");
+  const [qadaRamadanCompleted, setQadaRamadanCompleted] = useState("0");
+  const [isSavingQadaRamadan, setIsSavingQadaRamadan] = useState(false);
   const [reminders, setReminders] = useState<ReminderPreferences>(() =>
     readStored("nour-reminders", defaultReminders),
   );
@@ -300,16 +232,6 @@ export default function Dashboard() {
   const notifiedLateCycle = useRef<string | null>(null);
   const firstName = user?.name?.trim().split(" ")[0];
   const today = todayKey();
-  const reminderDate = parseISO(today);
-  const reminderDay = Math.floor(
-    Date.UTC(
-      reminderDate.getFullYear(),
-      reminderDate.getMonth(),
-      reminderDate.getDate(),
-    ) / 86_400_000,
-  );
-  const reminderIndex = reminderDay % dailyEncouragements.length;
-  const dailyReminder = dailyEncouragements[reminderIndex];
   const historyStart = startOfMonth(subMonths(new Date(), 18));
   const visibleMonthStart = startOfMonth(calendarMonth);
   const visibleMonthEnd = endOfMonth(calendarMonth);
@@ -327,17 +249,24 @@ export default function Dashboard() {
   const cycleSettings = useQuery(api.cycleTracking.getSettings, {});
   const personalNotes = useQuery(api.personalNotes.list, {});
   const adhkarProgress = useQuery(api.adhkarProgress.forDate, { date: today });
+  const quranEntries = useQuery(api.quranProgress.list, {});
   const saveCycleDay = useMutation(api.cycleTracking.saveDay);
   const setPeriodRange = useMutation(api.cycleTracking.setPeriodRange);
   const updatePeriodRange = useMutation(api.cycleTracking.updatePeriodRange);
   const setLateAlertsEnabled = useMutation(
     api.cycleTracking.setLateAlertsEnabled,
   );
+  const setQadaRamadanProgress = useMutation(
+    api.cycleTracking.setQadaRamadanProgress,
+  );
   const addPersonalNote = useMutation(api.personalNotes.add);
   const editPersonalNote = useMutation(api.personalNotes.update);
   const reorderPersonalNotes = useMutation(api.personalNotes.reorder);
   const markPersonalNotesRead = useMutation(api.personalNotes.markAllRead);
   const setPersonalNoteArchived = useMutation(api.personalNotes.setArchived);
+  const setPersonalTaskCompleted = useMutation(
+    api.personalNotes.setTaskCompleted,
+  );
   const removePersonalNote = useMutation(api.personalNotes.remove);
   const recordAdhkarRepetition = useMutation(
     api.adhkarProgress.recordRepetition,
@@ -348,18 +277,48 @@ export default function Dashboard() {
   );
   const adhkarSequence = adhkarBySession[adhkarSession];
   const currentInvocation = adhkarSequence[sessionProgress?.currentIndex ?? 0];
+  const latestQuranEntry = quranEntries?.[0];
+  const quranResumeTarget =
+    quranResumePosition ??
+    (latestQuranEntry ? resumePositionFromReadingLog(latestQuranEntry) : null);
+  const currentMinutes =
+    new Date(clock).getHours() * 60 + new Date(clock).getMinutes();
+  const asrMinutes = prayer.times
+    ? prayer.times.asr
+        .split(":")
+        .map(Number)
+        .reduce((hours, minutes) => hours * 60 + minutes, 0)
+    : 16 * 60;
+  const momentAdhkarSession: AdhkarSession =
+    currentMinutes >= asrMinutes ? "evening" : "morning";
+  const nextPrayer = prayer.times
+    ? (
+        [
+          ["Fajr", prayer.times.fajr],
+          ["Dhuhr", prayer.times.dhuhr],
+          ["Asr", prayer.times.asr],
+          ["Maghrib", prayer.times.maghrib],
+          ["Isha", prayer.times.isha],
+        ] as const
+      ).find(([, time]) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes > currentMinutes;
+      })
+    : undefined;
   const currentRepetitionCount = sessionProgress?.repetitionCount ?? 0;
   const isInvocationComplete =
     currentInvocation !== undefined &&
     currentRepetitionCount >= currentInvocation.repetitions;
-  const completedMorningAdhkar =
-    adhkarProgress?.find((entry) => entry.session === "morning")
-      ?.currentIndex ?? 0;
-  const completedEveningAdhkar =
-    adhkarProgress?.find((entry) => entry.session === "evening")
-      ?.currentIndex ?? 0;
   const records = cycleDays ?? [];
   const selectedDayKey = format(selectedDate, "yyyy-MM-dd");
+  const todayTasks = (personalNotes ?? [])
+    .filter(
+      (note) =>
+        note.isTask === true &&
+        note.completed !== true &&
+        note.archived !== true,
+    )
+    .slice(0, 3);
   const selectedEntry = records.find((entry) => entry.date === selectedDayKey);
   const noteDraft = noteDrafts[selectedDayKey] ?? selectedEntry?.note ?? "";
   const periodDates = records
@@ -455,7 +414,12 @@ export default function Dashboard() {
     ?.filter((note) =>
       notesSection === "archived"
         ? note.archived === true
-        : note.archived !== true,
+        : note.archived !== true &&
+          (notesSection === "todo"
+            ? note.isTask === true && note.completed !== true
+            : notesSection === "done"
+              ? note.isTask === true && note.completed === true
+              : true),
     )
     .sort(
       (first, second) =>
@@ -467,6 +431,54 @@ export default function Dashboard() {
       entry.isPeriodDay &&
       entry.date.startsWith(format(calendarMonth, "yyyy-MM")),
   ).length;
+
+  useEffect(() => {
+    if (!user?._id) {
+      setPersonalNoteDraftOwner(null);
+      return;
+    }
+
+    const draft = readPersonalNoteDraft(user._id);
+    setPersonalNoteTitle(draft.title);
+    setPersonalNoteDraft(draft.content);
+    setPersonalNoteUrgent(draft.urgent);
+    setPersonalNoteColor(draft.color);
+    setPersonalNoteIsTask(draft.isTask);
+    setPersonalNoteDraftOwner(user._id);
+  }, [user?._id]);
+
+  useEffect(() => {
+    if (!user?._id || personalNoteDraftOwner !== user._id) return;
+
+    const key = personalNoteDraftKey(user._id);
+    const isEmpty =
+      !personalNoteTitle &&
+      !personalNoteDraft &&
+      !personalNoteUrgent &&
+      personalNoteColor === "yellow" &&
+      !personalNoteIsTask;
+    if (isEmpty) {
+      localStorage.removeItem(key);
+      return;
+    }
+
+    const draft: PersonalNoteDraft = {
+      title: personalNoteTitle,
+      content: personalNoteDraft,
+      urgent: personalNoteUrgent,
+      color: personalNoteColor,
+      isTask: personalNoteIsTask,
+    };
+    localStorage.setItem(key, JSON.stringify(draft));
+  }, [
+    personalNoteColor,
+    personalNoteDraft,
+    personalNoteDraftOwner,
+    personalNoteIsTask,
+    personalNoteTitle,
+    personalNoteUrgent,
+    user?._id,
+  ]);
 
   useEffect(() => {
     localStorage.setItem("nour-reminders", JSON.stringify(reminders));
@@ -484,6 +496,15 @@ export default function Dashboard() {
   }, [isDarkMode]);
 
   useEffect(() => {
+    if (!cycleSettings) return;
+    setQadaRamadanTotal(String(cycleSettings.qadaRamadanTotal ?? 0));
+    setQadaRamadanCompleted(String(cycleSettings.qadaRamadanCompleted ?? 0));
+  }, [
+    cycleSettings?.qadaRamadanCompleted,
+    cycleSettings?.qadaRamadanTotal,
+  ]);
+
+  useEffect(() => {
     if (!("Notification" in window) || Notification.permission !== "granted")
       return;
     const checkReminders = () => {
@@ -495,24 +516,20 @@ export default function Dashboard() {
           key: "morning",
           enabled: reminders.morning,
           at: reminders.morningTime,
-          messages: morningMessages,
-          title: "Un instant pour vous",
+          title: "Un instant pour toi",
         },
         {
           key: "evening",
           enabled: reminders.evening,
           at: reminders.eveningTime,
-          messages: eveningMessages,
           title: "Une pause en douceur",
         },
       ];
-      moments.forEach(({ key, enabled, at, messages, title }) => {
+      moments.forEach(({ key, enabled, at, title }) => {
         if (enabled && time === at && firedToday.current[key] !== date) {
           firedToday.current[key] = date;
-          const messageIndex =
-            (now.getDate() + (key === "evening" ? 1 : 0)) % messages.length;
           new Notification(title, {
-            body: messages[messageIndex],
+            body: "Ton rappel Nour est disponible.",
             tag: `nour-${key}-${date}`,
           });
         }
@@ -545,7 +562,7 @@ export default function Dashboard() {
           : Notification.permission;
       if (permission !== "granted") {
         toast.message(
-          "Autorisez les notifications dans votre navigateur pour activer ce rappel.",
+          "Autorise les notifications dans ton navigateur pour activer ce rappel.",
         );
         return;
       }
@@ -564,7 +581,7 @@ export default function Dashboard() {
       await saveCycleDay({ date, isPeriodDay, symptoms, note });
       return true;
     } catch {
-      toast.error("Impossible d’enregistrer cette journée. Réessayez.");
+      toast.error("Impossible d’enregistrer cette journée. Réessaie.");
       return false;
     } finally {
       setIsSavingCycleDay(false);
@@ -610,7 +627,7 @@ export default function Dashboard() {
     const startDate = format(selectedRange.from, "yyyy-MM-dd");
     const endDate = format(selectedRange.to, "yyyy-MM-dd");
     if (differenceInCalendarDays(selectedRange.to, selectedRange.from) > 59) {
-      toast.error("Sélectionnez une plage de 60 jours maximum.");
+      toast.error("Sélectionne une plage de 60 jours maximum.");
       return;
     }
     if (!editingPeriodRange) {
@@ -655,7 +672,7 @@ export default function Dashboard() {
         );
       }
     } catch {
-      toast.error("Impossible d’enregistrer cette plage. Réessayez.");
+      toast.error("Impossible d’enregistrer cette plage. Réessaie.");
     } finally {
       setIsSavingCycleDay(false);
     }
@@ -691,9 +708,26 @@ export default function Dashboard() {
       }
       await setLateAlertsEnabled({ enabled });
     } catch {
-      toast.error("Impossible d’enregistrer votre préférence de notification.");
+      toast.error("Impossible d’enregistrer ta préférence de notification.");
     } finally {
       setIsSavingLateAlerts(false);
+    }
+  };
+
+  const saveQadaRamadan = async () => {
+    setIsSavingQadaRamadan(true);
+    try {
+      await setQadaRamadanProgress({
+        total: Number(qadaRamadanTotal),
+        completed: Number(qadaRamadanCompleted),
+      });
+      toast.success("Suivi mis à jour.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible d’enregistrer ce suivi.",
+      );
+    } finally {
+      setIsSavingQadaRamadan(false);
     }
   };
 
@@ -707,7 +741,7 @@ export default function Dashboard() {
         invocationId: currentInvocation.id,
       });
     } catch {
-      toast.error("Impossible d’enregistrer cette récitation. Réessayez.");
+      toast.error("Impossible d’enregistrer cette récitation. Réessaie.");
     } finally {
       setIsSavingAdhkar(false);
     }
@@ -723,7 +757,7 @@ export default function Dashboard() {
         invocationId: currentInvocation.id,
       });
     } catch {
-      toast.error("Récitez toutes les répétitions avant de passer à la suite.");
+      toast.error("Récite toutes les répétitions avant de passer à la suite.");
     } finally {
       setIsSavingAdhkar(false);
     }
@@ -743,7 +777,7 @@ export default function Dashboard() {
     if (notifiedLateCycle.current === alertKey) return;
     notifiedLateCycle.current = alertKey;
     new Notification("Petit rappel de suivi", {
-      body: "La date estimée de vos règles est passée. Les cycles peuvent varier : consultez votre calendrier quand vous le souhaitez.",
+        body: "Ton rappel de suivi est disponible dans Nour.",
       tag: `nour-cycle-late-${alertKey}`,
     });
   }, [
@@ -755,7 +789,7 @@ export default function Dashboard() {
 
   const navigateToView = (view: DashboardView) => {
     setActiveView(view);
-    if (view === "notes" && hasUnreadNotes) {
+    if (view === "notes" && hasUnreadNotes && !isAnonymousUser) {
       void markPersonalNotesRead({}).catch(() => {
         toast.error("Impossible de mettre à jour les notifications de notes.");
       });
@@ -780,7 +814,29 @@ export default function Dashboard() {
     });
   };
 
+  useEffect(() => {
+    const interval = window.setInterval(() => setClock(Date.now()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updateQuranResumePosition = (event: Event) => {
+      setQuranResumePosition(
+        (event as CustomEvent<QuranResumePosition>).detail,
+      );
+    };
+    window.addEventListener(quranResumeEvent, updateQuranResumePosition);
+    return () =>
+      window.removeEventListener(quranResumeEvent, updateQuranResumePosition);
+  }, []);
+
   const savePersonalNote = async () => {
+    if (isAnonymousUser) {
+      toast.error(
+        "Connecte-toi avec ton email ou Google pour enregistrer tes notes. Les sessions anonymes ne permettent pas de sauvegarder les données.",
+      );
+      return;
+    }
     setIsSavingPersonalNote(true);
     try {
       await addPersonalNote({
@@ -788,17 +844,23 @@ export default function Dashboard() {
         title: personalNoteTitle || undefined,
         urgent: personalNoteUrgent,
         color: personalNoteColor,
+        isTask: personalNoteIsTask,
       });
       setPersonalNoteDraft("");
       setPersonalNoteTitle("");
       setPersonalNoteUrgent(false);
       setPersonalNoteColor("yellow");
+      setPersonalNoteIsTask(false);
+      // Nettoyer le localStorage après sauvegarde réussie
+      if (user?._id) {
+        localStorage.removeItem(personalNoteDraftKey(user._id));
+      }
       toast.success("Note enregistrée.");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Impossible d’enregistrer la note. Réessayez.",
+          : "Impossible d’enregistrer la note. Réessaie.",
       );
     } finally {
       setIsSavingPersonalNote(false);
@@ -806,6 +868,12 @@ export default function Dashboard() {
   };
 
   const savePersonalNoteEdits = async (noteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error(
+        "Connecte-toi avec ton email ou Google pour modifier tes notes.",
+      );
+      return;
+    }
     setPendingNoteAction(noteId);
     try {
       await editPersonalNote({
@@ -829,8 +897,13 @@ export default function Dashboard() {
   };
 
   const reorderPersonalNote = async (targetNoteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour réorganiser tes notes.");
+      return;
+    }
     if (!draggedNoteId || draggedNoteId === targetNoteId) return;
     const archived = notesSection === "archived";
+    if (notesSection === "todo" || notesSection === "done") return;
     const notes = (personalNotes ?? [])
       .filter((note) => (note.archived === true) === archived)
       .sort(
@@ -863,6 +936,10 @@ export default function Dashboard() {
     noteId: Id<"personalNotes">,
     archived: boolean,
   ) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour archiver/restaurer tes notes.");
+      return;
+    }
     setPendingNoteAction(noteId);
     try {
       await setPersonalNoteArchived({ noteId, archived });
@@ -878,7 +955,33 @@ export default function Dashboard() {
     }
   };
 
+  const updatePersonalTaskCompletion = async (
+    noteId: Id<"personalNotes">,
+    completed: boolean,
+  ) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour mettre à jour tes tâches.");
+      return;
+    }
+    setPendingNoteAction(noteId);
+    try {
+      await setPersonalTaskCompleted({ noteId, completed });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Impossible de mettre à jour cette tâche.",
+      );
+    } finally {
+      setPendingNoteAction(null);
+    }
+  };
+
   const deletePersonalNote = async (noteId: Id<"personalNotes">) => {
+    if (isAnonymousUser) {
+      toast.error("Connecte-toi pour supprimer tes notes.");
+      return;
+    }
     if (
       !window.confirm(
         "Supprimer définitivement cette note ? Cette action est irréversible.",
@@ -904,7 +1007,7 @@ export default function Dashboard() {
 
   return (
     <main
-      className={`dashboard-shell min-h-screen bg-[#f7f5fb] text-stone-900 ${isDarkMode ? "dark-dashboard" : ""}`}
+      className={`dashboard-shell min-h-screen bg-background text-stone-900 ${isDarkMode ? "dark-dashboard" : ""}`}
     >
       <DashboardSidebar
         activeView={activeView}
@@ -921,90 +1024,94 @@ export default function Dashboard() {
         onSignOut={() => void handleSignOut()}
       />
       <div
-        className={`min-h-screen bg-[#f7f5fb] transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
+        className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
-        <header className="border-b border-violet-100 bg-white/90">
+        <header
+          className={`border-b border-[#E7E1D6] ${activeView === "overview" ? "bg-background" : "bg-white/90"}`}
+        >
           {activeView === "overview" ? (
             <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-4 sm:px-6 xl:px-8">
               <div className="flex items-center gap-3">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm">
                   <MoonStar className="size-5" />
                 </span>
-                <span className="text-lg font-bold tracking-tight text-stone-900">nour</span>
+                <span className="text-lg font-bold tracking-tight text-stone-900">
+                  nour
+                </span>
               </div>
-              <span className="text-sm font-medium text-stone-500">Ton espace quotidien</span>
+              <span className="text-sm font-medium text-stone-500">
+                Ton espace quotidien
+              </span>
             </div>
           ) : (
-          <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
-            <div className="min-w-0">
-              <p className="text-base font-semibold text-stone-900">
-                {new Intl.DateTimeFormat("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }).format(new Date())}
-              </p>
-              <p className="mt-1 text-[14px] leading-5 text-stone-500">
-                {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }).format(new Date())}
-                <span className="mt-0.5 block text-[14px] text-stone-400">
-                  Date hégirienne indicative
-                </span>
-              </p>
-            </div>
+            <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
+              <div className="min-w-0">
+                <p className="text-base font-semibold text-stone-900">
+                  {new Intl.DateTimeFormat("fr-FR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date())}
+                </p>
+                <p className="mt-1 text-[14px] leading-5 text-left text-stone-500">
+                  {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date())}
+                  <span className="mt-0.5 block text-[14px] text-stone-400">
+                    Date hégirienne indicative
+                  </span>
+                </p>
+              </div>
 
-            <div className="min-w-0">
-              <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
-                {prayer.times
-                  ? "Horaires calculés pour votre position"
-                  : "Horaires locaux · à configurer"}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { name: "Fajr", time: prayer.times?.fajr },
-                  { name: "Dhuhr", time: prayer.times?.dhuhr },
-                  { name: "Asr", time: prayer.times?.asr },
-                  { name: "Maghrib", time: prayer.times?.maghrib },
-                  { name: "Isha", time: prayer.times?.isha },
-                ].map(({ name, time }) => (
-                  <span
-                    key={name}
-                    className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
-                  >
-                    <Clock3 className="size-3.5 shrink-0 text-emerald-800" />
-                    <span className="inline-flex items-center gap-2.5">
-                      <span className="font-medium">{name}</span>
-                      <span className="tabular-nums text-stone-500">
-                        {time ?? (prayer.isLoading ? "…" : "--:--")}
+              <div className="min-w-0">
+                <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+                  {prayer.times
+                    ? "Horaires calculés pour ta position"
+                    : "Horaires locaux · à configurer"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { name: "Fajr", time: prayer.times?.fajr },
+                    { name: "Dhuhr", time: prayer.times?.dhuhr },
+                    { name: "Asr", time: prayer.times?.asr },
+                    { name: "Maghrib", time: prayer.times?.maghrib },
+                    { name: "Isha", time: prayer.times?.isha },
+                  ].map(({ name, time }) => (
+                    <span
+                      key={name}
+                      className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
+                    >
+                      <span className="inline-flex items-center gap-2.5">
+                        <span className="font-medium">{name}</span>
+                        <span className="tabular-nums text-stone-500">
+                          {time ?? (prayer.isLoading ? "…" : "--:--")}
+                        </span>
                       </span>
                     </span>
-                  </span>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleSignOut()}
-              className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
-              aria-label="Se déconnecter"
-            >
-              <LogOut className="size-4" />
-              Quitter
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleSignOut()}
+                className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
+                aria-label="Se déconnecter"
+              >
+                Quitter
+              </Button>
+            </div>
           )}
         </header>
 
-        <div className="mx-auto mt-3 min-h-[calc(100vh-100px)] max-w-[1600px] rounded-t-3xl border border-b-0 border-violet-100 bg-white px-4 pb-12 pt-6 sm:mt-4 sm:px-6 xl:px-8">
-          <div
-            className={`grid items-start gap-6 xl:gap-8 ${activeView === "settings" ? "xl:grid-cols-[minmax(0,1fr)_360px]" : "xl:grid-cols-1"}`}
-          >
+        <div
+          className="mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] bg-background px-4 pb-12 pt-6 sm:px-6 xl:px-8"
+        >
+          <div className="grid items-start gap-6 xl:gap-8 xl:grid-cols-1">
             <section className="min-w-0 space-y-4">
               {(activeView === "overview" ||
                 activeView === "salah" ||
@@ -1012,69 +1119,99 @@ export default function Dashboard() {
                 activeView === "science") && (
                 <>
                   {activeView === "overview" && (
-                    <div
-                      id="dashboard-home"
-                      className="scroll-mt-24 rounded-[28px] bg-gradient-to-br from-[#38245f] to-[#694a9d] p-5 text-white shadow-lg shadow-violet-200/40 sm:p-7"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-semibold text-violet-100">Espace personnel</p>
-                          <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-                            Salam, {firstName || "bienvenue"}
-                          </h1>
-                          <p className="mt-1.5 text-sm text-violet-100">{dailyReminder}</p>
-                        </div>
-                        <MoonStar className="size-7 shrink-0 text-violet-100" />
-                      </div>
-                    </div>
-                  )}
+                    <div id="dashboard-home" className="scroll-mt-24 space-y-5">
+                      <section className="rounded-3xl border border-[#DCE5DC] bg-[#EEF4EE] px-5 py-6 sm:px-8 sm:py-8">
+                        <h1
+                          className="text-xl font-semibold leading-snug text-[#26362A] sm:text-2xl"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          السلام عليكم ورحمة الله وبركاته
+                        </h1>
+                        <p className="mt-2 text-sm leading-6 text-[#405348] sm:text-base">
+                          Que la paix, la miséricorde d’Allah et Ses
+                          bénédictions soient sur toi
+                          {firstName ? `, ${firstName}` : ""}.
+                        </p>
+                      </section>
 
-                  {activeView === "overview" && (
-                    <section aria-label="Tes repères quotidiens" className="grid gap-3 sm:grid-cols-2">
-                      <button type="button" onClick={() => navigateToView("salah")} className="rounded-2xl border border-violet-100 bg-[#f7f4fb] p-4 text-left transition hover:border-violet-200 hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-violet-800"><Clock3 className="size-4" /> Horaires de prière</span>
-                        <span className="mt-4 flex flex-wrap gap-2">
-                          {[
-                            { name: "Fajr", time: prayer.times?.fajr },
-                            { name: "Dhuhr", time: prayer.times?.dhuhr },
-                            { name: "Asr", time: prayer.times?.asr },
-                            { name: "Maghrib", time: prayer.times?.maghrib },
-                            { name: "Isha", time: prayer.times?.isha },
-                          ].map(({ name, time }) => (
-                            <span key={name} className="rounded-full bg-white px-2.5 py-1.5 text-[11px] text-stone-600 shadow-sm">{name}{time ? ` ${time}` : ""}</span>
-                          ))}
-                        </span>
-                      </button>
+                      <section
+                        aria-label="Tes repères du jour"
+                        className="grid gap-3 sm:grid-cols-3"
+                      >
+                        <article className="rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Prochaine prière
+                          </h2>
+                          {nextPrayer ? (
+                            <p className="mt-3 text-lg font-semibold text-[#26362A]">
+                              {nextPrayer[0]}{" "}
+                              <span className="font-normal tabular-nums text-[#405348]">
+                                {nextPrayer[1]}
+                              </span>
+                            </p>
+                          ) : (
+                            <p className="mt-3 text-sm leading-5 text-[#405348]">
+                              {prayer.times
+                                ? `Fajr demain · ${prayer.times.fajr}`
+                                : "Configure tes horaires dans les réglages."}
+                            </p>
+                          )}
+                        </article>
 
-                      <button type="button" onClick={() => openAdhkarSession("morning")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-emerald-900"><Sun className="size-4" /> Routine du jour</span>
-                        <span className="mt-3 block text-sm text-stone-600">Adhkar du matin et du soir</span>
-                        <span className="mt-1 block text-xs text-stone-500">{completedMorningAdhkar}/{adhkarBySession.morning.length} matin · {completedEveningAdhkar}/{adhkarBySession.evening.length} soir</span>
-                      </button>
+                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Adhkar du{" "}
+                            {momentAdhkarSession === "morning"
+                              ? "matin"
+                              : "soir"}
+                          </h2>
+                          <p className="mt-2 text-sm leading-5 text-[#405348]">
+                            Retrouve les invocations de ce moment.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openAdhkarSession(momentAdhkarSession)
+                            }
+                            className="mt-4 rounded-xl bg-[#5D7C65] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#45624D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
+                          >
+                            Continuer
+                          </button>
+                        </article>
 
-                      <button type="button" onClick={() => navigateToView("quran")} className="rounded-2xl border border-violet-100 bg-white p-4 text-left transition hover:border-violet-200 hover:bg-violet-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-violet-800"><BookOpen className="size-4" /> Journal Al-Qur’an</span>
-                        <span className="mt-3 block text-sm text-stone-600">Note ta lecture et retrouve le passage où tu t’es arrêtée.</span>
-                      </button>
-
-                      <button type="button" onClick={() => navigateToView("periods")} className="rounded-2xl border border-emerald-100 bg-[#f1f6ef] p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:p-5">
-                        <span className="flex items-center gap-2 text-sm font-semibold text-emerald-900"><CalendarDays className="size-4" /> Mes repères</span>
-                        <span className="mt-3 block text-sm text-stone-600">{currentPeriodDay !== null ? `Jour ${currentPeriodDay} · suivi personnel` : currentCycleDay !== null && currentCycleDay <= 60 ? `Jour ${currentCycleDay} du cycle` : "Cycle et planning adapté"}</span>
-                        <span className="mt-1 block text-xs text-stone-500">{isExcusePeriod ? "Mode Al-‘Udhr actif" : "Tes informations restent personnelles"}</span>
-                      </button>
-                    </section>
-                  )}
-
-                  {activeView === "overview" && (
-                    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
-                      <DailyPlanner
-                        isExcusePeriod={isExcusePeriod}
-                        prayerTimes={prayer.times}
-                      />
-                      <QuranHabitTracker
-                        today={today}
-                        onNavigate={navigateToView}
-                      />
+                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
+                          <h2 className="text-sm font-semibold text-[#35533D]">
+                            Reprendre ma lecture
+                          </h2>
+                          <p className="mt-2 text-sm leading-5 text-[#405348]">
+                            {quranResumeTarget?.surah ??
+                              latestQuranEntry?.passage ??
+                              "Aucune lecture récente pour le moment."}
+                          </p>
+                          {quranResumeTarget ? (
+                            <p className="mt-1 text-xs text-[#52675A]">
+                              Verset {quranResumeTarget.ayah}
+                            </p>
+                          ) : latestQuranEntry?.pagesOrVerses ? (
+                            <p className="mt-1 text-xs text-[#52675A]">
+                              {latestQuranEntry.pagesOrVerses}
+                            </p>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setQuranResumeRequest(quranResumeTarget);
+                              navigateToView("quran");
+                            }}
+                            className="mt-4 rounded-xl border border-[#5D7C65] px-4 py-2 text-sm font-semibold text-[#35533D] transition hover:bg-[#F1F5EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
+                          >
+                            {quranResumeTarget
+                              ? "Reprendre"
+                              : "Ouvrir Al-Quran"}
+                          </button>
+                        </article>
+                      </section>
                     </div>
                   )}
 
@@ -1085,16 +1222,74 @@ export default function Dashboard() {
                     />
                   )}
 
-                  {activeView === "quran" && <QuranJournal />}
+                  {activeView === "quran" && (
+                    <QuranJournal resumePosition={quranResumeRequest} />
+                  )}
 
                   {activeView === "science" && <ScienceJournal />}
 
                   {activeView === "overview" && (
+                    <section className="rounded-3xl border border-[#DCE5DC] bg-white p-5 sm:p-6">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5F7F68]">
+                            Aujourd’hui
+                          </p>
+                          <h2 className="mt-1 text-xl font-semibold text-[#26362A]">
+                            Ce que tu veux faire
+                          </h2>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => navigateToView("notes")}
+                          className="rounded-xl border border-[#DCE5DC] px-3 py-2 text-sm font-medium text-[#35533D] transition hover:bg-[#EEF4EE]"
+                        >
+                          Gérer les tâches
+                        </button>
+                      </div>
+                      <p className="mt-4 rounded-xl bg-[#EEF4EE] px-3 py-2 text-sm text-[#405348]">
+                        Rappel du jour : TODO — contenu validé à sélectionner.
+                      </p>
+                      {todayTasks.length > 0 ? (
+                        <ul className="mt-4 space-y-2">
+                          {todayTasks.map((task) => (
+                            <li
+                              key={task._id}
+                              className="flex items-start gap-3 rounded-xl border border-[#E7EDE6] px-4 py-3"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={task.completed === true}
+                                disabled={pendingNoteAction === task._id}
+                                onChange={(event) =>
+                                  void updatePersonalTaskCompletion(
+                                    task._id,
+                                    event.target.checked,
+                                  )
+                                }
+                                aria-label={`Marquer « ${task.title || task.content.split("\n")[0]} » comme terminée`}
+                                className="mt-0.5 size-4 accent-[#5F7F68]"
+                              />
+                              <p className="text-sm font-medium text-[#26362A]">
+                                {task.title || task.content.split("\n")[0]}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="mt-4 text-sm text-[#52675A]">
+                          Aucune tâche pour aujourd’hui. Ajoute-en une dans Notes.
+                        </p>
+                      )}
+                    </section>
+                  )}
+
+                  {activeView === "overview" && (
                     <details
                       id="dashboard-routine"
-                      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
+                      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 [&:not([open])]:hidden"
                     >
-                      <summary className="cursor-pointer list-none">
+                      <summary className="sr-only">
                         <div className="mb-4 flex items-center justify-between gap-4">
                           <div>
                             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
@@ -1104,7 +1299,6 @@ export default function Dashboard() {
                               Ouvrir les invocations du matin et du soir
                             </h2>
                           </div>
-                          <Sun className="size-5 text-emerald-800" />
                         </div>
                       </summary>
 
@@ -1114,15 +1308,13 @@ export default function Dashboard() {
                             {
                               id: "morning",
                               label: "Invocations du matin",
-                              icon: Sun,
                             },
                             {
                               id: "evening",
                               label: "Invocations du soir",
-                              icon: MoonStar,
                             },
                           ] as const
-                        ).map(({ id, label, icon: Icon }) => {
+                        ).map(({ id, label }) => {
                           const progress = adhkarProgress?.find(
                             (entry) => entry.session === id,
                           );
@@ -1142,7 +1334,6 @@ export default function Dashboard() {
                                   : "text-muted-foreground hover:text-foreground"
                               }`}
                             >
-                              <Icon className="size-4 shrink-0" />
                               <span className="truncate">{label}</span>
                               <span className="shrink-0 text-[10px]">
                                 {completed}/{adhkarBySession[id].length}
@@ -1155,7 +1346,7 @@ export default function Dashboard() {
                       <div className="mt-4 rounded-3xl border border-stone-200 bg-white p-4 sm:p-6">
                         {adhkarProgress === undefined ? (
                           <p className="py-10 text-center text-sm text-muted-foreground">
-                            Chargement de votre routine…
+                            Chargement de ta routine…
                           </p>
                         ) : currentInvocation ? (
                           <>
@@ -1176,18 +1367,84 @@ export default function Dashboard() {
                             >
                               {currentInvocation.arabic}
                             </div>
+                            <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
+                              <label className="inline-flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={showAdhkarTransliteration}
+                                  onChange={(event) =>
+                                    setShowAdhkarTransliteration(
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+                                Translittération
+                              </label>
+                              <label className="inline-flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={showAdhkarTranslation}
+                                  onChange={(event) =>
+                                    setShowAdhkarTranslation(
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+                                Traduction
+                              </label>
+                            </div>
                             <h3 className="study-prose mt-5 text-xl">
                               {currentInvocation.title}
                             </h3>
-                            <p className="study-prose mt-2 text-sm italic text-muted-foreground">
-                              {currentInvocation.transliteration}
-                            </p>
-                            <p className="study-prose mt-3 text-sm text-foreground">
-                              {currentInvocation.meaning}
-                            </p>
-                            <p className="mt-3 text-[10px] text-muted-foreground">
-                              Source : {currentInvocation.source}
-                            </p>
+                            {showAdhkarTransliteration && (
+                              <p className="study-prose mt-2 text-sm italic text-muted-foreground">
+                                {currentInvocation.transliteration}
+                              </p>
+                            )}
+                            {showAdhkarTranslation && (
+                              <p className="study-prose mt-3 text-sm text-foreground">
+                                {currentInvocation.meaning}
+                              </p>
+                            )}
+                            <details className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">
+                              <summary className="cursor-pointer font-medium text-stone-800">
+                                Preuve
+                              </summary>
+                              <dl className="mt-3 space-y-1.5">
+                                <div>
+                                  <dt className="inline font-medium">Référence indiquée : </dt>
+                                  <dd className="inline">{currentInvocation.proof.legacyReference} — référence existante à vérifier.</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Rapporteur : </dt>
+                                  <dd className="inline">{currentInvocation.proof.narrator}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Recueil et numéro : </dt>
+                                  <dd className="inline">{currentInvocation.proof.collection} {currentInvocation.proof.number}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Degré d’authenticité : </dt>
+                                  <dd className="inline">{currentInvocation.proof.grade}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Source de classification : </dt>
+                                  <dd className="inline">{currentInvocation.proof.gradingSource}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Édition : </dt>
+                                  <dd className="inline">{currentInvocation.proof.edition}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Moment : </dt>
+                                  <dd className="inline">{currentInvocation.moment === "morning" ? "Matin" : "Soir"}</dd>
+                                </div>
+                                <div>
+                                  <dt className="inline font-medium">Répétitions : </dt>
+                                  <dd className="inline">{currentInvocation.repetitions} — TODO : vérifier dans l’édition.</dd>
+                                </div>
+                              </dl>
+                            </details>
 
                             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                               <Button
@@ -1206,10 +1463,7 @@ export default function Dashboard() {
                                 className={`min-h-11 flex-1 rounded-full ${isInvocationComplete ? "" : "bg-[#523B46] text-white hover:bg-[#3D2A34]"}`}
                               >
                                 {isInvocationComplete ? (
-                                  <>
-                                    <Check className="mr-2 size-4" />
-                                    Invocation terminée
-                                  </>
+                                  <>Invocation terminée</>
                                 ) : (
                                   `J’ai récité (${currentRepetitionCount}/${currentInvocation.repetitions})`
                                 )}
@@ -1223,26 +1477,22 @@ export default function Dashboard() {
                                 className="min-h-11 flex-1 rounded-full bg-[#523B46] text-white hover:bg-[#3D2A34]"
                               >
                                 Invocation suivante
-                                <ChevronRight className="ml-2 size-4" />
                               </Button>
                             </div>
                             {!isInvocationComplete && (
                               <p className="mt-3 text-center text-xs text-muted-foreground">
-                                Marquez chaque récitation ; vous pourrez
-                                continuer une fois le nombre demandé atteint.
+                                Marque chaque récitation ; tu pourras continuer
+                                une fois le nombre demandé atteint.
                               </p>
                             )}
                           </>
                         ) : (
                           <div className="py-8 text-center">
-                            <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                              <Check className="size-6" />
-                            </span>
                             <h3 className="mt-4 font-serif text-2xl">
                               Routine terminée, bravo
                             </h3>
                             <p className="mt-2 text-sm text-muted-foreground">
-                              Vous avez terminé les invocations{" "}
+                              Tu as terminé les invocations{" "}
                               {adhkarSession === "morning"
                                 ? "du matin"
                                 : "du soir"}{" "}
@@ -1281,7 +1531,7 @@ export default function Dashboard() {
                           {periodStarts.length}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          d’après votre calendrier
+                          d’après ton calendrier
                         </p>
                       </CardContent>
                     </Card>
@@ -1301,18 +1551,18 @@ export default function Dashboard() {
                         </h2>
                       </div>
                       <span className="hidden text-xs text-muted-foreground sm:inline">
-                        Privé · enregistré sur votre compte
+                        Privé · enregistré sur ton compte
                       </span>
                     </div>
 
                     {isPeriodLate && expectedNextPeriod && (
                       <div className="mb-5 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
                         <p className="font-semibold">
-                          Votre cycle est peut-être un peu en retard
+                          Ton cycle a peut-être un peu de retard
                         </p>
                         <p className="mt-1 leading-6">
-                          D’après les journées que vous avez notées, la date
-                          estimée était le{" "}
+                          D’après les journées que tu as notées, la date estimée
+                          était le{" "}
                           {format(expectedNextPeriod, "d MMMM", { locale: fr })}
                           . Les cycles varient naturellement ; cette estimation
                           n’est pas un avis médical.
@@ -1375,12 +1625,11 @@ export default function Dashboard() {
                           modifiers={{ period: periodDates }}
                           modifiersClassNames={{
                             period:
-                              "bg-rose-100 font-semibold text-rose-800 hover:bg-rose-200",
+                              "bg-mauve-100 font-semibold text-mauve-800 hover:bg-mauve-200",
                           }}
                           className="mx-auto w-full max-w-md"
                         />
-                        <div className="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
-                          <span className="size-3 rounded-full bg-rose-200" />
+                        <div className="pb-2 text-center text-xs text-muted-foreground">
                           Règles déjà notées
                         </div>
                       </div>
@@ -1398,14 +1647,12 @@ export default function Dashboard() {
                                 locale: fr,
                               })}
                         </p>
-                        <h3 className="mt-2 font-serif text-xl">
-                          Votre période
-                        </h3>
+                        <h3 className="mt-2 font-serif text-xl">Ta période</h3>
 
                         <p className="mt-2 text-xs leading-5 text-muted-foreground">
                           {editingPeriodRange
-                            ? "Choisissez les nouvelles dates de début et de fin dans le calendrier."
-                            : "Choisissez les dates de début et de fin dans le calendrier."}
+                            ? "Choisis les nouvelles dates de début et de fin dans le calendrier."
+                            : "Choisis les dates de début et de fin dans le calendrier."}
                         </p>
 
                         {selectedPeriodRun && !editingPeriodRange && (
@@ -1508,17 +1755,18 @@ export default function Dashboard() {
                             !selectedRange.to
                           }
                           onClick={() => void saveSelectedPeriodRange()}
-                          className="mt-4 w-full rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-left text-sm font-medium text-rose-900 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="mt-4 w-full rounded-2xl border border-mauve-200 bg-mauve-50 px-4 py-3 text-left text-sm font-medium text-mauve-900 transition hover:bg-mauve-100 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           {editingPeriodRange
                             ? "Enregistrer les nouvelles dates"
                             : "Enregistrer cette plage de règles"}
                         </button>
 
-                        <p className="mt-5 text-sm font-medium">
-                          Observations personnelles (facultatif)
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                        <details className="mt-5 rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                          <summary className="cursor-pointer text-sm font-medium">
+                            Observations personnelles (facultatif)
+                          </summary>
+                          <div className="mt-3 flex flex-wrap gap-2">
                           {cycleSymptoms.map(({ key, label }) => {
                             const selected =
                               selectedEntry?.symptoms.includes(key) ?? false;
@@ -1541,7 +1789,8 @@ export default function Dashboard() {
                               </button>
                             );
                           })}
-                        </div>
+                          </div>
+                        </details>
 
                         <label
                           htmlFor="cycle-personal-note"
@@ -1563,7 +1812,7 @@ export default function Dashboard() {
                               [selectedDayKey]: event.target.value,
                             }))
                           }
-                          placeholder="Ajoutez ici une note que vous souhaitez retrouver plus tard…"
+                          placeholder="Ajoute ici une note que tu veux retrouver plus tard…"
                           className="mt-2 min-h-24 resize-y rounded-2xl border-stone-200 bg-stone-50 text-base md:text-base"
                         />
                         <div className="mt-2 flex items-center justify-between gap-3">
@@ -1586,13 +1835,17 @@ export default function Dashboard() {
                           aria-live="polite"
                         >
                           {cycleDays === undefined
-                            ? "Chargement de votre calendrier…"
+                            ? "Chargement de ton calendrier…"
                             : isSavingCycleDay
                               ? "Enregistrement…"
                               : "Les notes restent dans le suivi du cycle et sont enregistrées pour la date sélectionnée."}
                         </p>
 
-                        <div className="mt-5 border-t border-border/70 pt-4">
+                        <details className="mt-5 border-t border-border/70 pt-4">
+                          <summary className="cursor-pointer text-sm font-medium">
+                            Estimations et rappels du cycle (facultatif)
+                          </summary>
+                          <div className="mt-3">
                           <div className="flex items-center justify-between gap-3">
                             <div>
                               <p className="text-sm font-medium">
@@ -1620,13 +1873,31 @@ export default function Dashboard() {
                           </div>
                           {expectedNextPeriod === null && (
                             <p className="mt-3 text-xs text-muted-foreground">
-                              Notez plusieurs cycles pour que l’application
+                              Note plusieurs cycles pour que l’application
                               puisse proposer une estimation personnalisée.
                             </p>
                           )}
-                        </div>
+                          </div>
+                        </details>
                       </div>
                     </div>
+
+                    <section className="mt-5 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5" aria-labelledby="qada-heading">
+                      <h3 id="qada-heading" className="font-serif text-xl font-semibold">Suivi personnel du qada Ramadan</h3>
+                      <p className="mt-1 text-sm text-stone-600">TODO — les règles de détermination et de rattrapage sont à valider par une personne de science.</p>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <label className="text-sm">Jours à rattraper
+                          <Input type="number" min="0" max="10000" step="1" value={qadaRamadanTotal} onChange={(event) => setQadaRamadanTotal(event.target.value)} className="mt-1" />
+                        </label>
+                        <label className="text-sm">Jours effectués
+                          <Input type="number" min="0" max={qadaRamadanTotal || 0} step="1" value={qadaRamadanCompleted} onChange={(event) => setQadaRamadanCompleted(event.target.value)} className="mt-1" />
+                        </label>
+                      </div>
+                      <p className="mt-3 text-sm text-stone-600">Restants : {Math.max(0, Number(qadaRamadanTotal) - Number(qadaRamadanCompleted))}</p>
+                      <Button type="button" className="mt-3 bg-emerald-900 text-white hover:bg-emerald-800" disabled={cycleSettings === undefined || isSavingQadaRamadan || !Number.isInteger(Number(qadaRamadanTotal)) || !Number.isInteger(Number(qadaRamadanCompleted)) || Number(qadaRamadanCompleted) > Number(qadaRamadanTotal)} onClick={() => void saveQadaRamadan()}>
+                        {isSavingQadaRamadan ? "Enregistrement…" : "Enregistrer"}
+                      </Button>
+                    </section>
 
                     <div className="mt-5 grid gap-4 lg:grid-cols-2">
                       <section
@@ -1695,9 +1966,9 @@ export default function Dashboard() {
                                   onClick={() => void deleteCycleNote(entry)}
                                   disabled={isSavingCycleDay}
                                   aria-label={`Supprimer la note du ${format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}`}
-                                  className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-rose-100 hover:text-rose-700 disabled:opacity-50"
+                                  className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-mauve-100 hover:text-mauve-700 disabled:opacity-50"
                                 >
-                                  <Trash2 className="size-4" />
+                                  Supprimer
                                 </button>
                               </li>
                             ))}
@@ -1705,16 +1976,16 @@ export default function Dashboard() {
                         )}
                       </section>
 
-                      <section
+                      <details
                         aria-labelledby="cycle-symptoms-heading"
                         className="min-w-0 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5"
                       >
-                        <h3
+                        <summary
                           id="cycle-symptoms-heading"
-                          className="font-serif text-xl font-semibold"
+                          className="cursor-pointer font-serif text-xl font-semibold"
                         >
-                          Symptômes notés
-                        </h3>
+                          Symptômes notés (facultatif)
+                        </summary>
                         <p className="mt-1 text-sm text-stone-500">
                           Retrouve les symptômes associés à chaque date.
                         </p>
@@ -1769,7 +2040,7 @@ export default function Dashboard() {
                                       {entry.symptoms.map((symptom) => (
                                         <span
                                           key={symptom}
-                                          className="rounded-full bg-rose-50 px-2.5 py-1 text-sm text-rose-800"
+                                          className="rounded-full bg-mauve-50 px-2.5 py-1 text-sm text-mauve-800"
                                         >
                                           {cycleSymptoms.find(
                                             (item) => item.key === symptom,
@@ -1782,14 +2053,14 @@ export default function Dashboard() {
                               ))}
                           </ul>
                         )}
-                      </section>
+                      </details>
                     </div>
 
                     {cycleDays?.length === 0 && (
                       <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-                        Votre calendrier est vide pour le moment. Sélectionnez
-                        une date pour commencer ; vous pourrez modifier ou
-                        retirer vos entrées à tout moment.
+                        Ton calendrier est vide pour le moment. Sélectionne une
+                        date pour commencer ; tu pourras modifier ou retirer tes
+                        entrées à tout moment.
                       </p>
                     )}
                   </div>
@@ -1801,19 +2072,23 @@ export default function Dashboard() {
                   id="dashboard-notes"
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900">
-                      <StickyNote className="size-5" />
-                    </span>
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                        Espace personnel
-                      </p>
-                      <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
-                        Notes
-                      </h1>
-                    </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+                      Espace personnel
+                    </p>
+                    <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
+                      Notes
+                    </h1>
                   </div>
+
+                  {isAnonymousUser && (
+                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+                      <p className="text-sm font-medium">
+                        ⚠️ Connecte-toi avec ton email ou Google pour sauvegarder tes notes.
+                        Les données enregistrées avec une session anonyme seront perdues à la déconnexion.
+                      </p>
+                    </div>
+                  )}
 
                   <form
                     className="mt-5 rounded-3xl border border-stone-200 bg-[#F5F2EE] p-4 sm:p-5"
@@ -1850,6 +2125,17 @@ export default function Dashboard() {
                       placeholder="Écris ton idée ou ton rappel…"
                       className="mt-1.5 min-h-28 resize-y rounded-2xl border-stone-200 bg-white text-base md:text-base"
                     />
+                    <label className="mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
+                      <input
+                        type="checkbox"
+                        checked={personalNoteIsTask}
+                        onChange={(event) =>
+                          setPersonalNoteIsTask(event.target.checked)
+                        }
+                        className="size-4 accent-[#5F7F68]"
+                      />
+                      Ajouter aussi à mes tâches
+                    </label>
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                       <fieldset>
                         <legend className="mb-2 text-[15px] font-medium text-stone-700">
@@ -1868,16 +2154,16 @@ export default function Dashboard() {
                           ))}
                         </div>
                       </fieldset>
-                      <label className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[15px] font-medium text-rose-800">
+                      <label className="inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
                         <input
                           type="checkbox"
                           checked={personalNoteUrgent}
                           onChange={(event) =>
                             setPersonalNoteUrgent(event.target.checked)
                           }
-                          className="size-4 accent-rose-700"
+                          className="size-4 accent-[#5F7F68]"
                         />
-                        Urgent
+                        Importante
                       </label>
                     </div>
                     <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1894,10 +2180,11 @@ export default function Dashboard() {
                         }
                         className="rounded-xl bg-[#523B46] text-[15px] text-white hover:bg-[#3D2A34]"
                       >
-                        <Plus className="mr-2 size-4" />
                         {isSavingPersonalNote
                           ? "Enregistrement…"
-                          : "Ajouter un post-it"}
+                          : personalNoteIsTask
+                            ? "Ajouter à mes tâches"
+                            : "Ajouter un post-it"}
                       </Button>
                     </div>
                   </form>
@@ -1907,12 +2194,18 @@ export default function Dashboard() {
                       <h2 className="text-base font-semibold text-stone-900">
                         {notesSection === "active"
                           ? "Mes notes"
-                          : "Notes archivées"}
+                          : notesSection === "todo"
+                            ? "À faire"
+                            : notesSection === "done"
+                              ? "Faites"
+                              : "Notes archivées"}
                       </h2>
                       <div className="flex rounded-xl border border-stone-200 bg-stone-50 p-1">
                         {(
                           [
                             { id: "active", label: "Notes" },
+                            { id: "todo", label: "À faire" },
+                            { id: "done", label: "Faites" },
                             { id: "archived", label: "Archivées" },
                           ] as const
                         ).map(({ id, label }) => (
@@ -1934,13 +2227,17 @@ export default function Dashboard() {
                     </div>
                     {visiblePersonalNotes === undefined ? (
                       <p className="mt-4 text-base text-stone-500">
-                        Chargement de vos notes…
+                        Chargement de tes notes…
                       </p>
                     ) : visiblePersonalNotes.length === 0 ? (
                       <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-base leading-6 text-stone-600">
                         {notesSection === "archived"
                           ? "Aucune note archivée pour le moment."
-                          : "Aucun post-it pour le moment. Ajoute ta première note juste au-dessus."}
+                          : notesSection === "todo"
+                            ? "Aucune tâche à faire."
+                            : notesSection === "done"
+                              ? "Aucune tâche terminée pour le moment."
+                              : "Aucun post-it pour le moment. Ajoute ta première note juste au-dessus."}
                       </p>
                     ) : (
                       <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -1958,7 +2255,11 @@ export default function Dashboard() {
                           return (
                             <li
                               key={note._id}
-                              draggable={!isEditing}
+                              draggable={
+                                !isEditing &&
+                                (notesSection === "active" ||
+                                  notesSection === "archived")
+                              }
                               onDragStart={(event) => {
                                 setDraggedNoteId(note._id);
                                 event.dataTransfer.effectAllowed = "move";
@@ -1975,7 +2276,6 @@ export default function Dashboard() {
                               }}
                               className={`group relative min-h-56 list-none rounded-sm border p-4 shadow-[2px_5px_12px_rgba(70,50,30,0.12)] transition duration-200 hover:-translate-y-1 hover:rotate-0 hover:shadow-[4px_9px_18px_rgba(70,50,30,0.17)] ${noteColor.card} ${draggedNoteId === note._id ? "scale-95 opacity-40" : ""} ${!isEditing && !note.archived ? "cursor-grab active:cursor-grabbing" : ""}`}
                             >
-                              <span className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full border border-white/70 bg-white/65 shadow-sm" />
                               {isEditing ? (
                                 <form
                                   className="relative z-10 space-y-3"
@@ -2019,7 +2319,7 @@ export default function Dashboard() {
                                         />
                                       ))}
                                     </div>
-                                    <label className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-800">
+                                    <label className="inline-flex items-center gap-1.5 text-sm font-medium text-mauve-800">
                                       <input
                                         type="checkbox"
                                         checked={editNoteUrgent}
@@ -2028,9 +2328,9 @@ export default function Dashboard() {
                                             event.target.checked,
                                           )
                                         }
-                                        className="size-4 accent-rose-700"
+                                        className="size-4 accent-[#5F7F68]"
                                       />
-                                      Urgent
+                                      Importante
                                     </label>
                                   </div>
                                   <div className="flex justify-end gap-2">
@@ -2073,16 +2373,38 @@ export default function Dashboard() {
                                         dateStyle: "medium",
                                       })}
                                     </time>
-                                    <GripVertical
-                                      className="size-4 shrink-0 text-stone-500/70"
-                                      aria-hidden="true"
-                                    />
                                   </div>
-                                  {note.urgent && (
-                                    <span className="relative z-10 mt-3 inline-flex rounded-full bg-rose-700 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                                      Urgent
-                                    </span>
-                                  )}
+                                  <div className="relative z-10 mt-3 flex items-center justify-between gap-3">
+                                    {note.isTask === true && (
+                                      <label className="inline-flex items-center gap-2 text-sm text-stone-700">
+                                        <input
+                                          type="checkbox"
+                                          checked={note.completed === true}
+                                          disabled={pendingNoteAction === note._id}
+                                          onChange={(event) =>
+                                            void updatePersonalTaskCompletion(
+                                              note._id,
+                                              event.target.checked,
+                                            )
+                                          }
+                                          aria-label={
+                                            note.completed
+                                              ? "Marquer comme à faire"
+                                              : "Marquer comme terminée"
+                                          }
+                                          className="size-4 accent-[#5F7F68]"
+                                        />
+                                        Tâche
+                                      </label>
+                                    )}
+                                    {note.urgent && (
+                                      <span
+                                        aria-label="Importante"
+                                        title="Importante"
+                                        className="ml-auto size-2 rounded-full bg-[#8A744C]"
+                                      />
+                                    )}
+                                  </div>
                                   <h3 className="relative z-10 mt-3 wrap-break-words font-serif text-xl font-semibold leading-6 text-stone-900">
                                     {noteTitle}
                                   </h3>
@@ -2106,7 +2428,6 @@ export default function Dashboard() {
                                       }}
                                       className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-stone-700 hover:bg-white/50 disabled:opacity-50"
                                     >
-                                      <Pencil className="size-3.5" />
                                       Modifier
                                     </button>
                                     <div className="flex items-center gap-1">
@@ -2149,7 +2470,7 @@ export default function Dashboard() {
                                         }
                                         aria-label="Supprimer définitivement ce post-it"
                                         title="Supprimer"
-                                        className="inline-flex size-8 items-center justify-center rounded-lg text-stone-700 hover:bg-rose-100 hover:text-rose-800 disabled:opacity-50"
+                                        className="inline-flex size-8 items-center justify-center rounded-lg text-stone-700 hover:bg-mauve-100 hover:text-mauve-800 disabled:opacity-50"
                                       >
                                         <Trash2 className="size-4" />
                                       </button>
@@ -2179,37 +2500,28 @@ export default function Dashboard() {
                   Réglages
                 </h1>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Choisissez votre méthode de calcul et autorisez la position de
-                  votre appareil pour afficher les horaires de prière locaux.
-                  Vous trouverez aussi ici les réglages des rappels.
+                  Choisis ta méthode de calcul et autorise l’accès à ta position
+                  sur ton appareil pour afficher les horaires de prière locaux.
+                  Tu trouveras aussi ici les réglages des rappels.
                 </p>
               </section>
             )}
 
             {activeView === "settings" && (
-              <aside
-                className="grid items-start gap-5 md:grid-cols-2"
-              >
+              <aside className="grid items-start gap-5 md:grid-cols-2">
                 <Card className="rounded-3xl border border-stone-200 bg-white shadow-none">
                   <CardContent className="p-5">
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                        <MapPin className="size-4" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold">
-                          Horaires de prière
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Calcul gratuit selon votre position
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-sm font-semibold">
+                      Horaires de prière
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Calcul gratuit selon ta position
+                    </p>
 
                     <p className="mt-4 text-xs leading-5 text-stone-600">
-                      Votre position est enregistrée sur cet appareil et envoyée
-                      à AlAdhan pour calculer les horaires. Elle n’est pas
-                      enregistrée dans votre compte Nour.
+                      Ta position est enregistrée sur cet appareil et envoyée à
+                      AlAdhan pour calculer les horaires. Elle n’est pas
+                      enregistrée dans ton compte Nour.
                     </p>
 
                     <div className="mt-4 space-y-3">
@@ -2256,7 +2568,6 @@ export default function Dashboard() {
                         disabled={prayer.isLoading}
                         className="gap-2"
                       >
-                        <LocateFixed className="size-4" />
                         {prayer.isLoading
                           ? "Recherche…"
                           : prayer.preferences.coordinates
@@ -2301,7 +2612,7 @@ export default function Dashboard() {
                       >
                         AlAdhan
                       </a>
-                      . Ils peuvent différer des horaires de votre mosquée.
+                      . Ils peuvent différer des horaires de ta mosquée.
                     </p>
                   </CardContent>
                 </Card>
@@ -2311,17 +2622,10 @@ export default function Dashboard() {
                   className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white shadow-none"
                 >
                   <CardContent className="p-5">
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                        <Bell className="size-4" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold">Rappels</p>
-                        <p className="text-xs text-muted-foreground">
-                          Notifications du navigateur
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-sm font-semibold text-left">Rappels</p>
+                    <p className="text-xs text-muted-foreground">
+                      Rappels discrets, sans détail personnel.
+                    </p>
 
                     <div className="mt-5 space-y-4">
                       <ReminderRow
@@ -2337,7 +2641,6 @@ export default function Dashboard() {
                         onToggle={(value) =>
                           void updateReminder("morning", value)
                         }
-                        icon={<Sun className="size-4" />}
                       />
                       <div className="border-t border-border/70" />
                       <ReminderRow
@@ -2353,9 +2656,14 @@ export default function Dashboard() {
                         onToggle={(value) =>
                           void updateReminder("evening", value)
                         }
-                        icon={<MoonStar className="size-4" />}
                       />
                     </div>
+                    <p className="mt-4 text-xs leading-5 text-stone-500">
+                      Les rappels locaux fonctionnent lorsque Nour est ouverte.
+                      Sur iPhone, les notifications écran verrouillé nécessitent
+                      l’installation sur l’écran d’accueil et un service Web
+                      Push côté serveur, qui n’est pas encore configuré.
+                    </p>
                   </CardContent>
                 </Card>
               </aside>
@@ -2365,8 +2673,8 @@ export default function Dashboard() {
           <footer className="mt-10 flex flex-col gap-2 border-t border-stone-200 pt-5 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
             <span>nour. · Suivi quotidien personnel</span>
             <span>
-              Votre calendrier est enregistré sur votre compte ; les préférences
-              de rappel sont enregistrées sur cet appareil.
+              Ton calendrier est enregistré sur ton compte ; tes préférences de
+              rappel sont enregistrées sur cet appareil.
             </span>
           </footer>
         </div>
@@ -2381,22 +2689,18 @@ function ReminderRow({
   enabled,
   onTimeChange,
   onToggle,
-  icon,
 }: {
   label: string;
   time: string;
   enabled: boolean;
   onTimeChange: (value: string) => void;
   onToggle: (value: boolean) => void;
-  icon: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-stone-500">{icon}</span>
       <div className="min-w-0 flex-1">
         <label className="text-xs font-medium">{label}</label>
         <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock3 className="size-3" />
           <input
             type="time"
             value={time}

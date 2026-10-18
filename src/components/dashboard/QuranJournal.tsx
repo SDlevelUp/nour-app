@@ -5,9 +5,9 @@ import {
   QuranAudioReader,
   type QuranPlaybackProgress,
 } from "@/components/dashboard/QuranAudioReader";
+import type { QuranResumePosition } from "@/components/dashboard/quranPlaybackResume";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { BookOpen, Loader2, Plus, Trash2 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +16,11 @@ function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
 }
 
-export function QuranJournal() {
+export function QuranJournal({
+  resumePosition = null,
+}: {
+  resumePosition?: QuranResumePosition | null;
+}) {
   const entries = useQuery(api.quranProgress.list, {});
   const addEntry = useMutation(api.quranProgress.add);
   const removeEntry = useMutation(api.quranProgress.remove);
@@ -109,10 +113,7 @@ export function QuranJournal() {
       id="dashboard-quran"
       className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
     >
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-900">
-          <BookOpen className="size-5" />
-        </span>
+      <div>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
             Suivi de lecture
@@ -129,6 +130,7 @@ export function QuranJournal() {
       <QuranAudioReader
         isSavingProgress={isSavingAudioProgress}
         onSaveProgress={saveAudioProgress}
+        resumePosition={resumePosition}
       />
 
       <form
@@ -201,14 +203,9 @@ export function QuranJournal() {
           <Button
             type="submit"
             disabled={isSaving}
-            className="gap-2 bg-emerald-900 text-[15px] text-white hover:bg-emerald-800"
+            className="bg-emerald-900 text-[15px] text-white hover:bg-emerald-800"
           >
-            {isSaving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Plus className="size-4" />
-            )}
-            Ajouter la lecture
+            {isSaving ? "Enregistrement…" : "Ajouter la lecture"}
           </Button>
         </div>
       </form>
@@ -268,13 +265,9 @@ export function QuranJournal() {
                     onClick={() => void deleteEntry(entry._id)}
                     disabled={pendingDelete === entry._id}
                     aria-label={`Supprimer la lecture ${entry.passage}`}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-stone-500 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                    className="shrink-0 rounded-lg px-2 py-1 text-sm text-stone-500 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
                   >
-                    {pendingDelete === entry._id ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="size-4" />
-                    )}
+                    {pendingDelete === entry._id ? "Suppression…" : "Supprimer"}
                   </button>
                 </div>
               </li>

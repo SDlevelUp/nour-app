@@ -1,11 +1,3 @@
-import {
-  BookOpen,
-  CalendarDays,
-  Clock3,
-  GraduationCap,
-  Headphones,
-  MoonStar,
-} from "lucide-react";
 import { useCallback, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -25,7 +17,6 @@ type PlannerEvent = {
   title: string;
   detail: string;
   kind: "prayer" | PlannerActivity["kind"];
-  icon: typeof MoonStar;
 };
 
 function getPlannerEvents(
@@ -39,7 +30,6 @@ function getPlannerEvents(
       title: "Fajr & Adhkar du matin",
       detail: "Prière selon son horaire local, puis invocations du matin",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.dhuhr ?? "13:00",
@@ -47,7 +37,6 @@ function getPlannerEvents(
       title: "Dhuhr",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.asr ?? "16:30",
@@ -55,7 +44,6 @@ function getPlannerEvents(
       title: "Asr & Adhkar du soir",
       detail: "Prière selon son horaire local, puis invocations du soir",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.maghrib ?? "19:00",
@@ -63,7 +51,6 @@ function getPlannerEvents(
       title: "Maghrib",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
     {
       time: times?.isha ?? "20:00",
@@ -71,19 +58,9 @@ function getPlannerEvents(
       title: "Isha",
       detail: "Prière selon son horaire local",
       kind: "prayer",
-      icon: MoonStar,
     },
   ];
-  const activityEvents = activities.map((activity) => ({
-    ...activity,
-    icon:
-      activity.kind === "science" || activity.kind === "science-session"
-        ? GraduationCap
-        : activity.kind === "listening"
-          ? Headphones
-          : BookOpen,
-  }));
-  return [...prayerEvents, ...activityEvents].sort((a, b) =>
+  return [...prayerEvents, ...activities].sort((a, b) =>
     a.time.localeCompare(b.time),
   );
 }
@@ -91,11 +68,15 @@ function getPlannerEvents(
 type DailyPlannerProps = {
   isExcusePeriod: boolean;
   prayerTimes: PrayerTimes | null;
+  initialView?: "day" | "week";
+  titleOverride?: string;
 };
 
 export function DailyPlanner({
   isExcusePeriod,
   prayerTimes,
+  initialView = "day",
+  titleOverride,
 }: DailyPlannerProps) {
   const today = dateKey(new Date());
   const quranSessions = useQuery(api.quranProgress.forPlanner, {
@@ -109,7 +90,7 @@ export function DailyPlanner({
   const [activities, setActivities] = useState(() =>
     readPlannerActivities(today),
   );
-  const [view, setView] = useState<"day" | "week">("day");
+  const [view, setView] = useState<"day" | "week">(initialView);
   const [isAddingActivity, setIsAddingActivity] = useState(false);
   const [newActivityTitle, setNewActivityTitle] = useState("");
   const [newActivityTime, setNewActivityTime] = useState("12:00");
@@ -179,57 +160,57 @@ export function DailyPlanner({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            {view === "day" ? "Planning du jour" : "Vue hebdomadaire"}
+            {titleOverride ??
+              (view === "day" ? "Planning du jour" : "Vue hebdomadaire")}
           </p>
           <h2 className="mt-2 font-serif text-2xl tracking-tight text-stone-900">
             {view === "day" ? "Planning quotidien" : "Planning de la semaine"}
           </h2>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[10px] text-stone-600">
-          <Clock3 className="size-3.5" />
           {prayerTimes ? "Horaires locaux calculés" : "Horaires indicatifs"}
         </span>
       </div>
 
-      <div
-        className="mt-4 inline-flex rounded-xl border border-stone-200 bg-stone-50 p-1"
-        role="group"
-        aria-label="Affichage du planning"
-      >
-        {(
-          [
-            { id: "day", label: "Jour", icon: Clock3 },
-            { id: "week", label: "Semaine", icon: CalendarDays },
-          ] as const
-        ).map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setView(id)}
-            aria-pressed={view === id}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition ${
-              view === id
-                ? "bg-white text-emerald-900 shadow-sm"
-                : "text-stone-500 hover:text-stone-800"
-            }`}
-          >
-            <Icon className="size-3.5" />
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {view === "day" && (
-        <button
-          type="button"
-          onClick={() => setIsAddingActivity((open) => !open)}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
-          aria-expanded={isAddingActivity}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div
+          className="inline-flex rounded-xl border border-stone-200 bg-stone-50 p-1"
+          role="group"
+          aria-label="Affichage du planning"
         >
-          <BookOpen className="size-3.5" />
-          {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
-        </button>
-      )}
+          {(
+            [
+              { id: "day", label: "Jour" },
+              { id: "week", label: "Semaine" },
+            ] as const
+          ).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setView(id)}
+              aria-pressed={view === id}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition ${
+                view === id
+                  ? "bg-white text-emerald-900 shadow-sm"
+                  : "text-stone-500 hover:text-stone-800"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {view === "day" && (
+          <button
+            type="button"
+            onClick={() => setIsAddingActivity((open) => !open)}
+            className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
+            aria-expanded={isAddingActivity}
+          >
+            {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
+          </button>
+        )}
+      </div>
 
       {view === "day" && isAddingActivity && (
         <form
@@ -279,13 +260,12 @@ export function DailyPlanner({
         <>
           <p className="mt-3 text-xs leading-5 text-stone-500">
             {prayerTimes
-              ? "Les horaires de prière sont calculés selon votre position et la méthode choisie."
-              : "Configurez votre position dans Réglages pour afficher les horaires de prière locaux."}
+              ? "Les horaires de prière sont calculés selon ta position et la méthode choisie."
+              : "Configure ta position dans Réglages pour afficher les horaires de prière locaux."}
           </p>
 
           {isExcusePeriod && (
             <div className="mt-4 flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-950">
-              <Headphones className="size-4 shrink-0" />
               <span>
                 Période d'indisponibilité active. Focus sur l'écoute du Coran et
                 l'étude de la science.
@@ -293,7 +273,7 @@ export function DailyPlanner({
             </div>
           )}
 
-          <div className="mt-5 overflow-hidden rounded-2xl border border-stone-100">
+          <div className="mt-5 overflow-hidden rounded-2xl bg-white">
             {eventHours.map((hour) => {
               const events = visiblePlannerEvents.filter(
                 (event) => Number(event.time.slice(0, 2)) === hour,
@@ -302,37 +282,29 @@ export function DailyPlanner({
               return (
                 <div
                   key={hour}
-                  className="grid min-h-19 grid-cols-[56px_minmax(0,1fr)] border-b border-stone-100 last:border-b-0 sm:grid-cols-[72px_minmax(0,1fr)]"
+                  className="grid min-h-19 grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[72px_minmax(0,1fr)]"
                 >
-                  <div className="border-r border-stone-100 px-2 pt-3 text-right text-[10px] font-semibold tabular-nums text-stone-400 sm:px-4">
+                  <div className="px-2 pt-3 text-center text-[10px] font-semibold tabular-nums text-stone-400 sm:px-4">
                     {String(hour).padStart(2, "0")}:00
                   </div>
                   <div className="space-y-1 p-1.5 sm:p-2">
                     {events.map(
-                      ({
-                        time,
-                        displayTime,
-                        title,
-                        detail,
-                        kind,
-                        icon: Icon,
-                      }) => (
+                      ({ time, displayTime, title, detail, kind }) => (
                         <article
                           key={`${kind}-${title}`}
-                          className={`rounded-xl border px-3 py-3 ${
+                          className={`rounded-xl px-3 py-3 ${
                             kind === "prayer"
-                              ? "border-stone-200 bg-[#F5F2EE]"
+                              ? "bg-[#F5F2EE]"
                               : kind.endsWith("-session")
-                                ? "border-emerald-200 bg-emerald-50/50"
-                                : "border-stone-200 bg-white"
+                                ? "bg-emerald-50/50"
+                                : "bg-white"
                           }`}
                         >
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start justify-center gap-3">
                             <span className="mt-0.5 text-[10px] font-semibold tabular-nums text-stone-600">
                               {displayTime ?? time}
                             </span>
-                            <Icon className="mt-0.5 size-4 shrink-0 text-stone-600" />
-                            <div>
+                            <div className="text-center">
                               <h3 className="text-xs font-semibold text-stone-900 sm:text-sm">
                                 {title}
                               </h3>

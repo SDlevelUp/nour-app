@@ -62,7 +62,7 @@ export const add = mutation({
     assertTime(time);
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     const title = args.title.trim();
     const lesson = args.lesson.trim();
@@ -110,7 +110,7 @@ export const remove = mutation({
   handler: async (ctx, { logId }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour supprimer.");
+      throw new Error("Connecte-toi pour supprimer.");
 
     const log = await ctx.db.get(logId);
     if (!log || log.userId !== userId) {
@@ -131,7 +131,7 @@ export const updateSchedule = mutation({
     assertTime(time);
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour modifier cette séance.");
+      throw new Error("Connecte-toi pour modifier cette séance.");
     const log = await ctx.db.get(logId);
     if (!log || log.userId !== userId) {
       throw new Error("Cette séance est introuvable.");

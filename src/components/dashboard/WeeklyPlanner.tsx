@@ -3,16 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import {
-  BookOpen,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  GraduationCap,
-  Headphones,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
@@ -336,7 +327,6 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <span className="inline-flex items-center gap-2 text-[15px] text-stone-500">
-          <CalendarDays className="size-4 text-emerald-800" />
           Activités répétées chaque jour par défaut
         </span>
         <Button
@@ -353,7 +343,6 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
           }}
           className="gap-1.5"
         >
-          <Plus className="size-4" />
           Ajouter une activité
         </Button>
       </div>
@@ -426,7 +415,6 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
               Annuler
             </Button>
             <Button type="submit" className="gap-1.5 bg-emerald-900">
-              <Plus className="size-4" />
               Ajouter
             </Button>
           </div>
@@ -477,13 +465,6 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
                     const isJournalSession =
                       activity.kind === "quran-session" ||
                       activity.kind === "science-session";
-                    const Icon =
-                      activity.kind === "science" ||
-                      activity.kind === "science-session"
-                        ? GraduationCap
-                        : activity.kind === "listening"
-                          ? Headphones
-                          : BookOpen;
                     return (
                       <article
                         key={activity.id}
@@ -504,7 +485,6 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
                         } cursor-grab active:cursor-grabbing ${draggedActivity?.activityId === activity.id ? "opacity-40" : ""}`}
                       >
                         <div className="flex items-center gap-1.5">
-                          <Icon className="size-3.5 shrink-0 text-emerald-800" />
                           {isJournalSession ? (
                             <>
                               <Input
@@ -530,7 +510,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
                                 aria-label={`Supprimer ${activity.title} du journal et du planning`}
                                 className="ml-auto rounded p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
                               >
-                                <Trash2 className="size-4" />
+                                Supprimer
                               </button>
                             </>
                           ) : (
@@ -564,7 +544,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
                                 aria-label={`Supprimer ${activity.title}`}
                                 className="ml-auto rounded p-1 text-stone-400 hover:bg-red-50 hover:text-red-700"
                               >
-                                <Trash2 className="size-3" />
+                                Supprimer
                               </button>
                             </>
                           )}

@@ -59,7 +59,7 @@ export const saveDay = mutation({
     }
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     const existing = await ctx.db
       .query("cycleDays")
@@ -109,7 +109,7 @@ export const setPeriodRange = mutation({
 
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     for (let offset = 0; offset < days; offset += 1) {
       const date = new Date(start.getTime() + offset * 86_400_000)
@@ -174,7 +174,7 @@ export const updatePeriodRange = mutation({
 
     const userId = await getAuthUserId(ctx);
     if (userId === null) {
-      throw new Error("Vous devez être connecté pour modifier cette période.");
+      throw new Error("Connecte-toi pour modifier cette période.");
     }
 
     const newDates = new Set<string>();
@@ -231,13 +231,62 @@ export const getSettings = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (userId === null) return { lateAlertsEnabled: false };
+    if (userId === null) {
+      return {
+        lateAlertsEnabled: false,
+        qadaRamadanTotal: 0,
+        qadaRamadanCompleted: 0,
+      };
+    }
 
     const settings = await ctx.db
       .query("cycleSettings")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-    return { lateAlertsEnabled: settings?.lateAlertsEnabled ?? false };
+    return {
+      lateAlertsEnabled: settings?.lateAlertsEnabled ?? false,
+      qadaRamadanTotal: settings?.qadaRamadanTotal ?? 0,
+      qadaRamadanCompleted: settings?.qadaRamadanCompleted ?? 0,
+    };
+  },
+});
+
+export const setQadaRamadanProgress = mutation({
+  args: {
+    total: v.number(),
+    completed: v.number(),
+  },
+  handler: async (ctx, { total, completed }) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Connecte-toi pour enregistrer.");
+    if (
+      !Number.isInteger(total) ||
+      !Number.isInteger(completed) ||
+      total < 0 ||
+      completed < 0 ||
+      completed > total ||
+      total > 10000
+    ) {
+      throw new Error("Vérifie le nombre de jours saisi.");
+    }
+
+    const existing = await ctx.db
+      .query("cycleSettings")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        qadaRamadanTotal: total,
+        qadaRamadanCompleted: completed,
+      });
+    } else {
+      await ctx.db.insert("cycleSettings", {
+        userId,
+        lateAlertsEnabled: false,
+        qadaRamadanTotal: total,
+        qadaRamadanCompleted: completed,
+      });
+    }
   },
 });
 
@@ -246,7 +295,7 @@ export const setLateAlertsEnabled = mutation({
   handler: async (ctx, { enabled }) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null)
-      throw new Error("Vous devez être connecté pour enregistrer.");
+      throw new Error("Connecte-toi pour enregistrer.");
 
     const existing = await ctx.db
       .query("cycleSettings")

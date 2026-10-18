@@ -2,19 +2,6 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { adhkarBySession, type AdhkarSession } from "@/convex/adhkarData";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
-import {
-  ArrowDown,
-  ArrowUp,
-  BookOpen,
-  CalendarClock,
-  Clock3,
-  GraduationCap,
-  MoonStar,
-  Plus,
-  Settings2,
-  Sun,
-  X,
-} from "lucide-react";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import type { DashboardView } from "./dashboardNavigation";
@@ -146,28 +133,24 @@ export function DashboardWidgets({
 
   const content: Record<
     WidgetId,
-    { icon: typeof Clock3; title: string; detail: string; view: DashboardView }
+    { title: string; detail: string; view: DashboardView }
   > = {
     "next-prayer": {
-      icon: Clock3,
       title: "Prochaine prière",
       detail: getNextPrayer(prayerTimes),
       view: "salah",
     },
     "morning-adhkar": {
-      icon: Sun,
       title: "Adhkar du matin",
       detail: `${completedMorning} / ${adhkarBySession.morning.length} invocations parcourues`,
       view: "overview",
     },
     "evening-adhkar": {
-      icon: MoonStar,
       title: "Adhkar du soir",
       detail: `${completedEvening} / ${adhkarBySession.evening.length} invocations parcourues`,
       view: "overview",
     },
     quran: {
-      icon: BookOpen,
       title: "Reprise Al-Qur’an",
       detail: latestQuran
         ? `${latestQuran.passage}${latestQuran.pagesOrVerses ? ` · ${latestQuran.pagesOrVerses}` : ""}`
@@ -175,7 +158,6 @@ export function DashboardWidgets({
       view: "quran",
     },
     science: {
-      icon: GraduationCap,
       title: "Dernière étude",
       detail: latestScience
         ? `${latestScience.title} · ${latestScience.lesson}`
@@ -183,7 +165,6 @@ export function DashboardWidgets({
       view: "science",
     },
     planner: {
-      icon: CalendarClock,
       title: "Planning du jour",
       detail: "Voir et organiser ta semaine.",
       view: "salah",
@@ -209,7 +190,6 @@ export function DashboardWidgets({
           aria-expanded={isCustomizing}
           className="gap-1.5 text-xs"
         >
-          <Settings2 className="size-3.5" />
           {isCustomizing ? "Terminer" : "Modifier"}
         </Button>
       </div>
@@ -236,7 +216,7 @@ export function DashboardWidgets({
                     aria-label={`Monter ${widgets.find((widget) => widget.id === id)?.label}`}
                     className="rounded p-1 text-stone-500 hover:bg-stone-100 disabled:opacity-30"
                   >
-                    <ArrowUp className="size-3.5" />
+                    Monter
                   </button>
                   <button
                     type="button"
@@ -245,7 +225,7 @@ export function DashboardWidgets({
                     aria-label={`Descendre ${widgets.find((widget) => widget.id === id)?.label}`}
                     className="rounded p-1 text-stone-500 hover:bg-stone-100 disabled:opacity-30"
                   >
-                    <ArrowDown className="size-3.5" />
+                    Descendre
                   </button>
                   <button
                     type="button"
@@ -253,7 +233,7 @@ export function DashboardWidgets({
                     aria-label={`Retirer ${widgets.find((widget) => widget.id === id)?.label}`}
                     className="rounded p-1 text-stone-500 hover:bg-red-50 hover:text-red-700"
                   >
-                    <X className="size-3.5" />
+                    Retirer
                   </button>
                 </li>
               ))}
@@ -289,7 +269,7 @@ export function DashboardWidgets({
               disabled={!widgetToAdd || selectedIds.length >= 6}
               aria-label="Ajouter le bloc sélectionné"
             >
-              <Plus className="size-4" />
+              Ajouter
             </Button>
           </div>
         </div>
@@ -298,7 +278,6 @@ export function DashboardWidgets({
       <div className="space-y-3">
         {selectedIds.map((id) => {
           const widget = content[id];
-          const Icon = widget.icon;
           return (
             <button
               key={id}
@@ -306,9 +285,6 @@ export function DashboardWidgets({
               onClick={() => onNavigate(widget.view)}
               className="flex w-full items-start gap-2 rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/40"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
-                <Icon className="size-4" />
-              </span>
               <span className="min-w-0">
                 <span className="block text-sm font-semibold text-stone-900">
                   {widget.title}

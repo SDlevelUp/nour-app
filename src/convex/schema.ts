@@ -53,6 +53,8 @@ const schema = defineSchema(
     cycleSettings: defineTable({
       userId: v.id("users"),
       lateAlertsEnabled: v.boolean(),
+      qadaRamadanTotal: v.optional(v.number()),
+      qadaRamadanCompleted: v.optional(v.number()),
     }).index("by_user", ["userId"]),
 
     personalNotes: defineTable({
@@ -63,10 +65,12 @@ const schema = defineSchema(
       isUnread: v.boolean(),
       archived: v.optional(v.boolean()),
       urgent: v.optional(v.boolean()),
+      isTask: v.optional(v.boolean()),
+      completed: v.optional(v.boolean()),
       color: v.optional(
         v.union(
           v.literal("yellow"),
-          v.literal("pink"),
+          v.literal("mauve"),
           v.literal("blue"),
           v.literal("green"),
           v.literal("lavender"),
@@ -108,6 +112,42 @@ const schema = defineSchema(
     })
       .index("by_user_createdAt", ["userId", "createdAt"])
       .index("by_user_date", ["userId", "date"]),
+
+    scienceBooks: defineTable({
+      userId: v.id("users"),
+      title: v.string(),
+      author: v.string(),
+      notes: v.optional(v.string()),
+      status: v.union(
+        v.literal("to-read"),
+        v.literal("in-progress"),
+        v.literal("read"),
+      ),
+      position: v.number(),
+      createdAt: v.number(),
+    }).index("by_user_position", ["userId", "position"]),
+
+    scienceLearningItems: defineTable({
+      userId: v.id("users"),
+      kind: v.union(v.literal("matn"), v.literal("hadith")),
+      title: v.string(),
+      status: v.union(
+        v.literal("to-learn"),
+        v.literal("learning"),
+        v.literal("memorized"),
+      ),
+      portions: v.array(v.string()),
+      reviewDate: v.optional(v.string()),
+      arabic: v.optional(v.string()),
+      transliteration: v.optional(v.string()),
+      translation: v.optional(v.string()),
+      narrator: v.optional(v.string()),
+      collection: v.optional(v.string()),
+      number: v.optional(v.string()),
+      grade: v.optional(v.string()),
+      gradingSource: v.optional(v.string()),
+      createdAt: v.number(),
+    }).index("by_user_createdAt", ["userId", "createdAt"]),
   },
   {
     schemaValidation: false,

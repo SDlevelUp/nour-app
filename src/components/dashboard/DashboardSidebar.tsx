@@ -1,9 +1,15 @@
 import {
+  BookOpen,
+  CalendarClock,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
-  CalendarDays,
+  GraduationCap,
+  LayoutDashboard,
   LogOut,
   MoonStar,
+  Settings,
+  StickyNote,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { dashboardNavigation, type DashboardView } from "./dashboardNavigation";
@@ -107,10 +113,10 @@ export function DashboardSidebar({
                 aria-label={isCollapsed ? label : undefined}
                 className={`relative flex w-full items-center rounded-xl py-3 text-sm transition ${
                   isCollapsed ? "justify-center px-0" : "gap-3 px-3 text-left"
-                } ${
+                } hover:bg-[#E8F0E8] ${
                   isActive
-                    ? "bg-[#F3EFEC] font-semibold text-[#523B46]"
-                    : "text-stone-600 hover:bg-stone-50 hover:text-stone-950"
+                    ? "font-semibold text-[#35533D]"
+                    : "text-stone-600 hover:text-[#35533D]"
                 }`}
               >
                 <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
@@ -266,10 +272,10 @@ export function DashboardSidebar({
               type="button"
               onClick={() => onNavigate(view)}
               aria-current={isActive ? "page" : undefined}
-              className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition ${
+              className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition hover:bg-[#E8F0E8] ${
                 isActive
-                  ? "bg-emerald-800 text-white"
-                  : "text-stone-600 hover:bg-stone-100"
+                  ? "border-b-2 border-[#5D7C65] font-semibold text-[#35533D]"
+                  : "text-stone-600 hover:text-[#35533D]"
               }`}
             >
               <Icon className="size-4" strokeWidth={1.8} />
