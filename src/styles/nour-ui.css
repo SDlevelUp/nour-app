@@ -1058,3 +1058,12 @@
   color: var(--n-muted);
   font-weight: 600;
 }
+
+.n-proof dt {
+  color: var(--n-ink);
+  font-weight: 700;
+}
+
+.n-proof dd {
+  margin: 0;
+}

@@ -1319,36 +1319,39 @@ export default function Dashboard() {
 
                             <details className="n-proof mt-8">
                               <summary>Preuve</summary>
-                              <dl className="mt-3 space-y-1.5">
+                              <dl className="mt-3 space-y-3">
                                 <div>
-                                  <dt className="inline font-semibold">Rapporteur : </dt>
-                                  <dd className="inline">{currentInvocation.proof.narrator}</dd>
+                                  <dt>Rapporteur</dt>
+                                  <dd>{currentInvocation.proof.narrator}</dd>
                                 </div>
-                                {currentInvocation.proof.sources.map((source) => (
-                                  <div key={`${source.collection}-${source.number}`}>
-                                    <dt className="inline font-semibold">
-                                      {source.collection} {source.number} :{" "}
-                                    </dt>
-                                    <dd className="inline">
-                                      {source.grades
-                                        .map(({ by, grade }) => `${grade} (${by})`)
-                                        .join(" · ")}
+                                <div>
+                                  <dt>Sources</dt>
+                                  {currentInvocation.proof.sources.map((source) => (
+                                    <dd key={`${source.collection}-${source.number}`} className="mt-1">
+                                      <span className="font-semibold">
+                                        {source.collection}, n° {source.number}
+                                      </span>
+                                      <span className="block text-(--n-muted)">
+                                        {source.grades
+                                          .map(({ by, grade }) => `${grade} selon ${by}`)
+                                          .join(" · ")}
+                                      </span>
                                     </dd>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
                                 {currentInvocation.proof.note && (
                                   <div>
-                                    <dt className="inline font-semibold">Note : </dt>
-                                    <dd className="inline">{currentInvocation.proof.note}</dd>
+                                    <dt>Note</dt>
+                                    <dd>{currentInvocation.proof.note}</dd>
                                   </div>
                                 )}
                                 <div>
-                                  <dt className="inline font-semibold">Répétitions : </dt>
-                                  <dd className="inline">{currentInvocation.repetitions}</dd>
+                                  <dt>Répétitions</dt>
+                                  <dd>{currentInvocation.repetitions}</dd>
                                 </div>
                               </dl>
                               <p className="mt-2 text-(--n-muted)">
-                                Numérotation et classifications reprises de sunnah.com.
+                                Degrés : « sahih » = authentique, « hasan » = bon. Numérotation et classifications reprises de sunnah.com.
                               </p>
                             </details>
                           </>
