@@ -1076,10 +1076,6 @@
   bottom: calc(max(14px, env(safe-area-inset-bottom)) + 72px);
   left: 12px;
   z-index: 39;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   overflow: hidden;
   border: 1px solid var(--n-line);
   border-radius: var(--n-radius-lg);
@@ -1094,7 +1090,41 @@
     right: 24px;
     bottom: 24px;
     left: auto;
-    width: 380px;
+    width: 440px;
+  }
+}
+
+.n-mini-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.n-mini-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--n-line);
+  padding: 4px 2px 12px;
+}
+
+.n-mini-options .n-select {
+  width: 100%;
+}
+
+.n-mini-player .n-icon-btn[aria-pressed="true"] {
+  background: var(--n-sage-tint);
+  color: var(--n-ink);
+}
+
+@media (max-width: 420px) {
+  .n-mini-player .n-icon-btn {
+    width: 28px;
+  }
+  .n-mini-player .n-surah-num {
+    display: none;
   }
 }
 

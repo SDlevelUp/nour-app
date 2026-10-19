@@ -9,9 +9,12 @@ import {
   Pause,
   Play,
   Repeat2,
+  ChevronsLeft,
+  ChevronsRight,
   Search,
   SkipBack,
   SkipForward,
+  SlidersHorizontal,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -113,6 +116,10 @@ export function QuranAudioReader({
   const [isProgressSaved, setIsProgressSaved] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [endBehavior, setEndBehavior] = useState<"stop" | "next" | "repeat">("stop");
+  const [showMiniOptions, setShowMiniOptions] = useState(false);
+  // Lecture à relancer une fois la nouvelle sourate (ou le récitateur) chargé.
+  const autoplayAfterLoadRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [surahQuery, setSurahQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -207,6 +214,11 @@ export function QuranAudioReader({
           setCurrentAyah(1);
         }
         setRepeatNumber(1);
+        if (autoplayAfterLoadRef.current) {
+          autoplayAfterLoadRef.current = false;
+          hasInteractedRef.current = true;
+          setIsPlaying(true);
+        }
       })
       .catch((cause: unknown) => {
         if (!controller.signal.aborted) {
@@ -314,10 +326,10 @@ export function QuranAudioReader({
   ]);
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || isLoading) return;
     const audio = audioRef.current;
     if (audio) void audio.play().catch(() => setIsPlaying(false));
-  }, [currentAyah, isPlaying, surahData]);
+  }, [currentAyah, isLoading, isPlaying, surahData]);
 
   const activeAyah = surahData?.ayahs.find(
     (ayah) => ayah.numberInSurah === currentAyah,
@@ -372,10 +384,25 @@ export function QuranAudioReader({
     setRepeatNumber(1);
     if (currentAyah < endAyah) {
       setCurrentAyah((ayah) => ayah + 1);
+    } else if (endBehavior === "repeat") {
+      setCurrentAyah(startAyah);
+      if (startAyah === currentAyah && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        void audioRef.current.play();
+      }
+    } else if (endBehavior === "next" && selectedSurah < 114) {
+      goToSurah(selectedSurah + 1);
     } else {
       setIsPlaying(false);
     }
   };
+
+  function goToSurah(surahNumber: number) {
+    if (surahNumber < 1 || surahNumber > 114) return;
+    autoplayAfterLoadRef.current = isPlaying || hasStarted;
+    hasInteractedRef.current = true;
+    setSelectedSurah(surahNumber);
+  }
 
   const updateRangeStart = (value: number) => {
     hasInteractedRef.current = true;
@@ -426,6 +453,60 @@ export function QuranAudioReader({
     setRepeatNumber(1);
     setIsPlaying(true);
   };
+
+  const reciterSelect = (
+    <label className="grid gap-1 text-[13px] font-semibold">
+      Récitateur
+      <select
+        value={selectedReciter}
+        onChange={(event) => {
+          autoplayAfterLoadRef.current = isPlaying;
+          setSelectedReciter(event.target.value);
+        }}
+        disabled={!reciters.length}
+        className="n-select"
+      >
+        {reciters.map((reciter) => (
+          <option key={reciter.identifier} value={reciter.identifier}>
+            {reciter.englishName}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+  const repeatSelect = (
+    <label className="grid gap-1 text-[13px] font-semibold">
+      Répéter chaque verset
+      <select
+        value={repeatCount}
+        onChange={(event) => setRepeatCount(Number(event.target.value))}
+        className="n-select"
+      >
+        <option value={1}>1 fois</option>
+        <option value={2}>2 fois</option>
+        <option value={3}>3 fois</option>
+        <option value={4}>4 fois</option>
+        <option value={5}>5 fois</option>
+        <option value={0}>En boucle</option>
+      </select>
+    </label>
+  );
+  const endSelect = (
+    <label className="grid gap-1 text-[13px] font-semibold">
+      À la fin de la sourate
+      <select
+        value={endBehavior}
+        onChange={(event) =>
+          setEndBehavior(event.target.value as "stop" | "next" | "repeat")
+        }
+        className="n-select"
+      >
+        <option value="stop">Arrêter</option>
+        <option value="next">Sourate suivante</option>
+        <option value="repeat">Recommencer</option>
+      </select>
+    </label>
+  );
 
   return (
     <>
@@ -607,21 +688,7 @@ export function QuranAudioReader({
                   Options d’écoute
                 </summary>
                 <div className="mt-3 flex flex-wrap gap-3">
-                  <label className="grid gap-1 text-[13px] font-semibold">
-                    Récitateur
-                    <select
-                      value={selectedReciter}
-                      onChange={(event) => setSelectedReciter(event.target.value)}
-                      disabled={!reciters.length}
-                      className="n-select"
-                    >
-                      {reciters.map((reciter) => (
-                        <option key={reciter.identifier} value={reciter.identifier}>
-                          {reciter.englishName}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  {reciterSelect}
                   <label className="grid gap-1 text-[13px] font-semibold">
                     Jusqu’au verset
                     <select
@@ -640,21 +707,8 @@ export function QuranAudioReader({
                       ))}
                     </select>
                   </label>
-                  <label className="grid gap-1 text-[13px] font-semibold">
-                    Répéter chaque verset
-                    <select
-                      value={repeatCount}
-                      onChange={(event) => setRepeatCount(Number(event.target.value))}
-                      className="n-select"
-                    >
-                      <option value={1}>1 fois</option>
-                      <option value={2}>2 fois</option>
-                      <option value={3}>3 fois</option>
-                      <option value={4}>4 fois</option>
-                      <option value={5}>5 fois</option>
-                      <option value={0}>En boucle</option>
-                    </select>
-                  </label>
+                  {repeatSelect}
+                  {endSelect}
                 </div>
               </details>
               <button
@@ -694,6 +748,14 @@ export function QuranAudioReader({
 
     {!isActive && hasStarted && activeAyah && (
       <div className="n-mini-player" role="region" aria-label="Lecture du Coran en cours">
+        {showMiniOptions && (
+          <div className="n-mini-options">
+            {repeatSelect}
+            {endSelect}
+            {reciterSelect}
+          </div>
+        )}
+        <div className="n-mini-row">
         <button type="button" className="n-mini-info" onClick={onOpen}>
           <span className="n-surah-num">
             <NourMark />
@@ -709,6 +771,15 @@ export function QuranAudioReader({
           </span>
         </button>
         <div className="flex shrink-0 items-center">
+          <button
+            type="button"
+            className="n-icon-btn n-mini-wide"
+            onClick={() => goToSurah(selectedSurah - 1)}
+            disabled={selectedSurah <= 1 || isLoading}
+            aria-label="Sourate précédente"
+          >
+            <ChevronsLeft className="size-4" />
+          </button>
           <button
             type="button"
             className="n-icon-btn"
@@ -737,12 +808,31 @@ export function QuranAudioReader({
           </button>
           <button
             type="button"
+            className="n-icon-btn n-mini-wide"
+            onClick={() => goToSurah(selectedSurah + 1)}
+            disabled={selectedSurah >= 114 || isLoading}
+            aria-label="Sourate suivante"
+          >
+            <ChevronsRight className="size-4" />
+          </button>
+          <button
+            type="button"
+            className="n-icon-btn"
+            aria-pressed={showMiniOptions}
+            onClick={() => setShowMiniOptions((value) => !value)}
+            aria-label="Réglages de lecture"
+          >
+            <SlidersHorizontal className="size-4" />
+          </button>
+          <button
+            type="button"
             className="n-icon-btn"
             onClick={stopPlayback}
             aria-label="Arrêter et fermer le lecteur"
           >
             <X className="size-4" />
           </button>
+        </div>
         </div>
         <span className="n-mini-progress" aria-hidden="true">
           <span
