@@ -1,16 +1,18 @@
 import {
   BookOpen,
   CalendarClock,
-  CalendarDays,
   GraduationCap,
-  LayoutDashboard,
+  HandHeart,
+  Moon,
   StickyNote,
   Settings,
+  Sun,
   type LucideIcon,
 } from "lucide-react";
 
 export type DashboardView =
   | "overview"
+  | "adhkar"
   | "salah"
   | "quran"
   | "science"
@@ -18,52 +20,79 @@ export type DashboardView =
   | "notes"
   | "settings";
 
+export type DashboardNavigationGroup = "daily" | "deeper" | "other";
+
+export const dashboardNavigationGroups: {
+  id: DashboardNavigationGroup;
+  label: string;
+}[] = [
+  { id: "daily", label: "Au quotidien" },
+  { id: "deeper", label: "Approfondir" },
+  { id: "other", label: "Autres" },
+];
+
+// « daily » = onglets de la barre mobile ; le reste passe dans « Plus ».
 export const dashboardNavigation: {
   label: string;
   view: DashboardView;
   targetId: string;
   icon: LucideIcon;
+  group: DashboardNavigationGroup;
 }[] = [
   {
-    label: "Accueil",
+    label: "Aujourd’hui",
     view: "overview",
     targetId: "dashboard-home",
-    icon: LayoutDashboard,
+    icon: Sun,
+    group: "daily",
   },
   {
-    label: "Planning",
-    view: "salah",
-    targetId: "dashboard-salah",
-    icon: CalendarClock,
-  },
-  {
-    label: "Al-Quran",
+    label: "Coran",
     view: "quran",
     targetId: "dashboard-quran",
     icon: BookOpen,
+    group: "daily",
+  },
+  {
+    label: "Adhkar",
+    view: "adhkar",
+    targetId: "dashboard-routine",
+    icon: HandHeart,
+    group: "daily",
+  },
+  {
+    label: "Cycle",
+    view: "periods",
+    targetId: "dashboard-status",
+    icon: Moon,
+    group: "daily",
   },
   {
     label: "Science bénéfique",
     view: "science",
     targetId: "dashboard-science",
     icon: GraduationCap,
+    group: "deeper",
   },
   {
-    label: "Périodes d’excuse",
-    view: "periods",
-    targetId: "dashboard-status",
-    icon: CalendarDays,
+    label: "Planning",
+    view: "salah",
+    targetId: "dashboard-salah",
+    icon: CalendarClock,
+    group: "deeper",
   },
   {
     label: "Notes",
     view: "notes",
     targetId: "dashboard-notes",
     icon: StickyNote,
+    group: "deeper",
   },
   {
     label: "Réglages",
     view: "settings",
     targetId: "dashboard-settings",
     icon: Settings,
+    group: "other",
   },
 ];

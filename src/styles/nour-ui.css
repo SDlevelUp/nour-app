@@ -1,0 +1,508 @@
+/*
+ * Nouveau design du dashboard (direction validée le 2026-10-19,
+ * voir docs/direction-design-2026-10.md).
+ * Classes préfixées « n- » : elles échappent aux règles globales
+ * `.dashboard-shell [class*="rounded-"]`, `[class*="text-stone-"]`, etc.
+ */
+
+:root {
+  --n-font-display: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+}
+
+.dashboard-shell {
+  --n-bg: var(--nour-cream);
+  --n-paper: #fffdf9;
+  --n-line: #e6e0d4;
+  --n-ink: #1f2a22;
+  --n-muted: #66705f;
+  --n-sage: #5d7c65;
+  --n-sage-dark: #3f5a47;
+  --n-sage-tint: #e6ece3;
+  --n-on-dark: #f5f2ea;
+  --n-on-dark-muted: #c9d6cb;
+  --n-mauve: #8e7a9b;
+  --n-mauve-text: #5e4d6a;
+  --n-mauve-tint: #eee8f1;
+  --n-radius-sm: 10px;
+  --n-radius-lg: 22px;
+}
+
+.dashboard-shell.dark-dashboard {
+  --n-bg: #202922;
+  --n-paper: #27312a;
+  --n-line: #3d4940;
+  --n-ink: #f5f4ed;
+  --n-muted: #b7c2b5;
+  --n-sage: #a8c8ae;
+  --n-sage-dark: #33473a;
+  --n-sage-tint: #2f3b32;
+  --n-mauve: #b9a6c6;
+  --n-mauve-text: #d9cde0;
+  --n-mauve-tint: #3c3542;
+}
+
+/* ---------- Typographie ---------- */
+
+.n-display {
+  font-family: var(--n-font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.n-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--n-muted);
+}
+
+.n-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.n-arabic {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-weight: 400;
+  line-height: 2;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ---------- Cartes ---------- */
+
+.n-card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-lg);
+  background: var(--n-paper);
+  padding: 24px;
+  color: var(--n-ink);
+}
+
+.n-card-tint {
+  border-color: transparent;
+  background: var(--n-sage-tint);
+}
+
+.n-card-dark {
+  border: 0;
+  background: var(--n-sage-dark);
+  color: var(--n-on-dark);
+}
+
+.n-card-dark .n-label {
+  color: var(--n-on-dark-muted);
+}
+
+.n-pattern {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 46%;
+  color: #ffffff;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+@media (max-width: 860px) {
+  .n-card {
+    padding: 20px;
+  }
+  .n-pattern {
+    width: 80%;
+  }
+}
+
+/* ---------- Boutons et pastilles ---------- */
+
+.n-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: var(--n-ink);
+  color: var(--n-bg);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.n-btn:hover {
+  opacity: 0.88;
+}
+
+.n-btn:focus-visible,
+.n-link:focus-visible,
+.n-nav-item:focus-visible,
+.n-tab:focus-visible {
+  outline: 2px solid var(--n-sage);
+  outline-offset: 2px;
+}
+
+.n-btn-sage {
+  background: var(--n-sage-dark);
+  color: var(--n-on-dark);
+}
+
+.n-btn-ghost {
+  border: 1px solid var(--n-line);
+  background: transparent;
+  color: var(--n-ink);
+}
+
+.n-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 11px;
+  background: var(--n-mauve-tint);
+  color: var(--n-mauve-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.n-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--n-sage);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.n-dashed {
+  width: 100%;
+  border: 1px dashed var(--n-line);
+  border-radius: var(--n-radius-lg);
+  background: transparent;
+  padding: 16px;
+  color: var(--n-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.n-dashed:hover {
+  color: var(--n-ink);
+}
+
+/* ---------- Frise des prières ---------- */
+
+.n-timeline {
+  position: relative;
+  margin-top: 30px;
+  padding-top: 18px;
+}
+
+.n-track {
+  position: absolute;
+  top: 23px;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.n-track > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--n-on-dark-muted);
+}
+
+.n-stops {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.n-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.n-stop:first-child {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.n-stop:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.n-stop-dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--n-on-dark-muted);
+  border-radius: 50%;
+  background: var(--n-sage-dark);
+}
+
+.n-stop-time {
+  color: var(--n-on-dark-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.n-stop[data-state="done"] .n-stop-dot {
+  background: var(--n-on-dark-muted);
+}
+
+.n-stop[data-state="next"] {
+  font-weight: 600;
+}
+
+.n-stop[data-state="next"] .n-stop-dot {
+  border-color: var(--n-on-dark);
+  background: var(--n-on-dark);
+  box-shadow: 0 0 0 5px rgba(245, 242, 234, 0.18);
+}
+
+.n-stop[data-state="next"] .n-stop-time {
+  color: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .n-stop {
+    font-size: 12px;
+  }
+}
+
+/* ---------- Cycle ---------- */
+
+.n-week {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.n-day {
+  flex: none;
+  width: 52px;
+  border: 1px solid var(--n-line);
+  border-radius: 14px;
+  background: var(--n-bg);
+  padding: 9px 0;
+  color: var(--n-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.n-day b {
+  display: block;
+  color: var(--n-ink);
+  font-family: var(--n-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.n-day[data-period="true"] {
+  border-color: transparent;
+  background: var(--n-mauve-tint);
+  color: var(--n-mauve-text);
+}
+
+.n-day[data-today="true"] {
+  border-color: var(--n-ink);
+  background: var(--n-ink);
+  color: var(--n-bg);
+}
+
+.n-day[data-today="true"] b {
+  color: var(--n-bg);
+}
+
+@media (max-width: 860px) {
+  .n-day {
+    width: 44px;
+  }
+}
+
+/* ---------- Navigation ---------- */
+
+.n-sidebar {
+  background: var(--n-bg);
+  border-right: 1px solid var(--n-line);
+  color: var(--n-ink);
+}
+
+.n-nav-heading {
+  padding: 0 10px 8px;
+  color: var(--n-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.n-nav-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 11px;
+  border: 0;
+  border-radius: var(--n-radius-sm);
+  background: transparent;
+  padding: 9px 10px;
+  color: var(--n-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.n-nav-item:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-nav-item[aria-current="page"] {
+  background: var(--n-ink);
+  color: var(--n-bg);
+}
+
+.n-nav-item[data-collapsed="true"] {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.n-panel {
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-sm);
+  background: var(--n-paper);
+}
+
+.n-unread {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b4473a;
+}
+
+/* Barre d'onglets mobile */
+.n-tabbar {
+  position: fixed;
+  right: 12px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 12px;
+  z-index: 40;
+  display: flex;
+  gap: 2px;
+  border-radius: 999px;
+  background: var(--n-ink);
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(31, 42, 34, 0.25);
+}
+
+.n-tab {
+  position: relative;
+  display: flex;
+  flex: 1;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #aeb8ad;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Classes non stratifiées : elles l'emportent sur `lg:hidden`, d'où ce masquage explicite. */
+@media (min-width: 1024px) {
+  .n-tabbar,
+  .n-sheet,
+  .n-sheet-backdrop {
+    display: none;
+  }
+}
+
+.dark-dashboard .n-tab {
+  color: #55625a;
+}
+
+.n-tab > span {
+  display: none;
+}
+
+.n-tab[aria-current="page"] {
+  flex: 2.4;
+  background: var(--n-bg);
+  color: var(--n-ink);
+}
+
+.n-tab[aria-current="page"] > span {
+  display: inline;
+}
+
+.n-tab .n-unread {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+}
+
+.n-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(31, 42, 34, 0.35);
+}
+
+.n-sheet {
+  position: fixed;
+  right: 12px;
+  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 70px);
+  left: 12px;
+  z-index: 46;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-lg);
+  background: var(--n-paper);
+  padding: 14px;
+  color: var(--n-ink);
+  box-shadow: 0 10px 30px rgba(31, 42, 34, 0.2);
+}
+
+/* ---------- Animation d'entrée ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .n-rise {
+    animation: n-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .n-rise:nth-child(2) { animation-delay: 0.06s; }
+  .n-rise:nth-child(3) { animation-delay: 0.12s; }
+  .n-rise:nth-child(4) { animation-delay: 0.18s; }
+  .n-rise:nth-child(5) { animation-delay: 0.24s; }
+  .n-track > span {
+    transition: width 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+@keyframes n-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

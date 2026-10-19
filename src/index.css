@@ -1,7 +1,8 @@
 /* DO NOT CHANGE */
-@import url("https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Urbanist:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Sora:wght@500;600&family=Urbanist:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/nour-ui.css";
 @custom-variant dark (&:is(.dark *));
 
 /* DO NOT CHANGE */
@@ -9,6 +10,7 @@
   --font-sans: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --radius-xs: var(--radius);
   --radius-sm: var(--radius);
   --radius-md: var(--radius);

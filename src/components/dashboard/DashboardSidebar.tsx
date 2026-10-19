@@ -1,18 +1,11 @@
-import {
-  BookOpen,
-  CalendarClock,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  GraduationCap,
-  LayoutDashboard,
-  LogOut,
-  MoonStar,
-  Settings,
-  StickyNote,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutGrid, LogOut, MoonStar, X } from "lucide-react";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { dashboardNavigation, type DashboardView } from "./dashboardNavigation";
+import {
+  dashboardNavigation,
+  dashboardNavigationGroups,
+  type DashboardView,
+} from "./dashboardNavigation";
 
 type DashboardSidebarProps = {
   activeView: DashboardView;
@@ -29,6 +22,28 @@ type DashboardSidebarProps = {
   onSignOut: () => void;
 };
 
+// Étoile à 8 branches (khatam) : deux carrés superposés, en traits.
+export function NourMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect
+        x="8"
+        y="8"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        transform="rotate(45 20 20)"
+      />
+    </svg>
+  );
+}
+
+const mobileTabs = dashboardNavigation.filter((item) => item.group === "daily");
+const moreItems = dashboardNavigation.filter((item) => item.group !== "daily");
+
 export function DashboardSidebar({
   activeView,
   firstName,
@@ -43,15 +58,35 @@ export function DashboardSidebar({
   onDarkModeChange,
   onSignOut,
 }: DashboardSidebarProps) {
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const initials = firstName
     ? firstName.slice(0, 1).toLocaleUpperCase("fr-FR")
     : "N";
+  const isMoreActive = moreItems.some((item) => item.view === activeView);
+
+  const excuseToggle = (
+    <div className="flex items-start gap-2.5">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-semibold leading-4">
+          Indisponibilité légale (‘Udhr)
+        </span>
+        <span className="mt-1 block text-[12px] leading-4 opacity-70">
+          Masque les créneaux de prière du planning
+        </span>
+      </span>
+      <Switch
+        checked={isExcusePeriod}
+        onCheckedChange={onExcusePeriodChange}
+        aria-label="Activer l’indisponibilité légale Al-Udhr"
+      />
+    </div>
+  );
 
   return (
     <>
       <aside
-        className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-[#ECE7DF] bg-white py-6 transition-[width,padding] duration-300 ease-in-out lg:flex ${
-          isCollapsed ? "w-18 items-center px-2" : "w-65 px-5"
+        className={`n-sidebar fixed inset-y-0 left-0 z-40 hidden flex-col py-6 transition-[width,padding] duration-300 ease-in-out lg:flex ${
+          isCollapsed ? "w-18 items-center px-2" : "w-65 px-4"
         }`}
       >
         <div
@@ -62,26 +97,18 @@ export function DashboardSidebar({
           <button
             type="button"
             onClick={() => onNavigate("overview")}
-            className={`flex items-center text-left ${
-              isCollapsed ? "" : "gap-3 px-2"
-            }`}
-            aria-label="Nour, accueil"
-            title={isCollapsed ? "Nour, accueil" : undefined}
+            className={`flex items-center text-left ${isCollapsed ? "" : "gap-2.5 px-2"}`}
+            aria-label="Nour, aujourd’hui"
+            title={isCollapsed ? "Nour, aujourd’hui" : undefined}
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-[#523B46] text-white">
-              <MoonStar className="size-5" aria-hidden="true" />
-            </span>
-            {!isCollapsed && (
-              <span className="text-xl font-semibold tracking-tight text-foreground">
-                nour
-              </span>
-            )}
+            <NourMark className="size-8 text-(--n-sage)" />
+            {!isCollapsed && <span className="n-display text-2xl">Nour</span>}
           </button>
           {!isCollapsed && (
             <button
               type="button"
               onClick={onCollapse}
-              className="flex size-8 items-center justify-center rounded-lg text-stone-500 transition hover:bg-stone-100 hover:text-stone-900"
+              className="n-nav-item !w-auto !p-1.5"
               aria-label="Replier la barre latérale"
               title="Replier la barre latérale"
             >
@@ -90,75 +117,42 @@ export function DashboardSidebar({
           )}
         </div>
 
-        <p
-          className={`mb-3 mt-10 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-400 ${
-            isCollapsed ? "text-center" : "px-3"
-          }`}
-        >
-          {isCollapsed ? "Menu" : "Espace personnel"}
-        </p>
-        <nav
-          aria-label="Navigation principale"
-          className={`w-full space-y-1 ${isCollapsed ? "px-0.5" : ""}`}
-        >
-          {dashboardNavigation.map(({ label, view, icon: Icon }) => {
-            const isActive = activeView === view;
-            return (
-              <button
-                key={view}
-                type="button"
-                onClick={() => onNavigate(view)}
-                aria-current={isActive ? "page" : undefined}
-                title={isCollapsed ? label : undefined}
-                aria-label={isCollapsed ? label : undefined}
-                className={`relative flex w-full items-center rounded-xl py-3 text-sm transition ${
-                  isCollapsed ? "justify-center px-0" : "gap-3 px-3 text-left"
-                } hover:bg-[#E8F0E8] ${
-                  isActive
-                    ? "font-semibold text-[#35533D]"
-                    : "text-stone-600 hover:text-[#35533D]"
-                }`}
-              >
-                <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
-                {!isCollapsed && <span>{label}</span>}
-                {view === "notes" && hasUnreadNotes && isCollapsed && (
-                  <span
-                    className="absolute right-2 top-2 size-2 rounded-full bg-red-600"
-                    role="status"
-                    aria-label="Nouvelle note non consultée"
-                  />
-                )}
-                {view === "notes" && hasUnreadNotes && !isCollapsed && (
-                  <span
-                    className="ml-auto size-2 rounded-full bg-red-600"
-                    role="status"
-                    aria-label="Nouvelle note non consultée"
-                  />
-                )}
-              </button>
-            );
-          })}
+        <nav aria-label="Navigation principale" className="mt-8 w-full space-y-6">
+          {dashboardNavigationGroups.map((group) => (
+            <div key={group.id}>
+              {!isCollapsed && <p className="n-nav-heading">{group.label}</p>}
+              <div className="space-y-0.5">
+                {dashboardNavigation
+                  .filter((item) => item.group === group.id)
+                  .map(({ label, view, icon: Icon }) => (
+                    <button
+                      key={view}
+                      type="button"
+                      onClick={() => onNavigate(view)}
+                      aria-current={activeView === view ? "page" : undefined}
+                      data-collapsed={isCollapsed}
+                      title={isCollapsed ? label : undefined}
+                      aria-label={isCollapsed ? label : undefined}
+                      className="n-nav-item"
+                    >
+                      <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                      {!isCollapsed && <span>{label}</span>}
+                      {view === "notes" && hasUnreadNotes && (
+                        <span
+                          className={`n-unread ${isCollapsed ? "absolute right-2 top-2" : "ml-auto"}`}
+                          role="status"
+                          aria-label="Nouvelle note non consultée"
+                        />
+                      )}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {!isCollapsed ? (
-          <div className="mt-5 rounded-xl border border-[#ECE7DF] bg-white p-3">
-            <div className="flex items-start gap-2.5">
-              <CalendarDays className="mt-0.5 size-4 shrink-0 text-[#523B46]" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-xs font-semibold leading-4 text-stone-900">
-                  Activer l’indisponibilité légale (‘Udhr)
-                </span>
-                <span className="mt-1 block text-[10px] leading-4 text-stone-500">
-                  Masquer les créneaux de prière du planning
-                </span>
-              </span>
-              <Switch
-                checked={isExcusePeriod}
-                onCheckedChange={onExcusePeriodChange}
-                aria-label="Activer l’indisponibilité légale Al-Udhr"
-              />
-            </div>
-          </div>
+          <div className="n-panel mt-6 w-full p-3">{excuseToggle}</div>
         ) : (
           <button
             type="button"
@@ -166,92 +160,72 @@ export function DashboardSidebar({
             aria-pressed={isExcusePeriod}
             aria-label="Activer ou désactiver l’indisponibilité légale Al-Udhr"
             title="Indisponibilité légale (‘Udhr)"
-            className={`mt-4 flex size-10 items-center justify-center rounded-xl transition ${
-              isExcusePeriod
-                ? "bg-amber-100 text-amber-900"
-                : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
-            }`}
+            className="n-nav-item mt-4"
+            data-collapsed="true"
+            aria-current={isExcusePeriod ? "page" : undefined}
           >
-            <CalendarDays className="size-4" />
+            <MoonStar className="size-4" />
           </button>
         )}
 
-        {!isCollapsed && (
-          <div className="mt-auto rounded-xl border border-[#ECE7DF] bg-white p-3">
-            <div className="flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-900">
+        <div className={`mt-auto w-full ${isCollapsed ? "flex flex-col items-center gap-2" : ""}`}>
+          {!isCollapsed && (
+            <div className="flex items-center gap-3 px-2">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--n-sage-tint) text-sm font-semibold">
                 {initials}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-stone-900">
+                <span className="block truncate text-sm font-semibold">
                   {firstName || "Mon profil"}
                 </span>
-                <span className="block truncate text-xs text-stone-500">
+                <span className="block truncate text-xs opacity-70">
                   {email || "Espace personnel"}
                 </span>
               </span>
             </div>
+          )}
+          <div className={isCollapsed ? "contents" : "mt-3 flex items-center justify-between px-2"}>
+            {isCollapsed ? (
+              <button
+                type="button"
+                onClick={() => onDarkModeChange(!isDarkMode)}
+                className="n-nav-item"
+                data-collapsed="true"
+                aria-label="Activer ou désactiver le mode nuit"
+                aria-pressed={isDarkMode}
+                title="Mode nuit"
+              >
+                <MoonStar className="size-4" />
+              </button>
+            ) : (
+              <label className="flex items-center gap-2 text-[13px] font-semibold">
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={onDarkModeChange}
+                  aria-label="Activer le mode nuit"
+                />
+                Mode nuit
+              </label>
+            )}
             <button
               type="button"
               onClick={onSignOut}
-              className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-stone-600 transition hover:bg-white hover:text-stone-950"
-            >
-              <LogOut className="size-4" />
-              Se déconnecter
-            </button>
-          </div>
-        )}
-
-        {isCollapsed ? (
-          <div className="mt-auto flex flex-col items-center gap-2">
-            <span
-              className="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-900"
-              title={firstName || "Mon profil"}
-            >
-              {initials}
-            </span>
-            <button
-              type="button"
-              onClick={() => onDarkModeChange(!isDarkMode)}
-              className={`flex size-10 items-center justify-center rounded-xl transition ${
-                isDarkMode
-                  ? "bg-emerald-100 text-emerald-900"
-                  : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
-              }`}
-              aria-label="Activer ou désactiver le mode nuit"
-              aria-pressed={isDarkMode}
-              title="Mode Nuit"
-            >
-              <MoonStar className="size-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="flex size-10 items-center justify-center rounded-xl text-stone-500 transition hover:bg-stone-100 hover:text-stone-900"
+              className={`n-nav-item ${isCollapsed ? "" : "!w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"}`}
+              data-collapsed={isCollapsed}
               aria-label="Se déconnecter"
               title="Se déconnecter"
             >
               <LogOut className="size-4" />
+              {!isCollapsed && "Quitter"}
             </button>
           </div>
-        ) : (
-          <div className="mt-3 flex w-full items-center justify-between px-2 py-2">
-            <span className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-              <MoonStar className="size-4" />
-              Mode Nuit
-            </span>
-            <Switch
-              checked={isDarkMode}
-              onCheckedChange={onDarkModeChange}
-              aria-label="Activer le mode nuit"
-            />
-          </div>
-        )}
+        </div>
+
         {isCollapsed && (
           <button
             type="button"
             onClick={onCollapse}
-            className="absolute right-0 top-1/2 flex size-7 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 shadow-sm transition hover:text-stone-900"
+            className="absolute right-0 top-1/2 flex size-7 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--n-line) bg-(--n-paper) text-(--n-muted) transition hover:text-(--n-ink)"
             aria-label="Déplier la barre latérale"
             title="Déplier la barre latérale"
           >
@@ -260,47 +234,102 @@ export function DashboardSidebar({
         )}
       </aside>
 
-      <nav
-        aria-label="Navigation principale"
-        className="sticky top-0 z-30 flex gap-1 overflow-x-auto border-b border-stone-200 bg-white/95 px-3 py-2 backdrop-blur lg:hidden"
-      >
-        {dashboardNavigation.map(({ label, view, icon: Icon }) => {
-          const isActive = activeView === view;
-          return (
-            <button
-              key={view}
-              type="button"
-              onClick={() => onNavigate(view)}
-              aria-current={isActive ? "page" : undefined}
-              className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition hover:bg-[#E8F0E8] ${
-                isActive
-                  ? "border-b-2 border-[#5D7C65] font-semibold text-[#35533D]"
-                  : "text-stone-600 hover:text-[#35533D]"
-              }`}
-            >
-              <Icon className="size-4" strokeWidth={1.8} />
-              {label}
-              {view === "notes" && hasUnreadNotes && (
-                <span
-                  className="size-2 rounded-full bg-red-600"
-                  role="status"
-                  aria-label="Nouvelle note non consultée"
-                />
-              )}
-            </button>
-          );
-        })}
+      {/* Mobile : barre d'onglets en pilule + panneau « Plus » */}
+      <nav aria-label="Navigation principale" className="n-tabbar lg:hidden">
+        {mobileTabs.map(({ label, view, icon: Icon }) => (
+          <button
+            key={view}
+            type="button"
+            onClick={() => {
+              setIsMoreOpen(false);
+              onNavigate(view);
+            }}
+            aria-current={activeView === view && !isMoreOpen ? "page" : undefined}
+            aria-label={label}
+            className="n-tab"
+          >
+            <Icon className="size-5 shrink-0" strokeWidth={1.8} />
+            <span>{label}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => setIsMoreOpen((open) => !open)}
+          aria-expanded={isMoreOpen}
+          aria-current={isMoreActive || isMoreOpen ? "page" : undefined}
+          aria-label="Plus"
+          className="n-tab"
+        >
+          <LayoutGrid className="size-5 shrink-0" strokeWidth={1.8} />
+          <span>Plus</span>
+          {hasUnreadNotes && !isMoreOpen && (
+            <span className="n-unread" role="status" aria-label="Nouvelle note non consultée" />
+          )}
+        </button>
       </nav>
-      <div className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-2 lg:hidden">
-        <span className="text-xs font-medium text-stone-700">
-          Activer l’indisponibilité légale (‘Udhr)
-        </span>
-        <Switch
-          checked={isExcusePeriod}
-          onCheckedChange={onExcusePeriodChange}
-          aria-label="Activer l’indisponibilité légale Al-Udhr"
-        />
-      </div>
+
+      {isMoreOpen && (
+        <div className="lg:hidden">
+          <button
+            type="button"
+            className="n-sheet-backdrop"
+            aria-label="Fermer le menu"
+            onClick={() => setIsMoreOpen(false)}
+          />
+          <div className="n-sheet" role="dialog" aria-label="Plus">
+            <div className="flex items-center justify-between px-1 pb-2">
+              <span className="n-label">Plus</span>
+              <button
+                type="button"
+                onClick={() => setIsMoreOpen(false)}
+                className="n-nav-item !w-auto !p-1.5"
+                aria-label="Fermer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="space-y-0.5">
+              {moreItems.map(({ label, view, icon: Icon }) => (
+                <button
+                  key={view}
+                  type="button"
+                  onClick={() => {
+                    setIsMoreOpen(false);
+                    onNavigate(view);
+                  }}
+                  aria-current={activeView === view ? "page" : undefined}
+                  className="n-nav-item"
+                >
+                  <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                  <span>{label}</span>
+                  {view === "notes" && hasUnreadNotes && (
+                    <span className="n-unread ml-auto" role="status" aria-label="Nouvelle note non consultée" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="n-panel mt-3 p-3">{excuseToggle}</div>
+            <div className="mt-3 flex items-center justify-between px-1">
+              <label className="flex items-center gap-2 text-[13px] font-semibold">
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={onDarkModeChange}
+                  aria-label="Activer le mode nuit"
+                />
+                Mode nuit
+              </label>
+              <button
+                type="button"
+                onClick={onSignOut}
+                className="n-nav-item !w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"
+              >
+                <LogOut className="size-4" />
+                Se déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

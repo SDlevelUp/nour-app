@@ -1,3 +1,4 @@
 {
+  "buildCommand": "if [ -n \"$CONVEX_DEPLOY_KEY\" ]; then npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name VITE_CONVEX_URL; else npm run build; fi",
   "rewrites": [{ "source": "/(.*)", "destination": "/app.html" }]
 }

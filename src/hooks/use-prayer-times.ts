@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 
 const storageKey = "nour-prayer-preferences";
 
-const calculationMethods = [
-  { id: 3, label: "Muslim World League" },
-  { id: 2, label: "ISNA (Amérique du Nord)" },
-  { id: 4, label: "Umm al-Qura (Arabie saoudite)" },
-  { id: 5, label: "Égypte" },
-  { id: 12, label: "UOIF (France)" },
-] as const;
+// Méthode imposée (décision du 2026-10-19) : Ligue islamique mondiale (MWL),
+// Fajr à 18° et Isha à 17° sous l'horizon (paramètres AlAdhan, méthode 3).
+// Quand le soleil ne descend pas assez en été, AlAdhan applique la règle
+// « angle based » (latitudeAdjustmentMethod=3), fixée ici explicitement.
+export const prayerCalculation = {
+  method: 3,
+  latitudeAdjustmentMethod: 3,
+  label: "Ligue islamique mondiale (MWL)",
+  fajrAngle: 18,
+  ishaAngle: 17,
+} as const;
 
 type Coordinates = {
   latitude: number;
@@ -17,7 +21,6 @@ type Coordinates = {
 
 type PrayerPreferences = {
   coordinates: Coordinates | null;
-  method: number;
   school: 0 | 1;
 };
 
@@ -44,7 +47,6 @@ type PrayerTimesState = {
 
 const defaultPreferences: PrayerPreferences = {
   coordinates: null,
-  method: 12,
   school: 0,
 };
 
@@ -72,11 +74,6 @@ function readPreferences(): PrayerPreferences {
 
     return {
       coordinates: hasValidCoordinates ? coordinates : null,
-      method: calculationMethods.some(
-        (method) => method.id === preferences.method,
-      )
-        ? preferences.method!
-        : defaultPreferences.method,
       school: preferences.school === 1 ? 1 : 0,
     };
   } catch {
@@ -143,7 +140,10 @@ export function usePrayerTimes() {
     const query = new URLSearchParams({
       latitude: String(coordinates.latitude),
       longitude: String(coordinates.longitude),
-      method: String(preferences.method),
+      method: String(prayerCalculation.method),
+      latitudeAdjustmentMethod: String(
+        prayerCalculation.latitudeAdjustmentMethod,
+      ),
       school: String(preferences.school),
     });
 
@@ -189,7 +189,6 @@ export function usePrayerTimes() {
   }, [
     localDate,
     preferences.coordinates,
-    preferences.method,
     preferences.school,
   ]);
 
@@ -230,14 +229,6 @@ export function usePrayerTimes() {
     );
   };
 
-  const setMethod = (method: number) => {
-    if (!calculationMethods.some((item) => item.id === method)) return;
-    if (preferences.coordinates) {
-      setState((current) => ({ ...current, isLoading: true, error: null }));
-    }
-    setPreferences((current) => ({ ...current, method }));
-  };
-
   const setSchool = (school: 0 | 1) => {
     if (preferences.coordinates) {
       setState((current) => ({ ...current, isLoading: true, error: null }));
@@ -260,9 +251,7 @@ export function usePrayerTimes() {
         state.error === null),
     error: state.error,
     requestLocation,
-    setMethod,
     setSchool,
     clearLocation,
-    calculationMethods,
   };
 }

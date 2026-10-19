@@ -18,7 +18,8 @@ import {
   type QuranResumePosition,
 } from "@/components/dashboard/quranPlaybackResume";
 import { ScienceJournal } from "@/components/dashboard/ScienceJournal";
-import { usePrayerTimes } from "@/hooks/use-prayer-times";
+import { TodayView } from "@/components/dashboard/TodayView";
+import { prayerCalculation, usePrayerTimes } from "@/hooks/use-prayer-times";
 import { api } from "@/convex/_generated/api";
 import { adhkarBySession, type AdhkarSession } from "@/convex/adhkarData";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
@@ -34,7 +35,7 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Archive, ArchiveRestore, MoonStar, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -291,20 +292,11 @@ export default function Dashboard() {
     : 16 * 60;
   const momentAdhkarSession: AdhkarSession =
     currentMinutes >= asrMinutes ? "evening" : "morning";
-  const nextPrayer = prayer.times
-    ? (
-        [
-          ["Fajr", prayer.times.fajr],
-          ["Dhuhr", prayer.times.dhuhr],
-          ["Asr", prayer.times.asr],
-          ["Maghrib", prayer.times.maghrib],
-          ["Isha", prayer.times.isha],
-        ] as const
-      ).find(([, time]) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        return hours * 60 + minutes > currentMinutes;
-      })
-    : undefined;
+  const momentProgress = adhkarProgress?.find(
+    (entry) => entry.session === momentAdhkarSession,
+  );
+  const momentIndex = momentProgress?.currentIndex ?? 0;
+  const momentInvocation = adhkarBySession[momentAdhkarSession][momentIndex];
   const currentRepetitionCount = sessionProgress?.repetitionCount ?? 0;
   const isInvocationComplete =
     currentInvocation !== undefined &&
@@ -806,12 +798,7 @@ export default function Dashboard() {
 
   const openAdhkarSession = (session: AdhkarSession) => {
     setAdhkarSession(session);
-    document.getElementById("dashboard-routine")?.setAttribute("open", "");
-    requestAnimationFrame(() => {
-      document
-        .getElementById("dashboard-routine")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    navigateToView("adhkar");
   };
 
   useEffect(() => {
@@ -1026,24 +1013,9 @@ export default function Dashboard() {
       <div
         className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
-        <header
-          className={`border-b border-[#E7E1D6] ${activeView === "overview" ? "bg-background" : "bg-white/90"}`}
-        >
-          {activeView === "overview" ? (
-            <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-4 sm:px-6 xl:px-8">
-              <div className="flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm">
-                  <MoonStar className="size-5" />
-                </span>
-                <span className="text-lg font-bold tracking-tight text-stone-900">
-                  nour
-                </span>
-              </div>
-              <span className="text-sm font-medium text-stone-500">
-                Ton espace quotidien
-              </span>
-            </div>
-          ) : (
+        {activeView !== "overview" && (
+        <header className="border-b border-[#E7E1D6] bg-white/90">
+          {(
             <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
               <div className="min-w-0">
                 <p className="text-base font-semibold text-stone-900">
@@ -1094,125 +1066,67 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => void handleSignOut()}
-                className="self-end gap-2 text-stone-600 hover:text-stone-950 xl:hidden"
-                aria-label="Se déconnecter"
-              >
-                Quitter
-              </Button>
             </div>
           )}
         </header>
+        )}
 
         <div
-          className="mx-auto min-h-[calc(100vh-100px)] max-w-[1600px] bg-background px-4 pb-12 pt-6 sm:px-6 xl:px-8"
+          className={`mx-auto min-h-[calc(100vh-100px)] bg-background px-4 pb-32 sm:px-6 lg:pb-12 xl:px-8 ${activeView === "overview" ? "max-w-[1180px] pt-8 lg:pt-10" : "max-w-[1600px] pt-6"}`}
         >
           <div className="grid items-start gap-6 xl:gap-8 xl:grid-cols-1">
             <section className="min-w-0 space-y-4">
               {(activeView === "overview" ||
+                activeView === "adhkar" ||
                 activeView === "salah" ||
                 activeView === "quran" ||
                 activeView === "science") && (
                 <>
                   {activeView === "overview" && (
-                    <div id="dashboard-home" className="scroll-mt-24 space-y-5">
-                      <section className="rounded-3xl border border-[#DCE5DC] bg-[#EEF4EE] px-5 py-6 sm:px-8 sm:py-8">
-                        <h1
-                          className="text-xl font-semibold leading-snug text-[#26362A] sm:text-2xl"
-                          dir="rtl"
-                          lang="ar"
-                        >
-                          السلام عليكم ورحمة الله وبركاته
-                        </h1>
-                        <p className="mt-2 text-sm leading-6 text-[#405348] sm:text-base">
-                          Que la paix, la miséricorde d’Allah et Ses
-                          bénédictions soient sur toi
-                          {firstName ? `, ${firstName}` : ""}.
-                        </p>
-                      </section>
-
-                      <section
-                        aria-label="Tes repères du jour"
-                        className="grid gap-3 sm:grid-cols-3"
-                      >
-                        <article className="rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
-                          <h2 className="text-sm font-semibold text-[#35533D]">
-                            Prochaine prière
-                          </h2>
-                          {nextPrayer ? (
-                            <p className="mt-3 text-lg font-semibold text-[#26362A]">
-                              {nextPrayer[0]}{" "}
-                              <span className="font-normal tabular-nums text-[#405348]">
-                                {nextPrayer[1]}
-                              </span>
-                            </p>
-                          ) : (
-                            <p className="mt-3 text-sm leading-5 text-[#405348]">
-                              {prayer.times
-                                ? `Fajr demain · ${prayer.times.fajr}`
-                                : "Configure tes horaires dans les réglages."}
-                            </p>
-                          )}
-                        </article>
-
-                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
-                          <h2 className="text-sm font-semibold text-[#35533D]">
-                            Adhkar du{" "}
-                            {momentAdhkarSession === "morning"
-                              ? "matin"
-                              : "soir"}
-                          </h2>
-                          <p className="mt-2 text-sm leading-5 text-[#405348]">
-                            Retrouve les invocations de ce moment.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openAdhkarSession(momentAdhkarSession)
-                            }
-                            className="mt-4 rounded-xl bg-[#5D7C65] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#45624D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
-                          >
-                            Continuer
-                          </button>
-                        </article>
-
-                        <article className="flex flex-col items-start rounded-2xl border border-[#DCE5DC] bg-white p-4 sm:p-5">
-                          <h2 className="text-sm font-semibold text-[#35533D]">
-                            Reprendre ma lecture
-                          </h2>
-                          <p className="mt-2 text-sm leading-5 text-[#405348]">
-                            {quranResumeTarget?.surah ??
-                              latestQuranEntry?.passage ??
-                              "Aucune lecture récente pour le moment."}
-                          </p>
-                          {quranResumeTarget ? (
-                            <p className="mt-1 text-xs text-[#52675A]">
-                              Verset {quranResumeTarget.ayah}
-                            </p>
-                          ) : latestQuranEntry?.pagesOrVerses ? (
-                            <p className="mt-1 text-xs text-[#52675A]">
-                              {latestQuranEntry.pagesOrVerses}
-                            </p>
-                          ) : null}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setQuranResumeRequest(quranResumeTarget);
-                              navigateToView("quran");
-                            }}
-                            className="mt-4 rounded-xl border border-[#5D7C65] px-4 py-2 text-sm font-semibold text-[#35533D] transition hover:bg-[#F1F5EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35533D] focus-visible:ring-offset-2"
-                          >
-                            {quranResumeTarget
-                              ? "Reprendre"
-                              : "Ouvrir Al-Quran"}
-                          </button>
-                        </article>
-                      </section>
-                    </div>
+                    <TodayView
+                      firstName={firstName}
+                      now={clock}
+                      prayer={prayer}
+                      adhkar={{
+                        session: momentAdhkarSession,
+                        invocation: momentInvocation,
+                        index: momentIndex,
+                        total: adhkarBySession[momentAdhkarSession].length,
+                        repetitionCount: momentProgress?.repetitionCount ?? 0,
+                        isLoading: adhkarProgress === undefined,
+                      }}
+                      quran={{
+                        surah: quranResumeTarget?.surah ?? latestQuranEntry?.passage,
+                        detail: quranResumeTarget
+                          ? `Verset ${quranResumeTarget.ayah}`
+                          : latestQuranEntry?.pagesOrVerses,
+                      }}
+                      cycle={{
+                        currentPeriodDay,
+                        expectedNextPeriod,
+                        periodDates: recordedPeriodDates,
+                      }}
+                      tasks={todayTasks.map((task) => ({
+                        id: task._id,
+                        label: task.title || task.content.split("\n")[0],
+                        completed: task.completed === true,
+                      }))}
+                      pendingTaskId={pendingNoteAction}
+                      onToggleTask={(id, completed) =>
+                        void updatePersonalTaskCompletion(
+                          id as Id<"personalNotes">,
+                          completed,
+                        )
+                      }
+                      onOpenAdhkar={openAdhkarSession}
+                      onOpenQuran={() => {
+                        setQuranResumeRequest(quranResumeTarget);
+                        navigateToView("quran");
+                      }}
+                      onOpenCycle={() => navigateToView("periods")}
+                      onOpenNotes={() => navigateToView("notes")}
+                      onOpenSettings={() => navigateToView("settings")}
+                    />
                   )}
 
                   {activeView === "salah" && (
@@ -1228,65 +1142,10 @@ export default function Dashboard() {
 
                   {activeView === "science" && <ScienceJournal />}
 
-                  {activeView === "overview" && (
-                    <section className="rounded-3xl border border-[#DCE5DC] bg-white p-5 sm:p-6">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5F7F68]">
-                            Aujourd’hui
-                          </p>
-                          <h2 className="mt-1 text-xl font-semibold text-[#26362A]">
-                            Ce que tu veux faire
-                          </h2>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => navigateToView("notes")}
-                          className="rounded-xl border border-[#DCE5DC] px-3 py-2 text-sm font-medium text-[#35533D] transition hover:bg-[#EEF4EE]"
-                        >
-                          Gérer les tâches
-                        </button>
-                      </div>
-                      <p className="mt-4 rounded-xl bg-[#EEF4EE] px-3 py-2 text-sm text-[#405348]">
-                        Rappel du jour : TODO — contenu validé à sélectionner.
-                      </p>
-                      {todayTasks.length > 0 ? (
-                        <ul className="mt-4 space-y-2">
-                          {todayTasks.map((task) => (
-                            <li
-                              key={task._id}
-                              className="flex items-start gap-3 rounded-xl border border-[#E7EDE6] px-4 py-3"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={task.completed === true}
-                                disabled={pendingNoteAction === task._id}
-                                onChange={(event) =>
-                                  void updatePersonalTaskCompletion(
-                                    task._id,
-                                    event.target.checked,
-                                  )
-                                }
-                                aria-label={`Marquer « ${task.title || task.content.split("\n")[0]} » comme terminée`}
-                                className="mt-0.5 size-4 accent-[#5F7F68]"
-                              />
-                              <p className="text-sm font-medium text-[#26362A]">
-                                {task.title || task.content.split("\n")[0]}
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="mt-4 text-sm text-[#52675A]">
-                          Aucune tâche pour aujourd’hui. Ajoute-en une dans Notes.
-                        </p>
-                      )}
-                    </section>
-                  )}
-
-                  {activeView === "overview" && (
+                  {activeView === "adhkar" && (
                     <details
                       id="dashboard-routine"
+                      open
                       className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 [&:not([open])]:hidden"
                     >
                       <summary className="sr-only">
@@ -1302,6 +1161,7 @@ export default function Dashboard() {
                         </div>
                       </summary>
 
+                      <h1 className="n-display mb-4 text-2xl">Adhkar du matin et du soir</h1>
                       <div className="flex gap-2 rounded-full border border-stone-200 bg-stone-50 p-1">
                         {(
                           [
@@ -1412,36 +1272,37 @@ export default function Dashboard() {
                               </summary>
                               <dl className="mt-3 space-y-1.5">
                                 <div>
-                                  <dt className="inline font-medium">Référence indiquée : </dt>
-                                  <dd className="inline">{currentInvocation.proof.legacyReference} — référence existante à vérifier.</dd>
-                                </div>
-                                <div>
                                   <dt className="inline font-medium">Rapporteur : </dt>
                                   <dd className="inline">{currentInvocation.proof.narrator}</dd>
                                 </div>
-                                <div>
-                                  <dt className="inline font-medium">Recueil et numéro : </dt>
-                                  <dd className="inline">{currentInvocation.proof.collection} {currentInvocation.proof.number}</dd>
-                                </div>
-                                <div>
-                                  <dt className="inline font-medium">Degré d’authenticité : </dt>
-                                  <dd className="inline">{currentInvocation.proof.grade}</dd>
-                                </div>
-                                <div>
-                                  <dt className="inline font-medium">Source de classification : </dt>
-                                  <dd className="inline">{currentInvocation.proof.gradingSource}</dd>
-                                </div>
-                                <div>
-                                  <dt className="inline font-medium">Édition : </dt>
-                                  <dd className="inline">{currentInvocation.proof.edition}</dd>
-                                </div>
+                                {currentInvocation.proof.sources.map((source) => (
+                                  <div key={`${source.collection}-${source.number}`}>
+                                    <dt className="inline font-medium">
+                                      {source.collection} {source.number} :{" "}
+                                    </dt>
+                                    <dd className="inline">
+                                      {source.grades
+                                        .map(({ by, grade }) => `${grade} (${by})`)
+                                        .join(" · ")}
+                                    </dd>
+                                  </div>
+                                ))}
+                                {currentInvocation.proof.note && (
+                                  <div>
+                                    <dt className="inline font-medium">Note : </dt>
+                                    <dd className="inline">{currentInvocation.proof.note}</dd>
+                                  </div>
+                                )}
+                                <p className="text-stone-500">
+                                  Numérotation et classifications reprises de sunnah.com.
+                                </p>
                                 <div>
                                   <dt className="inline font-medium">Moment : </dt>
                                   <dd className="inline">{currentInvocation.moment === "morning" ? "Matin" : "Soir"}</dd>
                                 </div>
                                 <div>
                                   <dt className="inline font-medium">Répétitions : </dt>
-                                  <dd className="inline">{currentInvocation.repetitions} — TODO : vérifier dans l’édition.</dd>
+                                  <dd className="inline">{currentInvocation.repetitions}</dd>
                                 </div>
                               </dl>
                             </details>
@@ -2500,8 +2361,8 @@ export default function Dashboard() {
                   Réglages
                 </h1>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Choisis ta méthode de calcul et autorise l’accès à ta position
-                  sur ton appareil pour afficher les horaires de prière locaux.
+                  Autorise l’accès à ta position sur ton appareil pour afficher
+                  les horaires de prière locaux.
                   Tu trouveras aussi ici les réglages des rappels.
                 </p>
               </section>
@@ -2525,22 +2386,43 @@ export default function Dashboard() {
                     </p>
 
                     <div className="mt-4 space-y-3">
-                      <label className="block text-xs font-medium text-stone-700">
-                        Méthode de calcul
-                        <select
-                          value={prayer.preferences.method}
-                          onChange={(event) =>
-                            prayer.setMethod(Number(event.target.value))
-                          }
-                          className="mt-1.5 w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-800"
-                        >
-                          {prayer.calculationMethods.map((method) => (
-                            <option key={method.id} value={method.id}>
-                              {method.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                      <div className="text-xs leading-5 text-stone-700">
+                        <p className="font-medium">
+                          Méthode de calcul : {prayerCalculation.label}
+                        </p>
+                        <p className="mt-1 text-stone-600">
+                          Fajr quand le soleil est à{" "}
+                          {prayerCalculation.fajrAngle}° sous l’horizon, Isha
+                          à {prayerCalculation.ishaAngle}°. La même méthode
+                          s’applique à tout le monde dans Nour.
+                        </p>
+                        <details className="mt-2">
+                          <summary className="cursor-pointer font-medium text-stone-800">
+                            Pourquoi cette méthode ?
+                          </summary>
+                          <div className="mt-2 space-y-2 text-stone-600">
+                            <p>
+                              En astronomie, l’aube commence quand le soleil
+                              est à {prayerCalculation.fajrAngle}° sous
+                              l’horizon : c’est le début du crépuscule
+                              astronomique, la première lueur du jour.
+                            </p>
+                            <p>
+                              Certains calendriers utilisés en France, comme
+                              celui de l’UOIF, retiennent 12° pour Fajr et pour
+                              Isha. À 12°, le ciel est déjà nettement éclairé :
+                              Fajr tombe plus tard et Isha plus tôt.
+                            </p>
+                            <p>
+                              En été, dans le nord de la France, le soleil ne
+                              descend pas toujours jusqu’à{" "}
+                              {prayerCalculation.fajrAngle}°. Le calcul applique
+                              alors une règle d’ajustement, et Isha peut tomber
+                              après minuit.
+                            </p>
+                          </div>
+                        </details>
+                      </div>
 
                       <label className="block text-xs font-medium text-stone-700">
                         Calcul de l’heure d’Asr
