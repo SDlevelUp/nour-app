@@ -84,6 +84,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-19 : page Réglages au nouveau design (horaires du jour affichés dans la carte « Horaires de prière », rappels « Adhkar du matin » et « Adhkar du soir »), formulaire de modification des post-it restylé. Composants shadcn Card, Input, Textarea et Button retirés de `Dashboard.tsx`.
 - 2026-10-19 : page Science bénéfique au nouveau design, en trois onglets (Séances, Livres, Apprentissage), formulaires d’ajout repliables, livres numérotés avec flèches pour réordonner. Module Apprentissage restylé ; le texte « TODO » visible par les utilisatrices remplacé par « À compléter ».
 - 2026-10-19 : vue Semaine du Planning au nouveau design (7 jours côte à côte avec défilement horizontal sur mobile, jour courant en vert foncé, activités colorées par type), bandeau du haut des pages restylé (date, date hégirienne, horaires du jour avec la prochaine prière en évidence), formulaire « Noter une lecture » du Coran restylé. La refonte du design couvre désormais toutes les pages du dashboard.
+- 2026-10-19 : vue Semaine refaite à la demande de Sarah (bordures retirées, plus fluide) : activités réduites à l’heure et au titre avec une pastille de couleur, un clic déplie l’heure, le jour et « Supprimer » ; sur téléphone et tablette, barre des 7 jours avec le nombre d’activités puis la liste du jour choisi ; sur ordinateur, 7 colonnes sans bordure, glisser-déposer conservé.
 
 ## Problèmes connus
 

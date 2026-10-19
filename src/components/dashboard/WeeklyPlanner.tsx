@@ -1,6 +1,6 @@
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
@@ -89,6 +89,8 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
     activityId: string;
   } | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(today);
+  const [openItem, setOpenItem] = useState<string | null>(null);
   const [newActivityDate, setNewActivityDate] = useState(today);
   const [newActivityTime, setNewActivityTime] = useState("12:00");
   const [newActivityTitle, setNewActivityTitle] = useState("");
@@ -279,6 +281,121 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
 
   const weekLabel = `${dates[0].toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} – ${dates[6].toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
 
+  const activitiesFor = (key: string) => {
+    const storedActivities = activitiesByDate[key] ?? [];
+    const journalActivities = journalActivitiesByDate.get(key) ?? [];
+    return quranSessions === undefined || scienceSessions === undefined
+      ? storedActivities
+      : includeJournalActivities(storedActivities, journalActivities);
+  };
+  const visibleDay = dates.some((date) => dateKey(date) === selectedDay)
+    ? selectedDay
+    : dates.some((date) => dateKey(date) === today)
+      ? today
+      : firstDateKey;
+
+  const renderActivity = (key: string, activity: PlannerActivity) => {
+    const isJournalSession =
+      activity.kind === "quran-session" || activity.kind === "science-session";
+    const itemKey = `${key}:${activity.id}`;
+    const isOpen = openItem === itemKey;
+    return (
+      <article
+        key={activity.id}
+        draggable={!isOpen}
+        onDragStart={() => setDraggedActivity({ date: key, activityId: activity.id })}
+        onDragEnd={() => setDraggedActivity(null)}
+        className="n-week-item"
+        data-kind={activity.kind}
+        data-open={isOpen}
+        data-dragging={draggedActivity?.activityId === activity.id}
+      >
+        <button
+          type="button"
+          className="n-week-item-main"
+          aria-expanded={isOpen}
+          onClick={() => setOpenItem(isOpen ? null : itemKey)}
+        >
+          <span className="n-week-item-time">{activity.time}</span>
+          <span className="min-w-0">
+            <span className="block truncate text-[14px] font-semibold">{activity.title}</span>
+            {activity.detail && (
+              <span className="block truncate text-[12px] text-(--n-muted)">{activity.detail}</span>
+            )}
+          </span>
+        </button>
+        {isOpen && (
+          <div className="n-week-item-edit">
+            <label className="grid gap-1 text-[12px] font-semibold">
+              Heure
+              {isJournalSession ? (
+                <input
+                  type="time"
+                  value={activity.time}
+                  onChange={(event) => void updateJournalSchedule(activity, key, event.target.value)}
+                  disabled={pendingJournalAction === activity.id}
+                  className="n-input h-9!"
+                />
+              ) : (
+                <select
+                  value={activity.time}
+                  onChange={(event) => changeTime(key, activity.id, event.target.value)}
+                  className="n-select h-9! w-full"
+                >
+                  {!times.includes(activity.time) && (
+                    <option value={activity.time}>{activity.time}</option>
+                  )}
+                  {times.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </label>
+            <label className="grid gap-1 text-[12px] font-semibold">
+              Jour
+              <select
+                value={key}
+                disabled={isJournalSession && pendingJournalAction === activity.id}
+                onChange={(event) => {
+                  setOpenItem(null);
+                  if (isJournalSession) {
+                    void updateJournalSchedule(activity, event.target.value, activity.time);
+                  } else {
+                    moveActivityBetweenDates(key, activity.id, event.target.value);
+                  }
+                }}
+                className="n-select h-9! w-full"
+              >
+                {dates.map((targetDate) => {
+                  const targetKey = dateKey(targetDate);
+                  return (
+                    <option key={targetKey} value={targetKey}>
+                      {targetDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}
+                    </option>
+                  );
+                })}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenItem(null);
+                if (isJournalSession) void deleteJournalActivity(activity);
+                else removeActivity(key, activity.id);
+              }}
+              disabled={isJournalSession && pendingJournalAction === activity.id}
+              className="n-link col-span-full justify-self-start text-[13px] text-[#b4473a]!"
+            >
+              Supprimer
+            </button>
+          </div>
+        )}
+      </article>
+    );
+  };
+
   return (
     <div className="mt-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -313,16 +430,14 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
         <button
           type="button"
           onClick={() => {
-            setNewActivityDate(
-              dates.some((date) => dateKey(date) === today) ? today : firstDateKey,
-            );
+            setNewActivityDate(visibleDay);
             setIsAdding((open) => !open);
           }}
           aria-expanded={isAdding}
           className="n-btn n-btn-ghost px-4! py-2.5! text-sm!"
         >
           <Plus className="size-4" />
-          Ajouter une activité
+          Ajouter
         </button>
       </div>
 
@@ -395,16 +510,50 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
         </form>
       )}
 
-      <div className="n-weekgrid">
+      {/* Téléphone et tablette : barre des 7 jours, puis le jour choisi */}
+      <div className="lg:hidden">
+        <div className="n-daypills" role="tablist" aria-label="Jours de la semaine">
+          {dates.map((date) => {
+            const key = dateKey(date);
+            const count = activitiesFor(key).length;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={visibleDay === key}
+                data-today={key === today}
+                onClick={() => {
+                  setSelectedDay(key);
+                  setOpenItem(null);
+                }}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  moveActivity(key);
+                }}
+                className="n-daypill"
+              >
+                <span>{date.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "")}</span>
+                <b>{date.getDate()}</b>
+                <i aria-label={`${count} activité${count > 1 ? "s" : ""}`}>{count > 0 ? count : ""}</i>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 space-y-2" role="tabpanel">
+          {activitiesFor(visibleDay).map((activity) => renderActivity(visibleDay, activity))}
+          {activitiesFor(visibleDay).length === 0 && (
+            <p className="n-week-empty">Rien de prévu ce jour-là.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Ordinateur : la semaine entière */}
+      <div className="n-weekgrid hidden lg:grid">
         {dates.map((date) => {
           const key = dateKey(date);
-          const storedActivities = activitiesByDate[key] ?? [];
-          const journalActivities = journalActivitiesByDate.get(key) ?? [];
-          const activities =
-            quranSessions === undefined || scienceSessions === undefined
-              ? storedActivities
-              : includeJournalActivities(storedActivities, journalActivities);
-          const isCurrentDay = key === today;
+          const activities = activitiesFor(key);
           return (
             <section
               key={key}
@@ -415,110 +564,21 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
               }}
               aria-label={`Activités du ${date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}`}
               className="n-weekday"
-              data-today={isCurrentDay}
+              data-today={key === today}
             >
               <header className="n-weekday-head">
-                <span>{date.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
+                <span>{date.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "")}</span>
                 <b>{date.getDate()}</b>
               </header>
-              <div className="space-y-2 p-2">
-                {activities.map((activity) => {
-                  const isJournalSession =
-                    activity.kind === "quran-session" || activity.kind === "science-session";
-                  return (
-                    <article
-                      key={activity.id}
-                      draggable
-                      onDragStart={() => setDraggedActivity({ date: key, activityId: activity.id })}
-                      onDragEnd={() => setDraggedActivity(null)}
-                      className="n-week-item"
-                      data-kind={activity.kind}
-                      data-dragging={draggedActivity?.activityId === activity.id}
-                    >
-                      <div className="flex items-center gap-1">
-                        {isJournalSession ? (
-                          <input
-                            type="time"
-                            value={activity.time}
-                            onChange={(event) =>
-                              void updateJournalSchedule(activity, key, event.target.value)
-                            }
-                            disabled={pendingJournalAction === activity.id}
-                            aria-label={`Heure de ${activity.title}`}
-                            className="n-week-time"
-                          />
-                        ) : (
-                          <select
-                            value={activity.time}
-                            onChange={(event) => changeTime(key, activity.id, event.target.value)}
-                            aria-label={`Heure de ${activity.title}`}
-                            className="n-week-time"
-                          >
-                            {!times.includes(activity.time) && (
-                              <option value={activity.time}>{activity.time}</option>
-                            )}
-                            {times.map((time) => (
-                              <option key={time} value={time}>
-                                {time}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            isJournalSession
-                              ? void deleteJournalActivity(activity)
-                              : removeActivity(key, activity.id)
-                          }
-                          disabled={isJournalSession && pendingJournalAction === activity.id}
-                          aria-label={
-                            isJournalSession
-                              ? `Supprimer ${activity.title} du journal et du planning`
-                              : `Supprimer ${activity.title}`
-                          }
-                          className="n-icon-btn ml-auto size-7!"
-                        >
-                          <X className="size-3.5" />
-                        </button>
-                      </div>
-                      <p className="mt-1.5 text-[14px] font-semibold leading-5">{activity.title}</p>
-                      {activity.detail && (
-                        <p className="mt-0.5 line-clamp-2 text-[13px] leading-5 text-(--n-muted)">
-                          {activity.detail}
-                        </p>
-                      )}
-                      <label className="mt-2 block">
-                        <span className="sr-only">Déplacer {activity.title} vers un autre jour</span>
-                        <select
-                          value={key}
-                          disabled={isJournalSession && pendingJournalAction === activity.id}
-                          onChange={(event) =>
-                            isJournalSession
-                              ? void updateJournalSchedule(activity, event.target.value, activity.time)
-                              : moveActivityBetweenDates(key, activity.id, event.target.value)
-                          }
-                          className="n-week-move"
-                        >
-                          {dates.map((targetDate) => {
-                            const targetKey = dateKey(targetDate);
-                            return (
-                              <option key={targetKey} value={targetKey}>
-                                {targetKey === key ? "Déplacer vers…" : targetDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}
-                              </option>
-                            );
-                          })}
-                        </select>
-                      </label>
-                    </article>
-                  );
-                })}
-                {activities.length === 0 && <p className="n-week-empty">Dépose une activité ici</p>}
+              <div className="space-y-1.5 p-1.5">
+                {activities.map((activity) => renderActivity(key, activity))}
+                {activities.length === 0 && <p className="n-week-empty">Libre</p>}
               </div>
             </section>
           );
         })}
       </div>
+
       <p className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[13px] text-(--n-muted)">
         <span className="inline-flex items-center gap-1.5">
           <span className="n-week-dot" data-kind="custom" /> Mes activités
@@ -526,7 +586,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
         <span className="inline-flex items-center gap-1.5">
           <span className="n-week-dot" data-kind="quran-session" /> Lectures et études notées
         </span>
-        <span>Glisse une activité vers un autre jour. Ta semaine est conservée sur cet appareil.</span>
+        <span>Touche une activité pour la modifier.</span>
       </p>
     </div>
   );
