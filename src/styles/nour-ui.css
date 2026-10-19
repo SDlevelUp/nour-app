@@ -109,19 +109,20 @@
 
 .n-pattern {
   position: absolute;
-  inset: 0 0 0 auto;
-  width: 46%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   color: #ffffff;
-  opacity: 0.07;
+  opacity: 0.09;
   pointer-events: none;
+  /* Motif qui s'efface vers le bas, comme coupé par une ombre. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 95%);
+  mask-image: linear-gradient(to bottom, #000 20%, transparent 95%);
 }
 
 @media (max-width: 860px) {
   .n-card {
     padding: 20px;
-  }
-  .n-pattern {
-    width: 80%;
   }
 }
 

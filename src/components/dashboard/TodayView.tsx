@@ -212,7 +212,7 @@ export function TodayView({
           <span className="text-(--n-sage)">à ton rythme.</span>
         </h1>
         <p className="text-[15px] text-(--n-muted) sm:text-right">
-          <strong className="block text-[17px] font-semibold first-letter:uppercasetext-(--n-ink)">
+          <strong className="block text-[17px] font-semibold text-(--n-ink)">
             {gregorian}
           </strong>
           {hijri}
