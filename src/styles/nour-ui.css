@@ -1189,3 +1189,48 @@
 .n-note:hover {
   transform: translateY(-2px);
 }
+
+.n-textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* ---------- Notes (post-it) ---------- */
+
+.n-swatch {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--n-paper);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--n-line);
+}
+
+.n-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--n-ink);
+}
+
+.n-postit {
+  position: relative;
+  min-height: 200px;
+  list-style: none;
+  border: 0;
+  border-radius: 18px;
+  padding: 18px;
+  color: #1f2a22;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.n-postit:hover {
+  transform: translateY(-2px);
+}
+
+.n-postit-tag {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+}

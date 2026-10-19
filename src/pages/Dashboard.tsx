@@ -1395,301 +1395,231 @@ export default function Dashboard() {
               )}
 
               {activeView === "periods" && (
-                <>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Card className="rounded-3xl border-stone-200 bg-white shadow-none">
-                      <CardContent className="p-4">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-stone-500">
-                          Jours de règles notés
-                        </p>
-                        <p className="mt-3 text-3xl font-semibold tracking-tight text-stone-900">
-                          {daysTrackedThisMonth}
-                        </p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          ce mois-ci
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card className="rounded-3xl border-stone-200 bg-white shadow-none">
-                      <CardContent className="p-4">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-stone-500">
-                          Débuts de cycle notés
-                        </p>
-                        <p className="mt-3 text-3xl font-semibold tracking-tight text-stone-900">
-                          {periodStarts.length}
-                        </p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          d’après ton calendrier
-                        </p>
-                      </CardContent>
-                    </Card>
+                <div id="dashboard-status" className="scroll-mt-24 space-y-5">
+                  <div className="n-page-head px-1">
+                    <div>
+                      <span className="n-label">Suivi privé</span>
+                      <h1 className="n-page-title">Cycle</h1>
+                    </div>
+                    <span className="n-chip">Enregistré dans ton compte</span>
                   </div>
 
-                  <div
-                    id="dashboard-status"
-                    className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
-                  >
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                          Périodes d’excuse
-                        </p>
-                        <h2 className="mt-2 font-serif text-2xl tracking-tight">
-                          Suivi du cycle
-                        </h2>
-                      </div>
-                      <span className="hidden text-xs text-muted-foreground sm:inline">
-                        Privé · enregistré sur ton compte
-                      </span>
+                  {isPeriodLate && expectedNextPeriod && (
+                    <div className="n-card n-card-tint" role="status">
+                      <p className="font-semibold">Ton cycle a peut-être un peu de retard</p>
+                      <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">
+                        D’après les journées que tu as notées, la date estimée était le{" "}
+                        {format(expectedNextPeriod, "d MMMM", { locale: fr })}. Les cycles
+                        varient naturellement ; cette estimation n’est pas un avis médical.
+                      </p>
                     </div>
+                  )}
 
-                    {isPeriodLate && expectedNextPeriod && (
-                      <div className="mb-5 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-                        <p className="font-semibold">
-                          Ton cycle a peut-être un peu de retard
-                        </p>
-                        <p className="mt-1 leading-6">
-                          D’après les journées que tu as notées, la date estimée
-                          était le{" "}
-                          {format(expectedNextPeriod, "d MMMM", { locale: fr })}
-                          . Les cycles varient naturellement ; cette estimation
-                          n’est pas un avis médical.
-                        </p>
-                      </div>
-                    )}
+                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.9fr)]">
+                    <article className="n-card n-card-dark n-rise">
+                      <span className="n-label">Prochaines règles estimées</span>
+                      <p className="n-display mt-4 text-[34px] leading-none">
+                        {expectedNextPeriod
+                          ? format(expectedNextPeriod, "d MMMM", { locale: fr })
+                          : "—"}
+                      </p>
+                      <p className="mt-3 text-[14px] text-(--n-on-dark-muted)">
+                        {expectedNextPeriod
+                          ? format(expectedNextPeriod, "EEEE yyyy", { locale: fr })
+                          : "Note au moins 3 débuts de cycle pour obtenir une estimation."}
+                      </p>
+                    </article>
+                    <div className="n-card n-rise grid grid-cols-2 gap-5 sm:grid-cols-4">
+                      {[
+                        { label: "Jours notés", value: String(daysTrackedThisMonth), hint: "ce mois-ci" },
+                        { label: "Débuts notés", value: String(periodStarts.length), hint: "au total" },
+                        {
+                          label: "Durée des règles",
+                          value: averagePeriodLength ? String(averagePeriodLength) : "—",
+                          hint: averagePeriodLength ? `jour${averagePeriodLength === 1 ? "" : "s"} en moyenne` : "à calculer",
+                        },
+                        {
+                          label: "Durée du cycle",
+                          value: averageCycleLength ? String(averageCycleLength) : "—",
+                          hint: averageCycleLength ? "jours en moyenne" : "à calculer",
+                        },
+                      ].map((stat) => (
+                        <div key={stat.label}>
+                          <p className="text-[13px] font-semibold text-(--n-muted)">{stat.label}</p>
+                          <p className="n-display mt-2 text-[30px] leading-none">{stat.value}</p>
+                          <p className="mt-1 text-[13px] text-(--n-muted)">{stat.hint}</p>
+                        </div>
+                      ))}
+                      <p className="col-span-full text-[13px] leading-5 text-(--n-muted)">
+                        Estimations fondées sur les cycles enregistrés ; elles peuvent varier et
+                        ne constituent pas un avis médical.
+                      </p>
+                    </div>
+                  </div>
 
-                    <div className="mb-5 grid gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 sm:grid-cols-3">
-                      <div>
-                        <p className="text-xs text-stone-500">
-                          Durée moyenne des règles
-                        </p>
-                        <p className="mt-1 text-base font-semibold text-stone-900">
-                          {averagePeriodLength
-                            ? `${averagePeriodLength} jour${averagePeriodLength === 1 ? "" : "s"}`
-                            : "À calculer"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-stone-500">
-                          Durée moyenne du cycle
-                        </p>
-                        <p className="mt-1 text-base font-semibold text-stone-900">
-                          {averageCycleLength
-                            ? `${averageCycleLength} jours`
-                            : "À calculer"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-stone-500">
-                          Prochaines règles estimées
-                        </p>
-                        <p className="mt-1 text-base font-semibold text-stone-900">
-                          {expectedNextPeriod
-                            ? format(expectedNextPeriod, "d MMMM yyyy", {
-                                locale: fr,
-                              })
-                            : "Note au moins 3 débuts de cycle"}
-                        </p>
-                      </div>
-                      <p className="text-xs leading-5 text-stone-500 sm:col-span-3">
-                        Estimations fondées sur les cycles enregistrés ; elles
-                        peuvent varier et ne constituent pas un avis médical.
+                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                    <div className="n-card min-w-0 p-3! sm:p-5!">
+                      <Calendar
+                        mode="range"
+                        selected={selectedRange}
+                        onSelect={(range) => {
+                          setSelectedRange(range);
+                          const focusedDate = range?.to ?? range?.from;
+                          if (focusedDate) setSelectedDate(focusedDate);
+                        }}
+                        month={calendarMonth}
+                        onMonthChange={setCalendarMonth}
+                        locale={fr}
+                        modifiers={{ period: periodDates }}
+                        modifiersClassNames={{
+                          period: "bg-mauve-100 font-semibold text-mauve-800 hover:bg-mauve-200",
+                        }}
+                        className="mx-auto w-full max-w-md"
+                      />
+                      <p className="mt-2 flex items-center justify-center gap-2 text-[13px] text-(--n-muted)">
+                        <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
+                        Règles déjà notées
                       </p>
                     </div>
 
-                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-                      <div className="min-w-0 rounded-3xl border border-primary/10 bg-[#F5F2EE] p-2 sm:p-4">
-                        <Calendar
-                          mode="range"
-                          selected={selectedRange}
-                          onSelect={(range) => {
-                            setSelectedRange(range);
-                            const focusedDate = range?.to ?? range?.from;
-                            if (focusedDate) setSelectedDate(focusedDate);
-                          }}
-                          month={calendarMonth}
-                          onMonthChange={setCalendarMonth}
-                          locale={fr}
-                          modifiers={{ period: periodDates }}
-                          modifiersClassNames={{
-                            period:
-                              "bg-mauve-100 font-semibold text-mauve-800 hover:bg-mauve-200",
-                          }}
-                          className="mx-auto w-full max-w-md"
-                        />
-                        <div className="pb-2 text-center text-xs text-muted-foreground">
-                          Règles déjà notées
-                        </div>
-                      </div>
+                    <div id="cycle-day-editor" className="n-card min-w-0">
+                      <span className="n-label">
+                        {selectedRange?.from
+                          ? selectedRange.to
+                            ? `${format(selectedRange.from, "d MMM", { locale: fr })} – ${format(selectedRange.to, "d MMM yyyy", { locale: fr })}`
+                            : `Début : ${format(selectedRange.from, "d MMMM yyyy", { locale: fr })}`
+                          : format(selectedDate, "EEEE d MMMM yyyy", { locale: fr })}
+                      </span>
+                      <h2 className="n-display mt-3 text-[22px]">Ta période</h2>
+                      <p className="mt-1 text-[15px] text-(--n-muted)">
+                        {editingPeriodRange
+                          ? "Choisis les nouvelles dates de début et de fin dans le calendrier."
+                          : "Choisis les dates de début et de fin dans le calendrier."}
+                      </p>
 
-                      <div
-                        id="cycle-day-editor"
-                        className="rounded-3xl border border-primary/10 bg-white p-4 sm:p-5"
-                      >
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
-                          {selectedRange?.from
-                            ? selectedRange.to
-                              ? `${format(selectedRange.from, "d MMM", { locale: fr })} – ${format(selectedRange.to, "d MMM yyyy", { locale: fr })}`
-                              : `Début : ${format(selectedRange.from, "d MMMM yyyy", { locale: fr })}`
-                            : format(selectedDate, "EEEE d MMMM yyyy", {
-                                locale: fr,
-                              })}
-                        </p>
-                        <h3 className="mt-2 font-serif text-xl">Ta période</h3>
-
-                        <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                          {editingPeriodRange
-                            ? "Choisis les nouvelles dates de début et de fin dans le calendrier."
-                            : "Choisis les dates de début et de fin dans le calendrier."}
-                        </p>
-
-                        {selectedPeriodRun && !editingPeriodRange && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const startDate = selectedPeriodRun[0];
-                              const endDate =
-                                selectedPeriodRun[selectedPeriodRun.length - 1];
-                              setEditingPeriodRange({ startDate, endDate });
-                              setSelectedRange({
-                                from: parseISO(startDate),
-                                to: parseISO(endDate),
-                              });
-                            }}
-                            className="mt-3 text-sm font-medium text-emerald-800 underline underline-offset-2 hover:text-emerald-950"
-                          >
-                            Modifier les dates de cette période
-                          </button>
-                        )}
-                        {editingPeriodRange && (
-                          <p className="mt-3 text-sm font-medium text-emerald-800">
-                            Modification des dates de cette période
-                          </p>
-                        )}
-                        {editingPeriodRange && (
-                          <>
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                              <label className="text-sm font-medium text-stone-700">
-                                Début des règles
-                                <Input
-                                  type="date"
-                                  value={
-                                    selectedRange?.from
-                                      ? format(selectedRange.from, "yyyy-MM-dd")
-                                      : editingPeriodRange.startDate
-                                  }
-                                  onChange={(event) => {
-                                    const value = event.target.value;
-                                    if (!value) return;
-                                    const from = parseISO(value);
-                                    setSelectedRange((current) => ({
-                                      from,
-                                      to:
-                                        current?.to && current.to >= from
-                                          ? current.to
-                                          : from,
-                                    }));
-                                    setSelectedDate(from);
-                                    setCalendarMonth(startOfMonth(from));
-                                  }}
-                                  className="mt-1 w-full text-base md:text-base"
-                                />
-                              </label>
-                              <label className="text-sm font-medium text-stone-700">
-                                Fin des règles
-                                <Input
-                                  type="date"
-                                  value={
-                                    selectedRange?.to
-                                      ? format(selectedRange.to, "yyyy-MM-dd")
-                                      : editingPeriodRange.endDate
-                                  }
-                                  min={
-                                    selectedRange?.from
-                                      ? format(selectedRange.from, "yyyy-MM-dd")
-                                      : editingPeriodRange.startDate
-                                  }
-                                  onChange={(event) => {
-                                    const value = event.target.value;
-                                    if (!value) return;
-                                    const to = parseISO(value);
-                                    setSelectedRange((current) => ({
-                                      from: current?.from ?? to,
-                                      to,
-                                    }));
-                                    setSelectedDate(to);
-                                    setCalendarMonth(startOfMonth(to));
-                                  }}
-                                  className="mt-1 w-full text-base md:text-base"
-                                />
-                              </label>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setEditingPeriodRange(null)}
-                              className="mt-3 text-sm text-stone-500 underline underline-offset-2 hover:text-stone-800"
-                            >
-                              Annuler la modification
-                            </button>
-                          </>
-                        )}
-
+                      {selectedPeriodRun && !editingPeriodRange && (
                         <button
                           type="button"
-                          disabled={
-                            cycleDays === undefined ||
-                            isSavingCycleDay ||
-                            !selectedRange?.from ||
-                            !selectedRange.to
-                          }
-                          onClick={() => void saveSelectedPeriodRange()}
-                          className="mt-4 w-full rounded-2xl border border-mauve-200 bg-mauve-50 px-4 py-3 text-left text-sm font-medium text-mauve-900 transition hover:bg-mauve-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          onClick={() => {
+                            const startDate = selectedPeriodRun[0];
+                            const endDate = selectedPeriodRun[selectedPeriodRun.length - 1];
+                            setEditingPeriodRange({ startDate, endDate });
+                            setSelectedRange({ from: parseISO(startDate), to: parseISO(endDate) });
+                          }}
+                          className="n-link mt-3 text-sm"
                         >
-                          {editingPeriodRange
-                            ? "Enregistrer les nouvelles dates"
-                            : "Enregistrer cette plage de règles"}
+                          Modifier les dates de cette période
                         </button>
+                      )}
+                      {editingPeriodRange && (
+                        <>
+                          <p className="mt-3 text-sm font-semibold text-(--n-sage)">
+                            Modification des dates de cette période
+                          </p>
+                          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                            <label className="grid gap-1 text-[13px] font-semibold">
+                              Début des règles
+                              <input
+                                type="date"
+                                value={
+                                  selectedRange?.from
+                                    ? format(selectedRange.from, "yyyy-MM-dd")
+                                    : editingPeriodRange.startDate
+                                }
+                                onChange={(event) => {
+                                  const value = event.target.value;
+                                  if (!value) return;
+                                  const from = parseISO(value);
+                                  setSelectedRange((current) => ({
+                                    from,
+                                    to: current?.to && current.to >= from ? current.to : from,
+                                  }));
+                                  setSelectedDate(from);
+                                  setCalendarMonth(startOfMonth(from));
+                                }}
+                                className="n-input"
+                              />
+                            </label>
+                            <label className="grid gap-1 text-[13px] font-semibold">
+                              Fin des règles
+                              <input
+                                type="date"
+                                value={
+                                  selectedRange?.to
+                                    ? format(selectedRange.to, "yyyy-MM-dd")
+                                    : editingPeriodRange.endDate
+                                }
+                                min={
+                                  selectedRange?.from
+                                    ? format(selectedRange.from, "yyyy-MM-dd")
+                                    : editingPeriodRange.startDate
+                                }
+                                onChange={(event) => {
+                                  const value = event.target.value;
+                                  if (!value) return;
+                                  const to = parseISO(value);
+                                  setSelectedRange((current) => ({ from: current?.from ?? to, to }));
+                                  setSelectedDate(to);
+                                  setCalendarMonth(startOfMonth(to));
+                                }}
+                                className="n-input"
+                              />
+                            </label>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setEditingPeriodRange(null)}
+                            className="n-link mt-3 text-sm text-(--n-muted)!"
+                          >
+                            Annuler la modification
+                          </button>
+                        </>
+                      )}
 
-                        <details className="mt-5 rounded-2xl border border-stone-200 bg-stone-50 p-3">
-                          <summary className="cursor-pointer text-sm font-medium">
-                            Observations personnelles (facultatif)
-                          </summary>
-                          <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={
+                          cycleDays === undefined ||
+                          isSavingCycleDay ||
+                          !selectedRange?.from ||
+                          !selectedRange.to
+                        }
+                        onClick={() => void saveSelectedPeriodRange()}
+                        className="n-btn n-btn-sage mt-5 w-full disabled:opacity-40"
+                      >
+                        {editingPeriodRange
+                          ? "Enregistrer les nouvelles dates"
+                          : "Enregistrer cette plage de règles"}
+                      </button>
+
+                      <div className="mt-6 border-t border-(--n-line) pt-5">
+                        <p className="text-[14px] font-semibold">
+                          Observations du jour <span className="font-normal text-(--n-muted)">(facultatif)</span>
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
                           {cycleSymptoms.map(({ key, label }) => {
-                            const selected =
-                              selectedEntry?.symptoms.includes(key) ?? false;
+                            const selected = selectedEntry?.symptoms.includes(key) ?? false;
                             return (
                               <button
                                 key={key}
                                 type="button"
-                                disabled={
-                                  cycleDays === undefined || isSavingCycleDay
-                                }
+                                disabled={cycleDays === undefined || isSavingCycleDay}
                                 aria-pressed={selected}
                                 onClick={() => toggleSymptom(key)}
-                                className={`rounded-full border px-3 py-2 text-xs transition disabled:cursor-wait disabled:opacity-60 ${
-                                  selected
-                                    ? "border-primary bg-primary text-white"
-                                    : "border-primary/15 bg-white text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                                }`}
+                                className="n-toggle disabled:opacity-60"
                               >
                                 {label}
                               </button>
                             );
                           })}
-                          </div>
-                        </details>
+                        </div>
+                      </div>
 
-                        <label
-                          htmlFor="cycle-personal-note"
-                          className="mt-5 block text-base font-medium"
-                        >
-                          Note personnelle{" "}
-                          <span className="font-normal text-muted-foreground">
-                            (facultatif)
-                          </span>
+                      <div className="mt-6 border-t border-(--n-line) pt-5">
+                        <label htmlFor="cycle-personal-note" className="text-[14px] font-semibold">
+                          Note personnelle <span className="font-normal text-(--n-muted)">(facultatif)</span>
                         </label>
-                        <Textarea
+                        <textarea
                           id="cycle-personal-note"
                           value={noteDraft}
                           maxLength={2000}
@@ -1701,122 +1631,189 @@ export default function Dashboard() {
                             }))
                           }
                           placeholder="Ajoute ici une note que tu veux retrouver plus tard…"
-                          className="mt-2 min-h-24 resize-y rounded-2xl border-stone-200 bg-stone-50 text-base md:text-base"
+                          className="n-input n-textarea mt-2"
                         />
                         <div className="mt-2 flex items-center justify-between gap-3">
-                          <p className="text-xs tabular-nums text-muted-foreground">
-                            {noteDraft.length}/2 000
-                          </p>
-                          <Button
+                          <p className="text-[13px] tabular-nums text-(--n-muted)">{noteDraft.length}/2 000</p>
+                          <button
                             type="button"
                             onClick={() => void saveCycleNote()}
-                            disabled={
-                              cycleDays === undefined || isSavingCycleDay
-                            }
-                            className="bg-emerald-900 text-[15px] text-white hover:bg-emerald-800"
+                            disabled={cycleDays === undefined || isSavingCycleDay}
+                            className="n-btn px-4! py-2.5! text-sm! disabled:opacity-40"
                           >
                             Enregistrer la note
-                          </Button>
+                          </button>
                         </div>
-                        <p
-                          className="mt-4 min-h-5 text-xs text-muted-foreground"
-                          aria-live="polite"
-                        >
+                        <p className="mt-3 min-h-5 text-[13px] text-(--n-muted)" aria-live="polite">
                           {cycleDays === undefined
                             ? "Chargement de ton calendrier…"
                             : isSavingCycleDay
                               ? "Enregistrement…"
-                              : "Les notes restent dans le suivi du cycle et sont enregistrées pour la date sélectionnée."}
+                              : "La note est enregistrée pour la date sélectionnée."}
                         </p>
+                      </div>
 
-                        <details className="mt-5 border-t border-border/70 pt-4">
-                          <summary className="cursor-pointer text-sm font-medium">
-                            Estimations et rappels du cycle (facultatif)
-                          </summary>
-                          <div className="mt-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-medium">
-                                Alerte si mes règles tardent
-                              </p>
-                              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                                Estimation après trois cycles notés ;
-                                notification navigateur lorsque l’application
-                                est ouverte.
-                              </p>
-                            </div>
-                            <Switch
-                              checked={
-                                cycleSettings?.lateAlertsEnabled ?? false
-                              }
-                              disabled={
-                                cycleSettings === undefined ||
-                                isSavingLateAlerts
-                              }
-                              onCheckedChange={(enabled) =>
-                                void updateLateAlerts(enabled)
-                              }
-                              aria-label="Activer les alertes de retard de règles"
-                            />
-                          </div>
-                          {expectedNextPeriod === null && (
-                            <p className="mt-3 text-xs text-muted-foreground">
-                              Note plusieurs cycles pour que l’application
-                              puisse proposer une estimation personnalisée.
-                            </p>
-                          )}
-                          </div>
-                        </details>
+                      <div className="mt-4 flex items-center justify-between gap-4 border-t border-(--n-line) pt-5">
+                        <div>
+                          <p className="text-[14px] font-semibold">Alerte si mes règles tardent</p>
+                          <p className="mt-1 text-[13px] leading-5 text-(--n-muted)">
+                            Estimation après trois cycles notés ; notification du navigateur
+                            lorsque l’application est ouverte.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={cycleSettings?.lateAlertsEnabled ?? false}
+                          disabled={cycleSettings === undefined || isSavingLateAlerts}
+                          onCheckedChange={(enabled) => void updateLateAlerts(enabled)}
+                          aria-label="Activer les alertes de retard de règles"
+                        />
                       </div>
                     </div>
+                  </div>
 
-                    <section className="mt-5 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5" aria-labelledby="qada-heading">
-                      <h3 id="qada-heading" className="font-serif text-xl font-semibold">Suivi personnel du qada Ramadan</h3>
-                      <p className="mt-1 text-sm text-stone-600">TODO — les règles de détermination et de rattrapage sont à valider par une personne de science.</p>
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        <label className="text-sm">Jours à rattraper
-                          <Input type="number" min="0" max="10000" step="1" value={qadaRamadanTotal} onChange={(event) => setQadaRamadanTotal(event.target.value)} className="mt-1" />
-                        </label>
-                        <label className="text-sm">Jours effectués
-                          <Input type="number" min="0" max={qadaRamadanTotal || 0} step="1" value={qadaRamadanCompleted} onChange={(event) => setQadaRamadanCompleted(event.target.value)} className="mt-1" />
-                        </label>
+                  <section className="n-card" aria-labelledby="qada-heading">
+                    <div className="flex flex-wrap items-end justify-between gap-4">
+                      <div>
+                        <span className="n-label">Ramadan</span>
+                        <h2 id="qada-heading" className="n-display mt-3 text-[22px]">
+                          Jours à rattraper (qada)
+                        </h2>
                       </div>
-                      <p className="mt-3 text-sm text-stone-600">Restants : {Math.max(0, Number(qadaRamadanTotal) - Number(qadaRamadanCompleted))}</p>
-                      <Button type="button" className="mt-3 bg-emerald-900 text-white hover:bg-emerald-800" disabled={cycleSettings === undefined || isSavingQadaRamadan || !Number.isInteger(Number(qadaRamadanTotal)) || !Number.isInteger(Number(qadaRamadanCompleted)) || Number(qadaRamadanCompleted) > Number(qadaRamadanTotal)} onClick={() => void saveQadaRamadan()}>
+                      <p className="text-right">
+                        <span className="n-display block text-[34px] leading-none">
+                          {Math.max(0, Number(qadaRamadanTotal) - Number(qadaRamadanCompleted))}
+                        </span>
+                        <span className="text-[13px] text-(--n-muted)">jours restants</span>
+                      </p>
+                    </div>
+                    <div className="n-steps mt-5" aria-hidden="true">
+                      <span
+                        data-state="done"
+                        style={{
+                          flex: Math.min(Number(qadaRamadanCompleted) || 0, Number(qadaRamadanTotal) || 0),
+                        }}
+                      />
+                      <span
+                        style={{
+                          flex: Math.max(0, (Number(qadaRamadanTotal) || 0) - (Number(qadaRamadanCompleted) || 0)),
+                        }}
+                      />
+                    </div>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                      <label className="grid gap-1 text-[13px] font-semibold">
+                        Jours à rattraper
+                        <input
+                          type="number"
+                          min="0"
+                          max="10000"
+                          step="1"
+                          value={qadaRamadanTotal}
+                          onChange={(event) => setQadaRamadanTotal(event.target.value)}
+                          className="n-input"
+                        />
+                      </label>
+                      <label className="grid gap-1 text-[13px] font-semibold">
+                        Jours effectués
+                        <input
+                          type="number"
+                          min="0"
+                          max={qadaRamadanTotal || 0}
+                          step="1"
+                          value={qadaRamadanCompleted}
+                          onChange={(event) => setQadaRamadanCompleted(event.target.value)}
+                          className="n-input"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="n-btn n-btn-sage disabled:opacity-40"
+                        disabled={
+                          cycleSettings === undefined ||
+                          isSavingQadaRamadan ||
+                          !Number.isInteger(Number(qadaRamadanTotal)) ||
+                          !Number.isInteger(Number(qadaRamadanCompleted)) ||
+                          Number(qadaRamadanCompleted) > Number(qadaRamadanTotal)
+                        }
+                        onClick={() => void saveQadaRamadan()}
+                      >
                         {isSavingQadaRamadan ? "Enregistrement…" : "Enregistrer"}
-                      </Button>
+                      </button>
+                    </div>
+                    <p className="mt-3 text-[13px] text-(--n-muted)">
+                      Un simple compteur personnel. Pour les règles du rattrapage, réfère-toi à une
+                      personne de science.
+                    </p>
+                  </section>
+
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <section aria-labelledby="cycle-notes-heading" className="n-card min-w-0">
+                      <h2 id="cycle-notes-heading" className="n-display text-[20px]">
+                        Notes du cycle
+                      </h2>
+                      {cycleDays === undefined ? (
+                        <p className="mt-4 text-[15px] text-(--n-muted)">Chargement des notes…</p>
+                      ) : cycleNotes.length === 0 ? (
+                        <p className="mt-3 text-[15px] text-(--n-muted)">
+                          Aucune note pour le moment. Sélectionne une date, écris une note et
+                          enregistre-la.
+                        </p>
+                      ) : (
+                        <ul className="mt-3 divide-y divide-(--n-line)">
+                          {cycleNotes.map((entry) => (
+                            <li key={entry._id} className="flex items-start gap-2 py-3">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const date = parseISO(entry.date);
+                                  setSelectedDate(date);
+                                  setSelectedRange(undefined);
+                                  setCalendarMonth(startOfMonth(date));
+                                  requestAnimationFrame(() =>
+                                    document
+                                      .getElementById("cycle-day-editor")
+                                      ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                                  );
+                                }}
+                                className="min-w-0 flex-1 text-left"
+                              >
+                                <time dateTime={entry.date} className="text-[13px] font-semibold text-(--n-sage)">
+                                  {format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}
+                                </time>
+                                <p className="mt-1 whitespace-pre-wrap text-[15px] leading-6">{entry.note}</p>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void deleteCycleNote(entry)}
+                                disabled={isSavingCycleDay}
+                                aria-label={`Supprimer la note du ${format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}`}
+                                className="n-link shrink-0 text-[13px] text-(--n-muted)! disabled:opacity-50"
+                              >
+                                Supprimer
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </section>
 
-                    <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                      <section
-                        aria-labelledby="cycle-notes-heading"
-                        className="min-w-0 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5"
-                      >
-                        <h3
-                          id="cycle-notes-heading"
-                          className="font-serif text-xl font-semibold"
-                        >
-                          Notes du cycle
-                        </h3>
-                        <p className="mt-1 text-sm text-stone-500">
-                          Tes notes enregistrées par date.
+                    <details className="n-card min-w-0">
+                      <summary className="n-display cursor-pointer text-[20px]">
+                        Symptômes notés <span className="text-[15px] font-normal text-(--n-muted)">(facultatif)</span>
+                      </summary>
+                      {cycleDays === undefined ? (
+                        <p className="mt-4 text-[15px] text-(--n-muted)">Chargement des symptômes…</p>
+                      ) : records.filter((entry) => entry.symptoms.length > 0).length === 0 ? (
+                        <p className="mt-3 text-[15px] text-(--n-muted)">
+                          Aucun symptôme noté. Sélectionne une date dans le calendrier et choisis
+                          les observations du jour.
                         </p>
-                        {cycleDays === undefined ? (
-                          <p className="mt-4 text-sm text-stone-500">
-                            Chargement des notes…
-                          </p>
-                        ) : cycleNotes.length === 0 ? (
-                          <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">
-                            Aucune note pour le moment. Sélectionne une date,
-                            écris une note et enregistre-la.
-                          </p>
-                        ) : (
-                          <ul className="mt-4 space-y-2">
-                            {cycleNotes.map((entry) => (
-                              <li
-                                key={entry._id}
-                                className="flex items-start gap-2 rounded-2xl border border-stone-200 bg-stone-50 p-3"
-                              >
+                      ) : (
+                        <ul className="mt-3 divide-y divide-(--n-line)">
+                          {[...records]
+                            .filter((entry) => entry.symptoms.length > 0)
+                            .sort((first, second) => second.date.localeCompare(first.date))
+                            .map((entry) => (
+                              <li key={entry._id}>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1827,208 +1824,104 @@ export default function Dashboard() {
                                     requestAnimationFrame(() =>
                                       document
                                         .getElementById("cycle-day-editor")
-                                        ?.scrollIntoView({
-                                          behavior: "smooth",
-                                          block: "center",
-                                        }),
+                                        ?.scrollIntoView({ behavior: "smooth", block: "center" }),
                                     );
                                   }}
-                                  className="min-w-0 flex-1 text-left"
+                                  className="w-full py-3 text-left"
                                 >
-                                  <time
-                                    dateTime={entry.date}
-                                    className="text-sm font-medium text-emerald-800"
-                                  >
-                                    {format(
-                                      parseISO(entry.date),
-                                      "d MMMM yyyy",
-                                      { locale: fr },
-                                    )}
+                                  <time dateTime={entry.date} className="text-[13px] font-semibold text-(--n-sage)">
+                                    {format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}
                                   </time>
-                                  <p className="mt-1 whitespace-pre-wrap text-base leading-6 text-stone-800">
-                                    {entry.note}
-                                  </p>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => void deleteCycleNote(entry)}
-                                  disabled={isSavingCycleDay}
-                                  aria-label={`Supprimer la note du ${format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}`}
-                                  className="shrink-0 rounded-lg p-2 text-stone-400 transition hover:bg-mauve-100 hover:text-mauve-700 disabled:opacity-50"
-                                >
-                                  Supprimer
+                                  <span className="mt-2 flex flex-wrap gap-1.5">
+                                    {entry.symptoms.map((symptom) => (
+                                      <span key={symptom} className="n-chip">
+                                        {cycleSymptoms.find((item) => item.key === symptom)?.label ?? symptom}
+                                      </span>
+                                    ))}
+                                  </span>
                                 </button>
                               </li>
                             ))}
-                          </ul>
-                        )}
-                      </section>
-
-                      <details
-                        aria-labelledby="cycle-symptoms-heading"
-                        className="min-w-0 rounded-3xl border border-stone-200 bg-white p-4 sm:p-5"
-                      >
-                        <summary
-                          id="cycle-symptoms-heading"
-                          className="cursor-pointer font-serif text-xl font-semibold"
-                        >
-                          Symptômes notés (facultatif)
-                        </summary>
-                        <p className="mt-1 text-sm text-stone-500">
-                          Retrouve les symptômes associés à chaque date.
-                        </p>
-                        {cycleDays === undefined ? (
-                          <p className="mt-4 text-sm text-stone-500">
-                            Chargement des symptômes…
-                          </p>
-                        ) : records.filter((entry) => entry.symptoms.length > 0)
-                            .length === 0 ? (
-                          <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">
-                            Aucun symptôme noté. Sélectionne une date dans le
-                            calendrier et choisis les symptômes observés.
-                          </p>
-                        ) : (
-                          <ul className="mt-4 space-y-2">
-                            {[...records]
-                              .filter((entry) => entry.symptoms.length > 0)
-                              .sort((first, second) =>
-                                second.date.localeCompare(first.date),
-                              )
-                              .map((entry) => (
-                                <li key={entry._id}>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const date = parseISO(entry.date);
-                                      setSelectedDate(date);
-                                      setSelectedRange(undefined);
-                                      setCalendarMonth(startOfMonth(date));
-                                      requestAnimationFrame(() =>
-                                        document
-                                          .getElementById("cycle-day-editor")
-                                          ?.scrollIntoView({
-                                            behavior: "smooth",
-                                            block: "center",
-                                          }),
-                                      );
-                                    }}
-                                    className="w-full rounded-2xl border border-stone-200 bg-stone-50 p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50/40"
-                                  >
-                                    <time
-                                      dateTime={entry.date}
-                                      className="text-sm font-medium text-emerald-800"
-                                    >
-                                      {format(
-                                        parseISO(entry.date),
-                                        "d MMMM yyyy",
-                                        { locale: fr },
-                                      )}
-                                    </time>
-                                    <div className="mt-2 flex flex-wrap gap-1.5">
-                                      {entry.symptoms.map((symptom) => (
-                                        <span
-                                          key={symptom}
-                                          className="rounded-full bg-mauve-50 px-2.5 py-1 text-sm text-mauve-800"
-                                        >
-                                          {cycleSymptoms.find(
-                                            (item) => item.key === symptom,
-                                          )?.label ?? symptom}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </button>
-                                </li>
-                              ))}
-                          </ul>
-                        )}
-                      </details>
-                    </div>
-
-                    {cycleDays?.length === 0 && (
-                      <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-                        Ton calendrier est vide pour le moment. Sélectionne une
-                        date pour commencer ; tu pourras modifier ou retirer tes
-                        entrées à tout moment.
-                      </p>
-                    )}
+                        </ul>
+                      )}
+                    </details>
                   </div>
-                </>
+
+                  {cycleDays?.length === 0 && (
+                    <p className="text-center text-[13px] leading-5 text-(--n-muted)">
+                      Ton calendrier est vide pour le moment. Sélectionne une date pour commencer ;
+                      tu pourras modifier ou retirer tes entrées à tout moment.
+                    </p>
+                  )}
+                </div>
               )}
 
               {activeView === "notes" && (
-                <section
-                  id="dashboard-notes"
-                  className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
-                >
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                      Espace personnel
-                    </p>
-                    <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
-                      Notes
-                    </h1>
+                <section id="dashboard-notes" className="scroll-mt-24 space-y-5">
+                  <div className="n-page-head px-1">
+                    <div>
+                      <span className="n-label">Espace personnel</span>
+                      <h1 className="n-page-title">Notes</h1>
+                    </div>
                   </div>
 
                   {isAnonymousUser && (
-                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
-                      <p className="text-sm font-medium">
-                        ⚠️ Connecte-toi avec ton email ou Google pour sauvegarder tes notes.
-                        Les données enregistrées avec une session anonyme seront perdues à la déconnexion.
+                    <div className="n-card n-card-tint" role="status">
+                      <p className="text-[15px] font-semibold">
+                        Connecte-toi avec ton e-mail ou Google pour sauvegarder tes notes.
+                      </p>
+                      <p className="mt-1 text-[14px] text-(--n-muted)">
+                        Les données d’une session anonyme sont perdues à la déconnexion.
                       </p>
                     </div>
                   )}
 
                   <form
-                    className="mt-5 rounded-3xl border border-stone-200 bg-[#F5F2EE] p-4 sm:p-5"
+                    className="n-card"
                     onSubmit={(event) => {
                       event.preventDefault();
                       void savePersonalNote();
                     }}
                   >
-                    <label className="block text-[15px] font-medium text-stone-800">
-                      Titre du post-it
-                      <Input
-                        value={personalNoteTitle}
-                        onChange={(event) =>
-                          setPersonalNoteTitle(event.target.value)
-                        }
-                        maxLength={100}
-                        placeholder="Ex. Appeler l’enseignante"
-                        className="mt-1.5 bg-white text-base md:text-base"
-                      />
-                    </label>
-                    <label
-                      htmlFor="personal-note"
-                      className="mt-4 block text-[15px] font-medium text-stone-800"
-                    >
-                      Contenu
-                    </label>
-                    <Textarea
+                    <h2 className="n-display text-[20px]">Nouvelle note</h2>
+                    <input
+                      value={personalNoteTitle}
+                      onChange={(event) => setPersonalNoteTitle(event.target.value)}
+                      maxLength={100}
+                      aria-label="Titre de la note"
+                      placeholder="Titre (facultatif)"
+                      className="n-input mt-4 font-semibold"
+                    />
+                    <textarea
                       id="personal-note"
                       value={personalNoteDraft}
-                      onChange={(event) =>
-                        setPersonalNoteDraft(event.target.value)
-                      }
+                      onChange={(event) => setPersonalNoteDraft(event.target.value)}
                       maxLength={5000}
+                      aria-label="Contenu de la note"
                       placeholder="Écris ton idée ou ton rappel…"
-                      className="mt-1.5 min-h-28 resize-y rounded-2xl border-stone-200 bg-white text-base md:text-base"
+                      className="n-input n-textarea mt-3"
                     />
-                    <label className="mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
-                      <input
-                        type="checkbox"
-                        checked={personalNoteIsTask}
-                        onChange={(event) =>
-                          setPersonalNoteIsTask(event.target.checked)
-                        }
-                        className="size-4 accent-[#5F7F68]"
-                      />
-                      Ajouter aussi à mes tâches
-                    </label>
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className="n-toggle"
+                          aria-pressed={personalNoteIsTask}
+                          onClick={() => setPersonalNoteIsTask((value) => !value)}
+                        >
+                          Ajouter à mes tâches
+                        </button>
+                        <button
+                          type="button"
+                          className="n-toggle"
+                          aria-pressed={personalNoteUrgent}
+                          onClick={() => setPersonalNoteUrgent((value) => !value)}
+                        >
+                          Importante
+                        </button>
+                      </div>
                       <fieldset>
-                        <legend className="mb-2 text-[15px] font-medium text-stone-700">
-                          Couleur du post-it
-                        </legend>
+                        <legend className="sr-only">Couleur du post-it</legend>
                         <div className="flex gap-2">
                           {stickyNoteColors.map((color) => (
                             <button
@@ -2037,28 +1930,17 @@ export default function Dashboard() {
                               onClick={() => setPersonalNoteColor(color.value)}
                               aria-label={color.label}
                               aria-pressed={personalNoteColor === color.value}
-                              className={`size-8 rounded-full border-2 ${color.swatch} ${personalNoteColor === color.value ? "border-stone-800 ring-2 ring-white ring-offset-1" : "border-white"}`}
+                              className={`n-swatch ${color.swatch}`}
                             />
                           ))}
                         </div>
                       </fieldset>
-                      <label className="inline-flex items-center gap-2 text-[15px] font-medium text-stone-700">
-                        <input
-                          type="checkbox"
-                          checked={personalNoteUrgent}
-                          onChange={(event) =>
-                            setPersonalNoteUrgent(event.target.checked)
-                          }
-                          className="size-4 accent-[#5F7F68]"
-                        />
-                        Importante
-                      </label>
                     </div>
-                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-[15px] tabular-nums text-stone-500">
+                    <div className="mt-5 flex items-center justify-between gap-3">
+                      <span className="text-[13px] tabular-nums text-(--n-muted)">
                         {personalNoteDraft.length}/5 000
                       </span>
-                      <Button
+                      <button
                         type="submit"
                         disabled={
                           !personalNoteDraft.trim() ||
@@ -2066,20 +1948,20 @@ export default function Dashboard() {
                           personalNoteTitle.length > 100 ||
                           isSavingPersonalNote
                         }
-                        className="rounded-xl bg-[#523B46] text-[15px] text-white hover:bg-[#3D2A34]"
+                        className="n-btn n-btn-sage disabled:opacity-40"
                       >
                         {isSavingPersonalNote
                           ? "Enregistrement…"
                           : personalNoteIsTask
                             ? "Ajouter à mes tâches"
-                            : "Ajouter un post-it"}
-                      </Button>
+                            : "Ajouter la note"}
+                      </button>
                     </div>
                   </form>
 
-                  <div className="mt-7 border-t border-stone-200 pt-5">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h2 className="text-base font-semibold text-stone-900">
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                      <h2 className="n-display text-[22px]">
                         {notesSection === "active"
                           ? "Mes notes"
                           : notesSection === "todo"
@@ -2088,7 +1970,7 @@ export default function Dashboard() {
                               ? "Faites"
                               : "Notes archivées"}
                       </h2>
-                      <div className="flex rounded-xl border border-stone-200 bg-stone-50 p-1">
+                      <div className="n-seg" role="group" aria-label="Filtrer les notes">
                         {(
                           [
                             { id: "active", label: "Notes" },
@@ -2102,11 +1984,6 @@ export default function Dashboard() {
                             type="button"
                             onClick={() => setNotesSection(id)}
                             aria-pressed={notesSection === id}
-                            className={`rounded-lg px-3 py-1.5 text-[15px] font-medium transition-colors ${
-                              notesSection === id
-                                ? "bg-white text-stone-900 shadow-sm"
-                                : "text-stone-500 hover:text-stone-900"
-                            }`}
                           >
                             {label}
                           </button>
@@ -2114,18 +1991,18 @@ export default function Dashboard() {
                       </div>
                     </div>
                     {visiblePersonalNotes === undefined ? (
-                      <p className="mt-4 text-base text-stone-500">
+                      <p className="mt-4 px-1 text-[15px] text-(--n-muted)">
                         Chargement de tes notes…
                       </p>
                     ) : visiblePersonalNotes.length === 0 ? (
-                      <p className="mt-4 rounded-2xl bg-stone-50 p-4 text-base leading-6 text-stone-600">
+                      <p className="n-dashed mt-4 text-center">
                         {notesSection === "archived"
                           ? "Aucune note archivée pour le moment."
                           : notesSection === "todo"
                             ? "Aucune tâche à faire."
                             : notesSection === "done"
                               ? "Aucune tâche terminée pour le moment."
-                              : "Aucun post-it pour le moment. Ajoute ta première note juste au-dessus."}
+                              : "Aucune note pour le moment. Ajoute ta première note juste au-dessus."}
                       </p>
                     ) : (
                       <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -2162,7 +2039,7 @@ export default function Dashboard() {
                                 event.preventDefault();
                                 void reorderPersonalNote(note._id);
                               }}
-                              className={`group relative min-h-56 list-none rounded-sm border p-4 shadow-[2px_5px_12px_rgba(70,50,30,0.12)] transition duration-200 hover:-translate-y-1 hover:rotate-0 hover:shadow-[4px_9px_18px_rgba(70,50,30,0.17)] ${noteColor.card} ${draggedNoteId === note._id ? "scale-95 opacity-40" : ""} ${!isEditing && !note.archived ? "cursor-grab active:cursor-grabbing" : ""}`}
+                              className={`n-postit ${noteColor.card} ${draggedNoteId === note._id ? "scale-95 opacity-40" : ""} ${!isEditing && !note.archived ? "cursor-grab active:cursor-grabbing" : ""}`}
                             >
                               {isEditing ? (
                                 <form
@@ -2286,14 +2163,10 @@ export default function Dashboard() {
                                       </label>
                                     )}
                                     {note.urgent && (
-                                      <span
-                                        aria-label="Importante"
-                                        title="Importante"
-                                        className="ml-auto size-2 rounded-full bg-[#8A744C]"
-                                      />
+                                      <span className="n-postit-tag ml-auto">Importante</span>
                                     )}
                                   </div>
-                                  <h3 className="relative z-10 mt-3 wrap-break-words font-serif text-xl font-semibold leading-6 text-stone-900">
+                                  <h3 className="n-display relative z-10 mt-3 wrap-break-words text-[19px] leading-6">
                                     {noteTitle}
                                   </h3>
                                   <p className="relative z-10 mt-2 min-h-12 whitespace-pre-wrap wrap-break-words text-base leading-6 text-stone-800">
