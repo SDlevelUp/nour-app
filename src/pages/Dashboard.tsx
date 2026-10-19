@@ -1,9 +1,5 @@
-﻿import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+﻿import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import {
   dashboardNavigation,
@@ -2049,23 +2045,23 @@ export default function Dashboard() {
                                     void savePersonalNoteEdits(note._id);
                                   }}
                                 >
-                                  <Input
+                                  <input
                                     value={editNoteTitle}
                                     onChange={(event) =>
                                       setEditNoteTitle(event.target.value)
                                     }
                                     maxLength={100}
                                     aria-label="Titre du post-it"
-                                    className="border-black/10 bg-white/60 text-base font-semibold md:text-base"
+                                    className="n-input n-postit-field font-semibold"
                                   />
-                                  <Textarea
+                                  <textarea
                                     value={editNoteContent}
                                     onChange={(event) =>
                                       setEditNoteContent(event.target.value)
                                     }
                                     maxLength={5000}
                                     aria-label="Contenu du post-it"
-                                    className="min-h-24 border-black/10 bg-white/60 text-base md:text-base"
+                                    className="n-input n-textarea n-postit-field"
                                   />
                                   <div className="flex flex-wrap items-center justify-between gap-2">
                                     <div className="flex gap-1.5">
@@ -2080,47 +2076,40 @@ export default function Dashboard() {
                                           aria-pressed={
                                             editNoteColor === color.value
                                           }
-                                          className={`size-7 rounded-full border-2 ${color.swatch} ${editNoteColor === color.value ? "border-stone-800 ring-2 ring-white ring-offset-1" : "border-white"}`}
+                                          className={`n-swatch size-7! ${color.swatch}`}
                                         />
                                       ))}
                                     </div>
-                                    <label className="inline-flex items-center gap-1.5 text-sm font-medium text-mauve-800">
-                                      <input
-                                        type="checkbox"
-                                        checked={editNoteUrgent}
-                                        onChange={(event) =>
-                                          setEditNoteUrgent(
-                                            event.target.checked,
-                                          )
-                                        }
-                                        className="size-4 accent-[#5F7F68]"
-                                      />
-                                      Importante
-                                    </label>
-                                  </div>
-                                  <div className="flex justify-end gap-2">
-                                    <Button
+                                    <button
                                       type="button"
-                                      variant="ghost"
-                                      size="sm"
+                                      className="n-toggle bg-white/60!"
+                                      aria-pressed={editNoteUrgent}
+                                      onClick={() => setEditNoteUrgent((value) => !value)}
+                                    >
+                                      Importante
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center justify-end gap-3">
+                                    <button
+                                      type="button"
+                                      className="n-link text-sm text-(--n-muted)!"
                                       onClick={() =>
                                         setEditingPersonalNote(null)
                                       }
                                     >
                                       Annuler
-                                    </Button>
-                                    <Button
+                                    </button>
+                                    <button
                                       type="submit"
-                                      size="sm"
                                       disabled={
                                         pendingNoteAction === note._id ||
                                         !editNoteTitle.trim() ||
                                         !editNoteContent.trim()
                                       }
-                                      className="bg-emerald-900 text-white hover:bg-emerald-800"
+                                      className="n-btn px-4! py-2.5! text-sm! disabled:opacity-40"
                                     >
                                       Enregistrer
-                                    </Button>
+                                    </button>
                                   </div>
                                 </form>
                               ) : (
@@ -2250,211 +2239,174 @@ export default function Dashboard() {
             </section>
 
             {activeView === "settings" && (
-              <section
-                id="dashboard-settings"
-                className="scroll-mt-24 px-1 pb-1"
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                  Préférences de l’application
-                </p>
-                <h1 className="mt-2 font-serif text-2xl font-bold tracking-tight">
-                  Réglages
-                </h1>
-                <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Autorise l’accès à ta position sur ton appareil pour afficher
-                  les horaires de prière locaux.
-                  Tu trouveras aussi ici les réglages des rappels.
-                </p>
-              </section>
-            )}
+              <section id="dashboard-settings" className="scroll-mt-24 space-y-5">
+                <div className="n-page-head px-1">
+                  <div>
+                    <span className="n-label">Préférences</span>
+                    <h1 className="n-page-title">Réglages</h1>
+                  </div>
+                </div>
 
-            {activeView === "settings" && (
-              <aside className="grid items-start gap-5 md:grid-cols-2">
-                <Card className="rounded-3xl border border-stone-200 bg-white shadow-none">
-                  <CardContent className="p-5">
-                    <p className="text-sm font-semibold">
-                      Horaires de prière
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Calcul gratuit selon ta position
-                    </p>
-
-                    <p className="mt-4 text-xs leading-5 text-stone-600">
-                      Ta position est enregistrée sur cet appareil et envoyée à
-                      AlAdhan pour calculer les horaires. Elle n’est pas
-                      enregistrée dans ton compte Nour.
-                    </p>
-
-                    <div className="mt-4 space-y-3">
-                      <div className="text-xs leading-5 text-stone-700">
-                        <p className="font-medium">
-                          Méthode de calcul : {prayerCalculation.label}
+                <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+                  <article className="n-card">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h2 className="n-display text-[22px]">Horaires de prière</h2>
+                        <p className="mt-1 text-[14px] text-(--n-muted)">
+                          {prayer.preferences.coordinates
+                            ? "Calculés selon ta position."
+                            : "Active ta position pour afficher les horaires de ta ville."}
                         </p>
-                        <p className="mt-1 text-stone-600">
-                          Fajr quand le soleil est à{" "}
-                          {prayerCalculation.fajrAngle}° sous l’horizon, Isha
-                          à {prayerCalculation.ishaAngle}°, Maghrib{" "}
-                          {prayerCalculation.maghribOffsetMinutes} minutes
-                          après le coucher du soleil. La même méthode
-                          s’applique à tout le monde dans Nour.
-                        </p>
-                        <details className="mt-2">
-                          <summary className="cursor-pointer font-medium text-stone-800">
-                            Pourquoi cette méthode ?
-                          </summary>
-                          <div className="mt-2 space-y-2 text-stone-600">
-                            <p>
-                              Ce sont les réglages de la{" "}
-                              {prayerCalculation.referenceMosque}. Les
-                              horaires de Nour correspondent donc à ceux
-                              affichés par cette mosquée.
-                            </p>
-                            <p>
-                              Chaque mosquée choisit ses propres angles et
-                              ajoute parfois quelques minutes de précaution.
-                              Si ta mosquée utilise d’autres réglages, un écart
-                              de quelques minutes est possible : en cas de
-                              doute, suis ta mosquée.
-                            </p>
-                            <p>
-                              Aux latitudes élevées, quand le soleil ne descend
-                              pas assez sous l’horizon, le calcul applique une
-                              règle d’ajustement.
-                            </p>
-                          </div>
-                        </details>
                       </div>
-
-                      <label className="block text-xs font-medium text-stone-700">
-                        Calcul de l’heure d’Asr
-                        <select
-                          value={prayer.preferences.school}
-                          onChange={(event) =>
-                            prayer.setSchool(event.target.value === "1" ? 1 : 0)
-                          }
-                          className="mt-1.5 w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-800"
-                        >
-                          <option value={0}>
-                            Standard (Shafi‘i, Maliki, Hanbali)
-                          </option>
-                          <option value={1}>Hanafi</option>
-                        </select>
-                      </label>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={prayer.requestLocation}
-                        disabled={prayer.isLoading}
-                        className="gap-2"
-                      >
-                        {prayer.isLoading
-                          ? "Recherche…"
-                          : prayer.preferences.coordinates
-                            ? "Actualiser ma position"
-                            : "Utiliser ma position"}
-                      </Button>
-                      {prayer.preferences.coordinates && (
-                        <Button
+                      <div className="flex flex-wrap gap-2">
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={prayer.clearLocation}
+                          onClick={prayer.requestLocation}
+                          disabled={prayer.isLoading}
+                          className={`n-btn ${prayer.preferences.coordinates ? "n-btn-ghost" : "n-btn-sage"} px-4! py-2.5! text-sm! disabled:opacity-50`}
                         >
-                          Effacer la position
-                        </Button>
-                      )}
+                          {prayer.isLoading
+                            ? "Recherche…"
+                            : prayer.preferences.coordinates
+                              ? "Actualiser ma position"
+                              : "Utiliser ma position"}
+                        </button>
+                        {prayer.preferences.coordinates && (
+                          <button
+                            type="button"
+                            onClick={prayer.clearLocation}
+                            className="n-link px-2 text-sm text-(--n-muted)!"
+                          >
+                            Effacer
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {prayer.error && (
-                      <p
-                        role="alert"
-                        className="mt-3 text-xs leading-5 text-red-700"
-                      >
+                      <p role="alert" className="mt-4 text-[14px] text-[#b4473a]">
                         {prayer.error}
                       </p>
                     )}
+
                     {prayer.times && (
-                      <p
-                        className="mt-3 text-xs text-emerald-800"
-                        role="status"
-                      >
-                        Horaires du jour chargés.
-                      </p>
+                      <ul className="n-times mt-5" aria-label="Horaires du jour">
+                        {(
+                          [
+                            ["Fajr", prayer.times.fajr],
+                            ["Dhuhr", prayer.times.dhuhr],
+                            ["Asr", prayer.times.asr],
+                            ["Maghrib", prayer.times.maghrib],
+                            ["Isha", prayer.times.isha],
+                          ] as const
+                        ).map(([name, time]) => (
+                          <li key={name}>
+                            <span>{name}</span>
+                            <b>{time}</b>
+                          </li>
+                        ))}
+                      </ul>
                     )}
-                    <p className="mt-3 text-[10px] leading-4 text-stone-500">
-                      Horaires calculés par{" "}
+
+                    <div className="mt-5 border-t border-(--n-line) pt-5">
+                      <p className="text-[14px] font-semibold">
+                        Méthode : {prayerCalculation.label}
+                      </p>
+                      <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+                        Fajr quand le soleil est à {prayerCalculation.fajrAngle}° sous
+                        l’horizon, Isha à {prayerCalculation.ishaAngle}°, Maghrib{" "}
+                        {prayerCalculation.maghribOffsetMinutes} minutes après le coucher du
+                        soleil. La même méthode s’applique à tout le monde dans Nour.
+                      </p>
+                      <details className="n-proof mt-3 border-t-0! pt-0!">
+                        <summary>Pourquoi cette méthode ?</summary>
+                        <div className="mt-2 space-y-2 text-(--n-muted)">
+                          <p>
+                            Ce sont les réglages de la {prayerCalculation.referenceMosque}. Les
+                            horaires de Nour correspondent donc à ceux affichés par cette
+                            mosquée.
+                          </p>
+                          <p>
+                            Chaque mosquée choisit ses propres angles et ajoute parfois quelques
+                            minutes de précaution. Si ta mosquée utilise d’autres réglages, un
+                            écart de quelques minutes est possible : en cas de doute, suis ta
+                            mosquée.
+                          </p>
+                          <p>
+                            Aux latitudes élevées, quand le soleil ne descend pas assez sous
+                            l’horizon, le calcul applique une règle d’ajustement.
+                          </p>
+                        </div>
+                      </details>
+                    </div>
+
+                    <label className="mt-5 grid gap-1 text-[13px] font-semibold">
+                      Calcul de l’heure d’Asr
+                      <select
+                        value={prayer.preferences.school}
+                        onChange={(event) =>
+                          prayer.setSchool(event.target.value === "1" ? 1 : 0)
+                        }
+                        className="n-select w-full"
+                      >
+                        <option value={0}>Standard (Shafi‘i, Maliki, Hanbali)</option>
+                        <option value={1}>Hanafi</option>
+                      </select>
+                    </label>
+
+                    <p className="mt-5 text-[13px] leading-5 text-(--n-muted)">
+                      Ta position reste sur cet appareil et n’est envoyée qu’à{" "}
                       <a
                         href="https://aladhan.com/prayer-times-api"
                         target="_blank"
                         rel="noreferrer"
-                        className="underline underline-offset-2"
+                        className="n-link font-normal"
                       >
                         AlAdhan
-                      </a>
-                      . Ils peuvent différer des horaires de ta mosquée.
+                      </a>{" "}
+                      pour calculer les horaires. Elle n’est pas enregistrée dans ton compte
+                      Nour.
                     </p>
-                  </CardContent>
-                </Card>
+                  </article>
 
-                <Card
-                  id="dashboard-reminders"
-                  className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white shadow-none"
-                >
-                  <CardContent className="p-5">
-                    <p className="text-sm font-semibold text-left">Rappels</p>
-                    <p className="text-xs text-muted-foreground">
-                      Rappels discrets, sans détail personnel.
+                  <article id="dashboard-reminders" className="n-card scroll-mt-24">
+                    <h2 className="n-display text-[22px]">Rappels</h2>
+                    <p className="mt-1 text-[14px] text-(--n-muted)">
+                      Discrets, sans détail personnel.
                     </p>
-
-                    <div className="mt-5 space-y-4">
+                    <div className="mt-5 divide-y divide-(--n-line)">
                       <ReminderRow
-                        label="Matin"
+                        label="Adhkar du matin"
                         time={reminders.morningTime}
                         enabled={reminders.morning}
                         onTimeChange={(value) =>
-                          setReminders((current) => ({
-                            ...current,
-                            morningTime: value,
-                          }))
+                          setReminders((current) => ({ ...current, morningTime: value }))
                         }
-                        onToggle={(value) =>
-                          void updateReminder("morning", value)
-                        }
+                        onToggle={(value) => void updateReminder("morning", value)}
                       />
-                      <div className="border-t border-border/70" />
                       <ReminderRow
-                        label="Soir"
+                        label="Adhkar du soir"
                         time={reminders.eveningTime}
                         enabled={reminders.evening}
                         onTimeChange={(value) =>
-                          setReminders((current) => ({
-                            ...current,
-                            eveningTime: value,
-                          }))
+                          setReminders((current) => ({ ...current, eveningTime: value }))
                         }
-                        onToggle={(value) =>
-                          void updateReminder("evening", value)
-                        }
+                        onToggle={(value) => void updateReminder("evening", value)}
                       />
                     </div>
-                    <p className="mt-4 text-xs leading-5 text-stone-500">
-                      Les rappels locaux fonctionnent lorsque Nour est ouverte.
-                      Sur iPhone, les notifications écran verrouillé nécessitent
-                      l’installation sur l’écran d’accueil et un service Web
-                      Push côté serveur, qui n’est pas encore configuré.
+                    <p className="mt-4 text-[13px] leading-5 text-(--n-muted)">
+                      Les rappels fonctionnent lorsque Nour est ouverte. Sur iPhone, les
+                      notifications écran verrouillé demandent l’installation sur l’écran
+                      d’accueil et un service Web Push, qui n’est pas encore configuré.
                     </p>
-                  </CardContent>
-                </Card>
-              </aside>
+                  </article>
+                </div>
+              </section>
             )}
           </div>
 
-          <footer className="mt-10 flex flex-col gap-2 border-t border-stone-200 pt-5 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
-            <span>nour. · Suivi quotidien personnel</span>
+          <footer className="mt-10 flex flex-col gap-2 border-t border-(--n-line) pt-5 text-[13px] text-(--n-muted) sm:flex-row sm:items-center sm:justify-between">
+            <span>Nour · Suivi quotidien personnel</span>
             <span>
               Ton calendrier est enregistré sur ton compte ; tes préférences de
               rappel sont enregistrées sur cet appareil.
@@ -2480,18 +2432,16 @@ function ReminderRow({
   onToggle: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 py-4">
       <div className="min-w-0 flex-1">
-        <label className="text-xs font-medium">{label}</label>
-        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <input
-            type="time"
-            value={time}
-            onChange={(event) => onTimeChange(event.target.value)}
-            className="w-18 bg-transparent tabular-nums outline-none"
-            aria-label={`Heure du rappel ${label}`}
-          />
-        </div>
+        <p className="text-[15px] font-semibold">{label}</p>
+        <input
+          type="time"
+          value={time}
+          onChange={(event) => onTimeChange(event.target.value)}
+          className="n-input mt-2 h-10! w-32 tabular-nums"
+          aria-label={`Heure du rappel ${label}`}
+        />
       </div>
       <Switch
         checked={enabled}
