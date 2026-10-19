@@ -108,7 +108,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={onCollapse}
-              className="n-nav-item !w-auto !p-1.5"
+              className="n-nav-item w-auto! p-1.5!"
               aria-label="Replier la barre latérale"
               title="Replier la barre latérale"
             >
@@ -135,7 +135,7 @@ export function DashboardSidebar({
                       aria-label={isCollapsed ? label : undefined}
                       className="n-nav-item"
                     >
-                      <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                      <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
                       {!isCollapsed && <span>{label}</span>}
                       {view === "notes" && hasUnreadNotes && (
                         <span
@@ -210,7 +210,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={onSignOut}
-              className={`n-nav-item ${isCollapsed ? "" : "!w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"}`}
+              className={`n-nav-item ${isCollapsed ? "" : "w-auto! gap-1.5! px-2! py-1.5! text-[13px]"}`}
               data-collapsed={isCollapsed}
               aria-label="Se déconnecter"
               title="Se déconnecter"
@@ -282,7 +282,7 @@ export function DashboardSidebar({
               <button
                 type="button"
                 onClick={() => setIsMoreOpen(false)}
-                className="n-nav-item !w-auto !p-1.5"
+                className="n-nav-item w-auto! p-1.5!"
                 aria-label="Fermer"
               >
                 <X className="size-4" />
@@ -300,7 +300,7 @@ export function DashboardSidebar({
                   aria-current={activeView === view ? "page" : undefined}
                   className="n-nav-item"
                 >
-                  <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                  <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
                   <span>{label}</span>
                   {view === "notes" && hasUnreadNotes && (
                     <span className="n-unread ml-auto" role="status" aria-label="Nouvelle note non consultée" />
@@ -321,7 +321,7 @@ export function DashboardSidebar({
               <button
                 type="button"
                 onClick={onSignOut}
-                className="n-nav-item !w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"
+                className="n-nav-item w-auto! gap-1.5! px-2! py-1.5! text-[13px]"
               >
                 <LogOut className="size-4" />
                 Se déconnecter

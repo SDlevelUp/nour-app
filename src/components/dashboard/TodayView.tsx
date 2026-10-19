@@ -278,7 +278,7 @@ export function TodayView({
                   "Autorise l’accès à ta position pour calculer les horaires de prière de ta ville."}
               </p>
               {!prayer.isLoading && (
-                <button type="button" onClick={onOpenSettings} className="n-btn mt-5 !bg-(--n-on-dark) !text-(--n-sage-dark)">
+                <button type="button" onClick={onOpenSettings} className="n-btn mt-5 bg-(--n-on-dark)! text-(--n-sage-dark)!">
                   Configurer ma position
                 </button>
               )}
@@ -370,7 +370,7 @@ export function TodayView({
         {modules.cycle && (
           <article className="n-card n-rise grid gap-4 lg:col-span-6 lg:grid-cols-[1fr_auto] lg:items-center" aria-label="Cycle">
             <div>
-              <span className="n-label !text-(--n-mauve)">Cycle</span>
+              <span className="n-label text-(--n-mauve)!">Cycle</span>
               <h2 className="n-display mt-3 text-[24px] leading-tight">
                 {cycle.currentPeriodDay !== null
                   ? `Jour ${cycle.currentPeriodDay} · prière et jeûne en pause`
@@ -460,7 +460,7 @@ export function TodayView({
                     onClick={() =>
                       setModules((current) => ({ ...current, [module]: !current[module] }))
                     }
-                    className={`n-btn ${modules[module] ? "" : "n-btn-ghost"} !px-4 !py-2.5 !text-sm`}
+                    className={`n-btn ${modules[module] ? "" : "n-btn-ghost"} px-4! py-2.5! text-sm!`}
                   >
                     {modules[module] ? "✓ " : "+ "}
                     {moduleLabels[module]}
