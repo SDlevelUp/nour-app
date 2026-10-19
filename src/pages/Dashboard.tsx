@@ -1072,7 +1072,7 @@ export default function Dashboard() {
         )}
 
         <div
-          className={`mx-auto min-h-[calc(100vh-100px)] bg-background px-4 pb-32 sm:px-6 lg:pb-12 xl:px-8 ${activeView === "overview" ? "max-w-[1180px] pt-8 lg:pt-10" : "max-w-[1600px] pt-6"}`}
+          className={`mx-auto min-h-[calc(100vh-100px)] bg-background px-4 pb-32 sm:px-6 lg:pb-12 xl:px-8 ${activeView === "overview" ? "max-w-295 pt-8 lg:pt-10" : "max-w-[1600px] pt-6"}`}
         >
           <div className="grid items-start gap-6 xl:gap-8 xl:grid-cols-1">
             <section className="min-w-0 space-y-4">

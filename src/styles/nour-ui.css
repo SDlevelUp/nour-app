@@ -9,7 +9,8 @@
   --n-font-display: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
 }
 
-.dashboard-shell {
+.dashboard-shell,
+.n-landing {
   --n-bg: var(--nour-cream);
   --n-paper: #fffdf9;
   --n-line: #e6e0d4;
@@ -27,7 +28,8 @@
   --n-radius-lg: 22px;
 }
 
-.dashboard-shell.dark-dashboard {
+.dashboard-shell.dark-dashboard,
+.n-landing.n-landing-dark {
   --n-bg: #202922;
   --n-paper: #27312a;
   --n-line: #3d4940;
@@ -505,4 +507,55 @@
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+/* ---------- Page publique (Landing) ---------- */
+
+.n-landing {
+  min-height: 100vh;
+  background: var(--n-bg);
+  color: var(--n-ink);
+}
+
+.n-landing ::selection {
+  background: var(--n-sage-tint);
+}
+
+.n-section-title {
+  font-family: var(--n-font-display);
+  font-size: clamp(30px, 4.4vw, 46px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.n-faq {
+  border-bottom: 1px solid var(--n-line);
+  padding: 18px 4px;
+}
+
+.n-faq summary {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.n-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.n-faq summary::after {
+  content: "+";
+  color: var(--n-muted);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.n-faq[open] summary::after {
+  content: "–";
 }

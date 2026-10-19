@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, LayoutGrid, LogOut, MoonStar, X } from "lucide-react";
 import { useState } from "react";
+import { NourMark } from "@/components/NourMark";
 import { Switch } from "@/components/ui/switch";
 import {
   dashboardNavigation,
@@ -21,25 +22,6 @@ type DashboardSidebarProps = {
   onDarkModeChange: (enabled: boolean) => void;
   onSignOut: () => void;
 };
-
-// Étoile à 8 branches (khatam) : deux carrés superposés, en traits.
-export function NourMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" />
-      <rect
-        x="8"
-        y="8"
-        width="24"
-        height="24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        transform="rotate(45 20 20)"
-      />
-    </svg>
-  );
-}
 
 const mobileTabs = dashboardNavigation.filter((item) => item.group === "daily");
 const moreItems = dashboardNavigation.filter((item) => item.group !== "daily");
@@ -108,7 +90,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={onCollapse}
-              className="n-nav-item !w-auto !p-1.5"
+              className="n-nav-item w-auto! p-1.5!"
               aria-label="Replier la barre latérale"
               title="Replier la barre latérale"
             >
@@ -135,7 +117,7 @@ export function DashboardSidebar({
                       aria-label={isCollapsed ? label : undefined}
                       className="n-nav-item"
                     >
-                      <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                      <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
                       {!isCollapsed && <span>{label}</span>}
                       {view === "notes" && hasUnreadNotes && (
                         <span
@@ -210,7 +192,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={onSignOut}
-              className={`n-nav-item ${isCollapsed ? "" : "!w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"}`}
+              className={`n-nav-item ${isCollapsed ? "" : "w-auto! gap-1.5! px-2! py-1.5! text-[13px]"}`}
               data-collapsed={isCollapsed}
               aria-label="Se déconnecter"
               title="Se déconnecter"
@@ -282,7 +264,7 @@ export function DashboardSidebar({
               <button
                 type="button"
                 onClick={() => setIsMoreOpen(false)}
-                className="n-nav-item !w-auto !p-1.5"
+                className="n-nav-item w-auto! p-1.5!"
                 aria-label="Fermer"
               >
                 <X className="size-4" />
@@ -300,7 +282,7 @@ export function DashboardSidebar({
                   aria-current={activeView === view ? "page" : undefined}
                   className="n-nav-item"
                 >
-                  <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
+                  <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
                   <span>{label}</span>
                   {view === "notes" && hasUnreadNotes && (
                     <span className="n-unread ml-auto" role="status" aria-label="Nouvelle note non consultée" />
@@ -321,7 +303,7 @@ export function DashboardSidebar({
               <button
                 type="button"
                 onClick={onSignOut}
-                className="n-nav-item !w-auto !gap-1.5 !px-2 !py-1.5 text-[13px]"
+                className="n-nav-item w-auto! gap-1.5! px-2! py-1.5! text-[13px]"
               >
                 <LogOut className="size-4" />
                 Se déconnecter
