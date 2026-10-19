@@ -72,6 +72,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-19 : tri des 12 inspirations visuelles et direction design (`docs/direction-design-2026-10.md`) : crème + sauge, accent mauve doux, navigation 4 onglets + Plus. Maquette statique de l'écran « Aujourd'hui » dans `docs/maquette/aujourdhui.html`.
 - 2026-10-19 : nouveau dashboard en place (navigation groupée, barre d'onglets mobile + « Plus », écran « Aujourd'hui » avec prochaine prière, adhkar du moment, reprise du Coran, cycle, modules personnalisables ; onglet « Adhkar » dédié). Horaires de prière : méthode MWL imposée (l'UOIF était la valeur par défaut), choix de méthode retiré des Réglages et remplacé par une explication.
 - 2026-10-19 : page publique (`src/pages/Landing.tsx`) refaite avec le nouveau design (classe racine `n-landing`, sans nuages, effet verre ni ombres violettes) : accroche « Une routine douce, à ton rythme », aperçu de la prochaine prière (horaires d'exemple signalés), principes, fonctionnalités, 3 étapes, FAQ enrichie (sources des invocations, méthode MWL, données). Anciennes règles CSS `.landing-*` retirées de `src/index.css`. Logo déplacé dans `src/components/NourMark.tsx`.
+- 2026-10-19 : page publique : « Selon le Coran et la Sunna authentique » mis en avant dans l'accroche, principes « Fidèle au Coran et à la Sunna authentique, selon la compréhension des pieux prédécesseurs » et « Sans publicité » (validés par Sarah).
 
 ## Problèmes connus
 
@@ -84,4 +85,6 @@ Côté Convex (`npx convex env set`) :
 - Traductions françaises des adhkar : pas encore relues par une personne de science [À CONFIRMER].
 - Méthode MWL en été dans le nord de la France : le soleil ne descend pas toujours à 18°, AlAdhan applique l'ajustement « angle based » ; à Paris le 21 juin 2026, Fajr 03:26 et Isha 00:11 (contre 04:13 et 23:32 avec l'UOIF).
 - Les règles CSS globales `.dashboard-shell [class*="rounded-"]`, `[class*="text-stone-"]`… réécrivent les classes Tailwind de l'ancien design ; le nouveau design utilise les classes `n-*` pour y échapper. À supprimer une fois tous les écrans restylés.
+- Connexion Google en production : erreur Google « 401 invalid_client / The OAuth client was not found ». `GOOGLE_CLIENT_ID` est bien défini dans Convex (format valide, projet Google Cloud 899304556650) : le client OAuth n'existe plus côté Google Cloud. À recréer, puis à remettre dans Convex (constaté le 2026-10-19).
+- Connexion par e-mail en production : `NOUR_MAILER_URL` et `NOUR_MAILER_API_KEY` ne sont pas définies dans Convex, l'envoi du code échoue (constaté le 2026-10-19).
 - Entrée « Notre démarche » prévue dans la navigation, pas encore ajoutée faute de contenu [À CONFIRMER : qui est derrière l'app, minhaj, relecture].

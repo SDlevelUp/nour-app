@@ -8,6 +8,10 @@ const authHref = "/auth?returnTo=%2Fdashboard";
 
 const principles = [
   {
+    title: "Le Coran et la Sunna authentique",
+    text: "Fidèle au Coran et à la Sunna authentique, selon la compréhension des pieux prédécesseurs.",
+  },
+  {
     title: "Des sources visibles",
     text: "Chaque invocation affiche son recueil, son numéro et son degré d’authenticité.",
   },
@@ -16,8 +20,8 @@ const principles = [
     text: "Pas de série à tenir, pas de score, pas de retard à rattraper.",
   },
   {
-    title: "À ton rythme",
-    text: "Tu reprends où tu t’es arrêtée, quand tu le souhaites.",
+    title: "Sans publicité",
+    text: "Aucune publicité, ni pendant la lecture, ni pendant l’écoute.",
   },
 ];
 
@@ -133,7 +137,10 @@ export default function Landing() {
       {/* Héros */}
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-8 sm:px-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pb-24">
         <div className="n-rise">
-          <span className="n-label">Prières · Adhkar · Coran · Cycle</span>
+          <span className="inline-flex items-center gap-2 rounded-full border border-(--n-line) bg-(--n-paper) px-3.5 py-2 text-sm font-semibold text-(--n-sage-dark)">
+            <NourMark className="size-4 text-(--n-sage)" />
+            Selon le Coran et la Sunna authentique
+          </span>
           <h1 className="n-display mt-5 text-[clamp(40px,6.4vw,72px)] leading-[1.02] tracking-[-0.03em]">
             Une routine douce,
             <br />
@@ -195,7 +202,7 @@ export default function Landing() {
 
       {/* Principes */}
       <section id="esprit" className="border-y border-(--n-line)">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-8 md:grid-cols-3 md:gap-10">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-10">
           {principles.map(({ title, text }) => (
             <div key={title}>
               <h2 className="n-display text-xl">{title}</h2>
@@ -325,7 +332,7 @@ export default function Landing() {
       </section>
 
       <footer className="border-t border-(--n-line) px-4 py-6 text-center text-sm text-(--n-muted)">
-        Nour · Ton rythme est le bon.
+        Nour · Selon le Coran et la Sunna authentique · Sans publicité
       </footer>
     </main>
   );
