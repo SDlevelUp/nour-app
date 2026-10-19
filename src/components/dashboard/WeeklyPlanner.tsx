@@ -318,9 +318,9 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
         >
           <span className="n-week-item-time">{activity.time}</span>
           <span className="min-w-0">
-            <span className="block truncate text-[14px] font-semibold">{activity.title}</span>
+            <span className="n-week-item-title">{activity.title}</span>
             {activity.detail && (
-              <span className="block truncate text-[12px] text-(--n-muted)">{activity.detail}</span>
+              <span className="n-week-item-detail">{activity.detail}</span>
             )}
           </span>
         </button>
@@ -511,7 +511,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
       )}
 
       {/* Téléphone et tablette : barre des 7 jours, puis le jour choisi */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         <div className="n-daypills" role="tablist" aria-label="Jours de la semaine">
           {dates.map((date) => {
             const key = dateKey(date);
@@ -550,7 +550,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
       </div>
 
       {/* Ordinateur : la semaine entière */}
-      <div className="n-weekgrid hidden lg:grid">
+      <div className="n-weekgrid hidden xl:grid">
         {dates.map((date) => {
           const key = dateKey(date);
           const activities = activitiesFor(key);

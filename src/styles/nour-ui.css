@@ -1538,3 +1538,42 @@
 .n-topbar-times li[data-next="true"] span {
   color: var(--n-on-dark-muted);
 }
+
+.n-week-item-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.n-week-item-detail {
+  display: block;
+  margin-top: 2px;
+  color: var(--n-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Grille de la semaine : l'heure au-dessus du titre, détail sur 2 lignes au plus. */
+.n-weekgrid .n-week-item-main {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3px;
+}
+
+.n-weekgrid .n-week-item-detail {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Liste du jour (téléphone et tablette) : plus aérée. */
+.n-daypills ~ div .n-week-item-main {
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.n-daypills ~ div .n-week-item-title {
+  font-size: 15px;
+}
