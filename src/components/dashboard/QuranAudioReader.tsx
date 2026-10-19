@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { NourMark } from "@/components/NourMark";
 import {
   saveQuranResumePosition,
   type QuranResumePosition,
 } from "@/components/dashboard/quranPlaybackResume";
-import { BookOpen, Loader2, Repeat2, Volume2 } from "lucide-react";
+import { BookOpen, Loader2, Repeat2, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const API = "https://api.alquran.cloud/v1";
@@ -19,7 +19,7 @@ type Surah = {
   name: string;
   englishName: string;
   numberOfAyahs: number;
-  revelationType?: "meccan" | "medinan";
+  revelationType?: string;
 };
 
 type Reciter = {
@@ -97,6 +97,7 @@ export function QuranAudioReader({
   const [isProgressSaved, setIsProgressSaved] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [surahQuery, setSurahQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pendingResumeRef = useRef<QuranResumePosition | null>(null);
@@ -304,13 +305,41 @@ export function QuranAudioReader({
   const activeAyah = surahData?.ayahs.find(
     (ayah) => ayah.numberInSurah === currentAyah,
   );
-  const shouldShowBasmala =
-    currentAyah === 1 && selectedSurah !== 1 && selectedSurah !== 9 && !!basmala;
-  const rawAyahText = activeAyah?.text.replace(/^\uFEFF/, "").trim() ?? "";
-  const displayAyahText =
-    shouldShowBasmala && rawAyahText.startsWith(basmala)
-      ? rawAyahText.slice(basmala.length).trim()
-      : rawAyahText;
+  const showsBasmala = selectedSurah !== 1 && selectedSurah !== 9 && !!basmala;
+  const jsonVerses = quranJsonData?.sourates[selectedSurah - 1]?.versets;
+  const ayahArabic = (ayah: Ayah) => {
+    const fromJson = jsonVerses?.find(
+      (verse) => verse.position_ds_sourate === ayah.numberInSurah,
+    )?.text_arabe;
+    if (fromJson) return fromJson;
+    const raw = ayah.text.replace(/^\uFEFF/, "").trim();
+    return ayah.numberInSurah === 1 && showsBasmala && raw.startsWith(basmala)
+      ? raw.slice(basmala.length).trim()
+      : raw;
+  };
+  const normalizedQuery = surahQuery
+    .trim()
+    .toLocaleLowerCase("fr")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f'’-]/g, "");
+  const visibleSurahs = normalizedQuery
+    ? surahs.filter(
+        (surah) =>
+          String(surah.number) === normalizedQuery ||
+          surah.englishName
+            .toLocaleLowerCase("en")
+            .replace(/['’-]/g, "")
+            .includes(normalizedQuery) ||
+          surah.name.includes(surahQuery.trim()),
+      )
+    : surahs;
+
+  useEffect(() => {
+    if (!isPlaying) return;
+    document
+      .getElementById(`quran-ayah-${currentAyah}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [currentAyah, isPlaying]);
   const handleEnded = () => {
     if (repeatCount === 0 || repeatNumber < repeatCount) {
       setRepeatNumber((count) => count + 1);
@@ -350,249 +379,273 @@ export function QuranAudioReader({
     }
   };
 
+  const playFromAyah = (ayah: number) => {
+    updateRangeStart(ayah);
+    setRepeatNumber(1);
+    setIsPlaying(true);
+  };
+
   return (
-    <section className="mt-6 rounded-3xl border border-[#DCE5DC] bg-white p-4 sm:p-6">
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-800">
-          <Volume2 className="size-5" />
-        </span>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-700">
-            Écoute & répétition
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-stone-900">
-            Réviser à ton rythme
-          </h2>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <label className="text-xs font-medium text-stone-600">
-          Sourate
-          <select
-            value={selectedSurah}
-            onChange={(event) => {
-              hasInteractedRef.current = true;
-              setSelectedSurah(Number(event.target.value));
-            }}
-            disabled={isLoading || !surahs.length}
-            className="mt-1.5 h-11 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-stone-800"
-          >
-            {surahs.map((surah) => (
-              <option key={surah.number} value={surah.number}>
-                {surah.number}. {surah.englishName} · {surah.name}
-              </option>
-            ))}
-          </select>
+    <div className="n-quran">
+      <aside className="n-card n-quran-aside p-4!" aria-label="Choix de la sourate">
+        <label className="relative block">
+          <span className="sr-only">Rechercher une sourate</span>
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-(--n-muted)"
+            aria-hidden="true"
+          />
+          <input
+            value={surahQuery}
+            onChange={(event) => setSurahQuery(event.target.value)}
+            placeholder="Rechercher une sourate…"
+            className="n-input pl-9!"
+          />
         </label>
-        <label className="text-xs font-medium text-stone-600">
-          Récitateur
-          <select
-            value={selectedReciter}
-            onChange={(event) => setSelectedReciter(event.target.value)}
-            disabled={isLoading || !reciters.length}
-            className="mt-1.5 h-11 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-stone-800"
-          >
-            {reciters.map((reciter) => (
-              <option key={reciter.identifier} value={reciter.identifier}>
-                {reciter.englishName}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        <label className="text-xs font-medium text-stone-600">
-          De la sourate
-          <select
-            value={startAyah}
-            onChange={(event) => updateRangeStart(Number(event.target.value))}
-            disabled={!surahData}
-            className="mt-1.5 h-11 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-stone-800"
-          >
-            {Array.from(
-              { length: selectedSurahData?.numberOfAyahs ?? 0 },
-              (_, index) => index + 1,
-            ).map((ayah) => (
-              <option key={ayah} value={ayah}>
-                Verset {ayah}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-xs font-medium text-stone-600">
-          Jusqu’au verset
-          <select
-            value={endAyah}
-            onChange={(event) => updateRangeEnd(Number(event.target.value))}
-            disabled={!surahData}
-            className="mt-1.5 h-11 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-stone-800"
-          >
-            {Array.from(
-              { length: selectedSurahData?.numberOfAyahs ?? 0 },
-              (_, index) => index + 1,
-            ).map((ayah) => (
-              <option key={ayah} value={ayah}>
-                Verset {ayah}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-xs font-medium text-stone-600">
-          Répéter chaque verset
-          <select
-            value={repeatCount}
-            onChange={(event) => setRepeatCount(Number(event.target.value))}
-            className="mt-1.5 h-11 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-stone-800"
-          >
-            <option value={1}>1 fois</option>
-            <option value={2}>2 fois</option>
-            <option value={3}>3 fois</option>
-            <option value={4}>4 fois</option>
-            <option value={5}>5 fois</option>
-            <option value={0}>En boucle</option>
-          </select>
-        </label>
-      </div>
-
-      {error && (
-        <p
-          role="alert"
-          className="mt-4 rounded-xl bg-mauve-50 p-3 text-sm text-mauve-800"
-        >
-          {error}
-        </p>
-      )}
-      {isLoading && (
-        <p
-          className="mt-4 flex items-center gap-2 text-sm text-stone-500"
-          role="status"
-        >
-          <Loader2 className="size-4 animate-spin" /> Chargement du lecteur…
-        </p>
-      )}
-
-      {activeAyah && !isLoading && (
-        <div className="mt-5 rounded-2xl border border-violet-100 bg-white p-4 sm:p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
-            <span>
-              {selectedSurahData?.englishName} · verset {currentAyah}/{endAyah}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Repeat2 className="size-3.5" />{" "}
-              {repeatCount === 0 ? "Boucle" : `${repeatNumber}/${repeatCount}`}
-            </span>
-          </div>
-          {shouldShowBasmala && (
-            <p
-              lang="ar"
-              dir="rtl"
-              className="quran-verse mt-5 text-center text-2xl leading-loose text-stone-700 sm:text-3xl"
-            >
-              {basmala}
-            </p>
-          )}
-          <p
-            lang="ar"
-            dir="rtl"
-            className="quran-verse mt-5 text-right text-3xl leading-loose text-stone-900 sm:text-4xl"
-          >
-            {quranJsonData?.sourates[selectedSurah-1]?.versets.find(v => v.position_ds_sourate === currentAyah)?.text_arabe ?? displayAyahText}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
-            <label className="inline-flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={showTransliteration}
-                onChange={(event) =>
-                  setShowTransliteration(event.target.checked)
-                }
-              />
-              Phonétique
-            </label>
-            <label className="inline-flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={showTranslation}
-                onChange={(event) => setShowTranslation(event.target.checked)}
-              />
-              Traduction française
-            </label>
-          </div>
-          {showTransliteration && (
-            <p className="mt-2 text-sm text-stone-700">
-              {transliterationData?.ayahs.find((a) => a.numberInSurah === currentAyah)?.text ?? "Phonétique non disponible."}
-            </p>
-          )}
-          {showTranslation && (
-            <p className="mt-2 text-sm text-stone-700">
-              {quranJsonData?.sourates[selectedSurah-1]?.versets.find(v => v.position_ds_sourate === currentAyah)?.text ?? "Traduction non disponible."}
-            </p>
-          )}
-          <p className="mt-2 text-xs text-stone-500">
-            Source : Al Qur'an, {selectedSurahData?.englishName} {selectedSurah} : {currentAyah}
-            {selectedSurahData?.revelationType ? ` (${selectedSurahData.revelationType === "meccan" ? "Mecquoise" : "Médinoise"})` : ""}
-          </p>
-          <audio
-            ref={audioRef}
-            key={`${selectedReciter}-${currentAyah}`}
-            controls
-            preload="none"
-            src={activeAyah.audio}
-            className="mt-4 w-full accent-violet-700"
-            onPlay={() => {
-              hasInteractedRef.current = true;
-              setIsPlaying(true);
-            }}
-            onPause={(event) => {
-              if (!event.currentTarget.ended) setIsPlaying(false);
-            }}
-            onEnded={handleEnded}
-          >
-            Ton navigateur ne peut pas lire cet audio.
-          </audio>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs text-stone-500">
-              {selectedReciterData?.englishName} · répétition par verset
-            </span>
-            <Button
+        <div className="n-surah-list">
+          {visibleSurahs.map((surah) => (
+            <button
+              key={surah.number}
               type="button"
-              variant="outline"
-              disabled={
-                !lastCompletedAyah || isSavingProgress || isProgressSaved
-              }
-              onClick={async () => {
-                const saved = await onSaveProgress({
-                  surah:
-                    selectedSurahData?.englishName ??
-                    `Sourate ${selectedSurah}`,
-                  startAyah,
-                  lastCompletedAyah,
-                  reciter: selectedReciterData?.englishName ?? selectedReciter,
-                });
-                setIsProgressSaved(saved);
+              onClick={() => {
+                hasInteractedRef.current = true;
+                setIsPlaying(false);
+                setSelectedSurah(surah.number);
               }}
-              className="gap-2 border-violet-200 text-violet-800 hover:bg-violet-50"
+              aria-current={surah.number === selectedSurah}
+              className="n-surah-item"
             >
-              {isSavingProgress ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <BookOpen className="size-4" />
-              )}
-              {isSavingProgress
-                ? "Enregistrement…"
-                : isProgressSaved
-                  ? "Progression enregistrée"
-                  : "Enregistrer ma progression"}
-            </Button>
-          </div>
+              <span className="n-surah-num">
+                <NourMark />
+                <span className="relative">{surah.number}</span>
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate font-semibold">{surah.englishName}</span>
+                <span className="block text-[13px] text-(--n-muted)">
+                  {surah.numberOfAyahs} versets
+                </span>
+              </span>
+              <span className="n-surah-name-ar" lang="ar">
+                {surah.name.replace(/^سُورَةُ\s*/, "")}
+              </span>
+            </button>
+          ))}
+          {surahs.length > 0 && visibleSurahs.length === 0 && (
+            <p className="p-2 text-sm text-(--n-muted)">Aucune sourate trouvée.</p>
+          )}
         </div>
-      )}
-      <p className="mt-3 text-[11px] leading-5 text-stone-500">
-        Audio fourni par Al Qur'an Cloud. La répétition et le suivi sont gérés
-        dans Nour.
-      </p>
-    </section>
+      </aside>
+
+      <div className="min-w-0">
+        <div className="n-card n-card-tint flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span className="n-label">
+              Sourate {selectedSurah}
+              {selectedSurahData?.revelationType
+                ? ` · ${selectedSurahData.revelationType.toLowerCase() === "meccan" ? "mecquoise" : "médinoise"}`
+                : ""}
+            </span>
+            <h2 className="n-display mt-2 text-[28px] leading-tight">
+              {selectedSurahData?.englishName ?? "…"}
+            </h2>
+            <p className="text-[15px] text-(--n-muted)">
+              {selectedSurahData ? `${selectedSurahData.numberOfAyahs} versets` : ""}
+            </p>
+          </div>
+          <p className="n-surah-name-ar text-[40px]! leading-none" lang="ar">
+            {selectedSurahData?.name.replace(/^سُورَةُ\s*/, "")}
+          </p>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="n-toggle"
+            aria-pressed={showTransliteration}
+            onClick={() => setShowTransliteration((value) => !value)}
+          >
+            Phonétique
+          </button>
+          <button
+            type="button"
+            className="n-toggle"
+            aria-pressed={showTranslation}
+            onClick={() => setShowTranslation((value) => !value)}
+          >
+            Traduction française
+          </button>
+        </div>
+
+        {error && (
+          <p role="alert" className="n-chip mt-4">
+            {error}
+          </p>
+        )}
+
+        <div className="n-card mt-4 px-3! py-2! sm:px-5!">
+          {isLoading ? (
+            <p className="flex items-center gap-2 p-4 text-[15px] text-(--n-muted)" role="status">
+              <Loader2 className="size-4 animate-spin" /> Chargement de la sourate…
+            </p>
+          ) : (
+            <>
+              {showsBasmala && (
+                <p className="n-arabic py-6 text-center! text-[28px]" lang="ar">
+                  {basmala}
+                </p>
+              )}
+              {surahData?.ayahs.map((ayah) => (
+                <button
+                  key={ayah.numberInSurah}
+                  id={`quran-ayah-${ayah.numberInSurah}`}
+                  type="button"
+                  className="n-ayah"
+                  data-active={ayah.numberInSurah === currentAyah}
+                  onClick={() => playFromAyah(ayah.numberInSurah)}
+                  aria-label={`Écouter à partir du verset ${ayah.numberInSurah}`}
+                >
+                  <span className="n-ayah-arabic block" lang="ar">
+                    {ayahArabic(ayah)}
+                    <span className="n-ayah-num">{ayah.numberInSurah}</span>
+                  </span>
+                  {showTransliteration && (
+                    <span className="n-ayah-translit block">
+                      {transliterationData?.ayahs.find(
+                        (item) => item.numberInSurah === ayah.numberInSurah,
+                      )?.text ?? "Phonétique non disponible."}
+                    </span>
+                  )}
+                  {showTranslation && (
+                    <span className="n-ayah-translation block">
+                      {jsonVerses?.find(
+                        (verse) => verse.position_ds_sourate === ayah.numberInSurah,
+                      )?.text ?? "Traduction non disponible."}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        {activeAyah && !isLoading && (
+          <div className="n-player">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <span className="font-semibold">
+                {selectedSurahData?.englishName} · verset {currentAyah}
+                <span className="font-normal text-(--n-muted)"> / {endAyah}</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-(--n-muted)">
+                <Repeat2 className="size-4" />
+                {repeatCount === 0 ? "En boucle" : `${repeatNumber}/${repeatCount}`}
+              </span>
+            </div>
+            <audio
+              ref={audioRef}
+              key={`${selectedReciter}-${currentAyah}`}
+              controls
+              preload="none"
+              src={activeAyah.audio}
+              className="mt-2 w-full"
+              onPlay={() => {
+                hasInteractedRef.current = true;
+                setIsPlaying(true);
+              }}
+              onPause={(event) => {
+                if (!event.currentTarget.ended) setIsPlaying(false);
+              }}
+              onEnded={handleEnded}
+            >
+              Ton navigateur ne peut pas lire cet audio.
+            </audio>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <details className="text-sm">
+                <summary className="cursor-pointer font-semibold text-(--n-muted)">
+                  Options d’écoute
+                </summary>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Récitateur
+                    <select
+                      value={selectedReciter}
+                      onChange={(event) => setSelectedReciter(event.target.value)}
+                      disabled={!reciters.length}
+                      className="n-select"
+                    >
+                      {reciters.map((reciter) => (
+                        <option key={reciter.identifier} value={reciter.identifier}>
+                          {reciter.englishName}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Jusqu’au verset
+                    <select
+                      value={endAyah}
+                      onChange={(event) => updateRangeEnd(Number(event.target.value))}
+                      disabled={!surahData}
+                      className="n-select"
+                    >
+                      {Array.from(
+                        { length: selectedSurahData?.numberOfAyahs ?? 0 },
+                        (_, index) => index + 1,
+                      ).map((ayah) => (
+                        <option key={ayah} value={ayah}>
+                          Verset {ayah}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Répéter chaque verset
+                    <select
+                      value={repeatCount}
+                      onChange={(event) => setRepeatCount(Number(event.target.value))}
+                      className="n-select"
+                    >
+                      <option value={1}>1 fois</option>
+                      <option value={2}>2 fois</option>
+                      <option value={3}>3 fois</option>
+                      <option value={4}>4 fois</option>
+                      <option value={5}>5 fois</option>
+                      <option value={0}>En boucle</option>
+                    </select>
+                  </label>
+                </div>
+              </details>
+              <button
+                type="button"
+                disabled={!lastCompletedAyah || isSavingProgress || isProgressSaved}
+                onClick={async () => {
+                  const saved = await onSaveProgress({
+                    surah: selectedSurahData?.englishName ?? `Sourate ${selectedSurah}`,
+                    startAyah,
+                    lastCompletedAyah,
+                    reciter: selectedReciterData?.englishName ?? selectedReciter,
+                  });
+                  setIsProgressSaved(saved);
+                }}
+                className="n-btn n-btn-sage px-4! py-2.5! text-sm! disabled:opacity-50"
+              >
+                {isSavingProgress ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <BookOpen className="size-4" />
+                )}
+                {isSavingProgress
+                  ? "Enregistrement…"
+                  : isProgressSaved
+                    ? "Progression enregistrée"
+                    : "Enregistrer ma progression"}
+              </button>
+            </div>
+          </div>
+        )}
+        <p className="mt-3 text-[13px] leading-5 text-(--n-muted)">
+          Texte arabe et audio : Al Qur’an Cloud. Touche un verset pour
+          l’écouter à partir de là.
+        </p>
+      </div>
+    </div>
   );
 }

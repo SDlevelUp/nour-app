@@ -109,23 +109,13 @@ export function QuranJournal({
   };
 
   return (
-    <section
-      id="dashboard-quran"
-      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6"
-    >
-      <div>
+    <section id="dashboard-quran" className="scroll-mt-24 space-y-4">
+      <div className="n-page-head px-1">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            Suivi de lecture
-          </p>
-          <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight">
-            Journal Al-Qur’an
-          </h1>
+          <span className="n-label">Lecture et écoute</span>
+          <h1 className="n-page-title">Coran</h1>
         </div>
       </div>
-      <p className="mt-3 text-base leading-6 text-stone-600">
-        Note les passages lus et reprends ta lecture là où tu l’as laissée.
-      </p>
 
       <QuranAudioReader
         isSavingProgress={isSavingAudioProgress}
@@ -133,9 +123,16 @@ export function QuranJournal({
         resumePosition={resumePosition}
       />
 
+      <details className="n-card">
+        <summary className="cursor-pointer">
+          <span className="n-display text-xl">Noter une lecture</span>
+          <span className="mt-1 block text-[15px] text-(--n-muted)">
+            Pour garder la trace d’un passage lu en dehors du lecteur.
+          </span>
+        </summary>
       <form
         onSubmit={(event) => void saveEntry(event)}
-        className="mt-5 space-y-4 rounded-2xl bg-[#F5F2EE] p-4"
+        className="mt-5 space-y-4"
       >
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_160px_120px]">
           <label className="text-base font-medium text-stone-700">
@@ -209,11 +206,10 @@ export function QuranJournal({
           </Button>
         </div>
       </form>
+      </details>
 
-      <div className="mt-6">
-        <h2 className="text-base font-semibold text-stone-800">
-          Lectures récentes
-        </h2>
+      <div className="n-card">
+        <h2 className="n-display text-xl">Lectures récentes</h2>
         {entries === undefined ? (
           <p className="mt-3 text-base text-stone-500">
             Chargement du journal…
