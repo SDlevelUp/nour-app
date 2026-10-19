@@ -169,6 +169,10 @@ export default function Dashboard() {
   const isAnonymousUser = user?.isAnonymous === true;
   const prayer = usePrayerTimes();
   const [activeView, setActiveView] = useState<DashboardView>("overview");
+  // Le lecteur du Coran reste monté après la première visite : l'écoute
+  // continue pendant la navigation, dans une mini-fenêtre.
+  const [hasOpenedQuran, setHasOpenedQuran] = useState(false);
+  if (activeView === "quran" && !hasOpenedQuran) setHasOpenedQuran(true);
   const [isExcusePeriod, setIsExcusePeriod] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() =>
     readStored("nour-sidebar-collapsed", false),
@@ -310,6 +314,10 @@ export default function Dashboard() {
         note.completed !== true &&
         note.archived !== true,
     )
+    .slice(0, 3);
+  const recentNotes = (personalNotes ?? [])
+    .filter((note) => note.archived !== true && note.isTask !== true)
+    .sort((a, b) => Number(b.urgent === true) - Number(a.urgent === true))
     .slice(0, 3);
   const selectedEntry = records.find((entry) => entry.date === selectedDayKey);
   const noteDraft = noteDrafts[selectedDayKey] ?? selectedEntry?.note ?? "";
@@ -1111,6 +1119,16 @@ export default function Dashboard() {
                         label: task.title || task.content.split("\n")[0],
                         completed: task.completed === true,
                       }))}
+                      notes={recentNotes.map((note) => ({
+                        id: note._id,
+                        title: note.title,
+                        content: note.content,
+                        urgent: note.urgent === true,
+                        cardClass:
+                          stickyNoteColors.find(
+                            (color) => color.value === (note.color ?? "yellow"),
+                          )?.card ?? "note-color-yellow",
+                      }))}
                       pendingTaskId={pendingNoteAction}
                       onToggleTask={(id, completed) =>
                         void updatePersonalTaskCompletion(
@@ -1136,9 +1154,6 @@ export default function Dashboard() {
                     />
                   )}
 
-                  {activeView === "quran" && (
-                    <QuranJournal resumePosition={quranResumeRequest} />
-                  )}
 
                   {activeView === "science" && <ScienceJournal />}
 
@@ -1369,6 +1384,14 @@ export default function Dashboard() {
                     </div>
                   )}
                 </>
+              )}
+
+              {hasOpenedQuran && (
+                <QuranJournal
+                  resumePosition={quranResumeRequest}
+                  isActive={activeView === "quran"}
+                  onOpen={() => navigateToView("quran")}
+                />
               )}
 
               {activeView === "periods" && (

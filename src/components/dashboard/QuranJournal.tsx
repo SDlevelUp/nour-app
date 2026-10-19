@@ -18,8 +18,12 @@ function todayKey() {
 
 export function QuranJournal({
   resumePosition = null,
+  isActive = true,
+  onOpen,
 }: {
   resumePosition?: QuranResumePosition | null;
+  isActive?: boolean;
+  onOpen?: () => void;
 }) {
   const entries = useQuery(api.quranProgress.list, {});
   const addEntry = useMutation(api.quranProgress.add);
@@ -110,7 +114,7 @@ export function QuranJournal({
 
   return (
     <section id="dashboard-quran" className="scroll-mt-24 space-y-4">
-      <div className="n-page-head px-1">
+      <div className="n-page-head px-1" hidden={!isActive}>
         <div>
           <span className="n-label">Lecture et écoute</span>
           <h1 className="n-page-title">Coran</h1>
@@ -121,9 +125,11 @@ export function QuranJournal({
         isSavingProgress={isSavingAudioProgress}
         onSaveProgress={saveAudioProgress}
         resumePosition={resumePosition}
+        isActive={isActive}
+        onOpen={onOpen}
       />
 
-      <details className="n-card">
+      <details className="n-card" hidden={!isActive}>
         <summary className="cursor-pointer">
           <span className="n-display text-xl">Noter une lecture</span>
           <span className="mt-1 block text-[15px] text-(--n-muted)">
@@ -208,7 +214,7 @@ export function QuranJournal({
       </form>
       </details>
 
-      <div className="n-card">
+      <div className="n-card" hidden={!isActive}>
         <h2 className="n-display text-xl">Lectures récentes</h2>
         {entries === undefined ? (
           <p className="mt-3 text-base text-stone-500">

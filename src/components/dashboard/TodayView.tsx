@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import type { AdhkarInvocation, AdhkarSession } from "@/convex/adhkarData";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
 
-type TodayModule = "adhkar" | "quran" | "cycle" | "tasks";
+type TodayModule = "adhkar" | "quran" | "cycle" | "notes" | "tasks";
 
 const moduleLabels: Record<TodayModule, string> = {
   adhkar: "Adhkar du moment",
   quran: "Reprendre la lecture",
   cycle: "Cycle",
+  notes: "Mes notes",
   tasks: "Tâches du jour",
 };
 
@@ -18,6 +19,7 @@ const defaultModules: Record<TodayModule, boolean> = {
   adhkar: true,
   quran: true,
   cycle: true,
+  notes: true,
   tasks: false,
 };
 
@@ -33,6 +35,7 @@ function readModules(): Record<TodayModule, boolean> {
       adhkar: typeof value.adhkar === "boolean" ? value.adhkar : defaultModules.adhkar,
       quran: typeof value.quran === "boolean" ? value.quran : defaultModules.quran,
       cycle: typeof value.cycle === "boolean" ? value.cycle : defaultModules.cycle,
+      notes: typeof value.notes === "boolean" ? value.notes : defaultModules.notes,
       tasks: typeof value.tasks === "boolean" ? value.tasks : defaultModules.tasks,
     };
   } catch {
@@ -121,6 +124,7 @@ type TodayViewProps = {
     periodDates: Set<string>;
   };
   tasks: { id: string; label: string; completed: boolean }[];
+  notes: { id: string; title?: string; content: string; cardClass: string; urgent: boolean }[];
   pendingTaskId: string | null;
   onToggleTask: (id: string, completed: boolean) => void;
   onOpenAdhkar: (session: AdhkarSession) => void;
@@ -138,6 +142,7 @@ export function TodayView({
   quran,
   cycle,
   tasks,
+  notes,
   pendingTaskId,
   onToggleTask,
   onOpenAdhkar,
@@ -406,6 +411,38 @@ export function TodayView({
                 Ouvrir le suivi
               </button>
             </div>
+          </article>
+        )}
+
+        {modules.notes && (
+          <article className="n-card n-rise lg:col-span-6" aria-label="Mes notes">
+            <div className="flex items-center justify-between gap-3">
+              <span className="n-label">Mes notes</span>
+              <button type="button" onClick={onOpenNotes} className="n-link text-sm">
+                {notes.length > 0 ? "Toutes les notes" : "Écrire une note"}
+              </button>
+            </div>
+            {notes.length > 0 ? (
+              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+                {notes.map((note) => (
+                  <li key={note.id}>
+                    <button
+                      type="button"
+                      onClick={onOpenNotes}
+                      className={`n-note ${note.cardClass}`}
+                    >
+                      {note.urgent && <span className="n-chip mb-2 text-xs!">Important</span>}
+                      {note.title && <strong className="block truncate text-[16px]">{note.title}</strong>}
+                      <span className="mt-1 line-clamp-3 block text-[14px]">{note.content}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-[15px] text-(--n-muted)">
+                Aucune note pour l’instant.
+              </p>
+            )}
           </article>
         )}
 

@@ -3,7 +3,17 @@ import {
   saveQuranResumePosition,
   type QuranResumePosition,
 } from "@/components/dashboard/quranPlaybackResume";
-import { BookOpen, Loader2, Repeat2, Search } from "lucide-react";
+import {
+  BookOpen,
+  Loader2,
+  Pause,
+  Play,
+  Repeat2,
+  Search,
+  SkipBack,
+  SkipForward,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const API = "https://api.alquran.cloud/v1";
@@ -73,10 +83,16 @@ export function QuranAudioReader({
   isSavingProgress,
   onSaveProgress,
   resumePosition = null,
+  isActive = true,
+  onOpen,
 }: {
   isSavingProgress: boolean;
   onSaveProgress: (progress: QuranPlaybackProgress) => Promise<boolean>;
   resumePosition?: QuranResumePosition | null;
+  // Faux quand on est sur une autre page : le lecteur reste monté pour que
+  // l'écoute continue, et seule la mini-fenêtre est affichée.
+  isActive?: boolean;
+  onOpen?: () => void;
 }) {
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [reciters, setReciters] = useState<Reciter[]>([]);
@@ -96,6 +112,7 @@ export function QuranAudioReader({
   const [lastCompletedAyah, setLastCompletedAyah] = useState(0);
   const [isProgressSaved, setIsProgressSaved] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [surahQuery, setSurahQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -335,11 +352,11 @@ export function QuranAudioReader({
     : surahs;
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || !isActive) return;
     document
       .getElementById(`quran-ayah-${currentAyah}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [currentAyah, isPlaying]);
+  }, [currentAyah, isActive, isPlaying]);
   const handleEnded = () => {
     if (repeatCount === 0 || repeatNumber < repeatCount) {
       setRepeatNumber((count) => count + 1);
@@ -379,6 +396,31 @@ export function QuranAudioReader({
     }
   };
 
+  const goToAyah = (ayah: number) => {
+    const total = surahData?.numberOfAyahs ?? 1;
+    const target = Math.min(Math.max(ayah, 1), total);
+    hasInteractedRef.current = true;
+    setRepeatNumber(1);
+    setCurrentAyah(target);
+    if (target > endAyah) setEndAyah(target);
+    if (target < startAyah) setStartAyah(target);
+  };
+
+  const togglePlayback = () => {
+    if (isPlaying) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+    } else {
+      setIsPlaying(true);
+    }
+  };
+
+  const stopPlayback = () => {
+    audioRef.current?.pause();
+    setIsPlaying(false);
+    setHasStarted(false);
+  };
+
   const playFromAyah = (ayah: number) => {
     updateRangeStart(ayah);
     setRepeatNumber(1);
@@ -386,7 +428,8 @@ export function QuranAudioReader({
   };
 
   return (
-    <div className="n-quran">
+    <>
+    <div className="n-quran" hidden={!isActive}>
       <aside className="n-card n-quran-aside p-4!" aria-label="Choix de la sourate">
         <label className="relative block">
           <span className="sr-only">Rechercher une sourate</span>
@@ -548,6 +591,7 @@ export function QuranAudioReader({
               className="mt-2 w-full"
               onPlay={() => {
                 hasInteractedRef.current = true;
+                setHasStarted(true);
                 setIsPlaying(true);
               }}
               onPause={(event) => {
@@ -647,5 +691,68 @@ export function QuranAudioReader({
         </p>
       </div>
     </div>
+
+    {!isActive && hasStarted && activeAyah && (
+      <div className="n-mini-player" role="region" aria-label="Lecture du Coran en cours">
+        <button type="button" className="n-mini-info" onClick={onOpen}>
+          <span className="n-surah-num">
+            <NourMark />
+            <span className="relative">{selectedSurah}</span>
+          </span>
+          <span className="min-w-0 text-left">
+            <span className="block truncate font-semibold">
+              {selectedSurahData?.englishName}
+            </span>
+            <span className="block text-[13px] text-(--n-muted)">
+              Verset {currentAyah} / {surahData?.numberOfAyahs}
+            </span>
+          </span>
+        </button>
+        <div className="flex shrink-0 items-center">
+          <button
+            type="button"
+            className="n-icon-btn"
+            onClick={() => goToAyah(currentAyah - 1)}
+            disabled={currentAyah <= 1}
+            aria-label="Verset précédent"
+          >
+            <SkipBack className="size-4" />
+          </button>
+          <button
+            type="button"
+            className="n-mini-play"
+            onClick={togglePlayback}
+            aria-label={isPlaying ? "Pause" : "Reprendre la lecture"}
+          >
+            {isPlaying ? <Pause className="size-5" /> : <Play className="size-5" />}
+          </button>
+          <button
+            type="button"
+            className="n-icon-btn"
+            onClick={() => goToAyah(currentAyah + 1)}
+            disabled={currentAyah >= (surahData?.numberOfAyahs ?? 1)}
+            aria-label="Verset suivant"
+          >
+            <SkipForward className="size-4" />
+          </button>
+          <button
+            type="button"
+            className="n-icon-btn"
+            onClick={stopPlayback}
+            aria-label="Arrêter et fermer le lecteur"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+        <span className="n-mini-progress" aria-hidden="true">
+          <span
+            style={{
+              width: `${(currentAyah / (surahData?.numberOfAyahs ?? 1)) * 100}%`,
+            }}
+          />
+        </span>
+      </div>
+    )}
+    </>
   );
 }
