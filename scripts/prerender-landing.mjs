@@ -13,6 +13,10 @@ const vite = await createServer({
   configLoader: "runner",
   server: { middlewareMode: true },
   appType: "custom",
+  // Le pré-rendu n'a pas besoin du pré-bundling : sans ça, l'analyse des
+  // dépendances tourne encore à la fermeture du serveur et inonde les logs
+  // Vercel d'avertissements « Request is outdated ».
+  optimizeDeps: { noDiscovery: true, include: [] },
 });
 
 try {
