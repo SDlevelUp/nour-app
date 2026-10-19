@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nour · Aujourd'hui (maquette)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Sora:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;600&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EA;
+    --paper: #FBF9F4;
+    --line: #E3DED2;
+    --ink: #1F2A22;
+    --muted: #6B7468;
+    --sage: #5D7C65;
+    --sage-dark: #3F5A47;
+    --sage-tint: #E6ECE3;
+    --mauve: #8E7A9B;
+    --mauve-tint: #EEE8F1;
+    --r-sm: 10px;
+    --r-lg: 22px;
+    --display: "Sora", "Urbanist", system-ui, sans-serif;
+    --text: "Urbanist", system-ui, sans-serif;
+    --arabic: "Amiri", "Noto Naskh Arabic", serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font: 16px/1.5 var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .demo-banner {
+    background: var(--ink); color: var(--cream);
+    font-size: 13px; text-align: center; padding: 6px 16px;
+  }
+
+  /* ---------- Layout ---------- */
+  .app { display: grid; grid-template-columns: 248px 1fr; min-height: calc(100vh - 31px); }
+  .sidebar {
+    border-right: 1px solid var(--line);
+    padding: 28px 18px; display: flex; flex-direction: column; gap: 28px;
+    position: sticky; top: 0; height: calc(100vh - 31px);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px; }
+  .brand-mark { width: 30px; height: 30px; color: var(--sage); }
+  .brand-name { font: 600 24px/1 var(--display); letter-spacing: -.01em; }
+  .nav-group h2 {
+    font: 600 11px/1 var(--text); letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); padding: 0 10px 10px;
+  }
+  .nav-group a {
+    display: flex; align-items: center; gap: 11px; padding: 9px 10px;
+    border-radius: var(--r-sm); color: var(--ink); text-decoration: none; font-weight: 500;
+  }
+  .nav-group a:hover { background: var(--sage-tint); }
+  .nav-group a[aria-current="page"] { background: var(--ink); color: var(--cream); }
+  .nav-group svg { width: 18px; height: 18px; flex: none; }
+  .sidebar-foot { margin-top: auto; font-size: 13px; color: var(--muted); padding: 0 10px; }
+
+  main { padding: 40px clamp(16px, 4vw, 56px) 120px; max-width: 1180px; }
+
+  /* ---------- Header ---------- */
+  .greeting { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; }
+  .greeting h1 { font: 600 clamp(34px, 5vw, 52px)/1.05 var(--display); letter-spacing: -.02em; }
+  .greeting h1 em { font-style: normal; color: var(--sage); }
+  .dates { text-align: right; color: var(--muted); font-size: 15px; }
+  .dates strong { display: block; color: var(--ink); font-weight: 600; font-size: 17px; }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    margin-top: 36px; display: grid; gap: 18px;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .grid > * { min-width: 0; }
+  .card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 24px; position: relative; overflow: hidden;
+  }
+  .label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 600 11px/1 var(--text); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+  .label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Prayer */
+  .prayer { grid-column: span 6; padding: 30px 32px 28px; background: var(--sage-dark); color: var(--cream); border: 0; }
+  .prayer .label { color: #C9D6CB; }
+  .prayer-pattern { position: absolute; inset: 0 0 0 auto; width: 46%; color: #fff; opacity: .07; pointer-events: none; }
+  .prayer-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative; }
+  .prayer-name { font: 600 30px/1 var(--display); margin-top: 14px; }
+  .prayer-time { font: 500 clamp(64px, 10vw, 104px)/.9 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .prayer-left { font-size: 17px; color: #DCE5DD; }
+  .prayer-left b { color: #fff; font-weight: 600; }
+
+  .timeline { margin-top: 34px; position: relative; padding-top: 18px; }
+  .track { position: absolute; top: 23px; left: 8px; right: 8px; height: 2px; background: rgba(255,255,255,.18); }
+  .track span { position: absolute; inset: 0 auto 0 0; width: 74%; background: #C9D6CB; }
+  .stops { display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+  .stop { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+  .stop:nth-child(n+2) { align-items: center; text-align: center; }
+  .stop:last-child { align-items: end; text-align: right; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--sage-dark); border: 2px solid #C9D6CB; }
+  .stop.done .dot { background: #C9D6CB; }
+  .stop.next .dot { background: var(--cream); border-color: var(--cream); box-shadow: 0 0 0 5px rgba(245,242,234,.18); }
+  .stop .t { font-variant-numeric: tabular-nums; color: #C9D6CB; }
+  .stop.next { font-weight: 600; }
+  .stop.next .t { color: #fff; }
+
+  /* Adhkar */
+  .adhkar { grid-column: span 4; display: flex; flex-direction: column; gap: 18px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .chip { font-size: 13px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--mauve-tint); color: #5E4D6A; }
+  .arabic { font: 400 clamp(24px, 3vw, 32px)/2 var(--arabic); direction: rtl; text-align: right; color: var(--ink); }
+  .translit { font-style: italic; color: var(--muted); font-size: 15px; }
+  .meaning { font-size: 16px; }
+  .proof {
+    display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--muted);
+    border-top: 1px solid var(--line); padding-top: 14px;
+  }
+  .proof b { color: var(--ink); font-weight: 600; }
+  .reps { display: flex; gap: 6px; }
+  .reps i { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+  .reps i.on { background: var(--mauve); }
+  .btn {
+    font: 600 15px/1 var(--text); border: 0; border-radius: 999px; padding: 13px 20px; cursor: pointer;
+    background: var(--ink); color: var(--cream);
+  }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+
+  /* Quran */
+  .quran { grid-column: span 2; display: flex; flex-direction: column; gap: 14px; background: var(--sage-tint); border-color: transparent; }
+  .surah-ar { font: 700 44px/1.3 var(--arabic); color: var(--sage-dark); direction: rtl; }
+  .surah-fr { font: 600 26px/1.1 var(--display); }
+  .quran .meta { color: var(--muted); font-size: 15px; }
+  .quran .btn { margin-top: auto; align-self: start; background: var(--sage-dark); }
+  .bar { height: 4px; background: rgba(63,90,71,.15); border-radius: 2px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 41%; background: var(--sage); }
+
+  /* Cycle */
+  .cycle { grid-column: span 6; display: grid; grid-template-columns: 1fr auto; gap: 18px 28px; align-items: center; }
+  .cycle h3 { font: 600 26px/1.1 var(--display); margin-top: 10px; }
+  .cycle p { color: var(--muted); font-size: 15px; margin-top: 4px; }
+  .week { display: flex; gap: 8px; }
+  .day {
+    width: 54px; padding: 10px 0; border-radius: 14px; text-align: center; border: 1px solid var(--line);
+    font-size: 12px; color: var(--muted); background: var(--cream);
+  }
+  .day b { display: block; font: 600 22px/1.2 var(--display); color: var(--ink); }
+  .day.period { background: var(--mauve-tint); border-color: transparent; color: #5E4D6A; }
+  .day.today { background: var(--ink); border-color: var(--ink); color: var(--cream); }
+  .day.today b { color: var(--cream); }
+  .privacy { grid-column: 1 / -1; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .privacy svg { width: 15px; height: 15px; }
+
+  .add-module {
+    grid-column: span 6; border: 1px dashed var(--line); border-radius: var(--r-lg); background: transparent;
+    padding: 18px; font: 500 15px var(--text); color: var(--muted); cursor: pointer;
+  }
+
+  /* ---------- Mobile tab bar ---------- */
+  .tabbar { display: none; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    main { padding: 28px 16px 130px; }
+    .dates { text-align: left; }
+    .grid { grid-template-columns: 1fr; gap: 14px; margin-top: 26px; }
+    .prayer, .adhkar, .quran, .cycle, .add-module { grid-column: auto; }
+    .prayer { padding: 24px 20px; }
+    .prayer-pattern { width: 80%; }
+    .stop { font-size: 12px; }
+    .cycle { grid-template-columns: 1fr; }
+    .week { overflow-x: auto; }
+    .day { width: 44px; flex: none; }
+    .tabbar {
+      display: flex; position: fixed; left: 12px; right: 12px; bottom: 14px; z-index: 5;
+      background: var(--ink); border-radius: 999px; padding: 6px; gap: 2px;
+      box-shadow: 0 10px 30px rgba(31,42,34,.25);
+    }
+    .tabbar a {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+      height: 48px; border-radius: 999px; color: #AEB8AD; text-decoration: none; font-weight: 600; font-size: 14px;
+    }
+    .tabbar a span { display: none; }
+    .tabbar a[aria-current="page"] { flex: 2.4; background: var(--cream); color: var(--ink); }
+    .tabbar a[aria-current="page"] span { display: inline; }
+    .tabbar svg { width: 20px; height: 20px; }
+  }
+
+  /* ---------- Load motion ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .greeting, .grid > * { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+    .grid > :nth-child(1) { animation-delay: .08s; }
+    .grid > :nth-child(2) { animation-delay: .16s; }
+    .grid > :nth-child(3) { animation-delay: .24s; }
+    .grid > :nth-child(4) { animation-delay: .32s; }
+    .grid > :nth-child(5) { animation-delay: .40s; }
+    .track span { animation: grow 1.2s .5s cubic-bezier(.2,.7,.2,1) both; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+  @keyframes grow { from { width: 0; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Étoile à 8 branches (khatam) : deux carrés superposés, en traits -->
+    <symbol id="star" viewBox="0 0 40 40">
+      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(45 20 20)"/>
+    </symbol>
+    <pattern id="khatam" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="8" y="8" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(45 20 20)"/>
+      <circle cx="0" cy="0" r="2.5" fill="none" stroke="currentColor"/>
+      <circle cx="40" cy="40" r="2.5" fill="none" stroke="currentColor"/>
+    </pattern>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2zM12 6v14"/></symbol>
+    <symbol id="i-beads" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="9" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/><path d="M12 18v4" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h4" stroke-linecap="round"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke-linecap="round"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l8-8" stroke-linecap="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  </defs>
+</svg>
+
+<div class="demo-banner">Maquette : horaires, dates et progression sont des données d'exemple.</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-mark"><use href="#star"/></svg>
+      <span class="brand-name">Nour</span>
+    </div>
+    <nav class="nav-group" aria-label="Au quotidien">
+      <h2>Au quotidien</h2>
+      <a href="#" aria-current="page"><svg><use href="#i-sun"/></svg>Aujourd'hui</a>
+      <a href="#"><svg><use href="#i-book"/></svg>Coran</a>
+      <a href="#"><svg><use href="#i-beads"/></svg>Adhkar</a>
+      <a href="#"><svg><use href="#i-moon"/></svg>Cycle</a>
+    </nav>
+    <nav class="nav-group" aria-label="Approfondir">
+      <h2>Approfondir</h2>
+      <a href="#"><svg><use href="#i-cap"/></svg>Science bénéfique</a>
+      <a href="#"><svg><use href="#i-cal"/></svg>Planning</a>
+      <a href="#"><svg><use href="#i-note"/></svg>Notes</a>
+    </nav>
+    <nav class="nav-group" aria-label="Autres">
+      <h2>Autres</h2>
+      <a href="#"><svg><use href="#i-gear"/></svg>Réglages</a>
+      <a href="#"><svg><use href="#i-leaf"/></svg>Notre démarche</a>
+    </nav>
+    <p class="sidebar-foot">Sans publicité. Sources visibles pour chaque contenu.</p>
+  </aside>
+
+  <main>
+    <header class="greeting">
+      <h1>As-salâmu ʿalayki,<br><em>à ton rythme.</em></h1>
+      <p class="dates"><strong>Lundi 19 octobre</strong>[date hégirienne]</p>
+    </header>
+
+    <section class="grid">
+      <!-- Prochaine prière -->
+      <article class="card prayer" aria-label="Prochaine prière">
+        <svg class="prayer-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#khatam)"/></svg>
+        <div class="prayer-head">
+          <div>
+            <span class="label">Prochaine prière</span>
+            <p class="prayer-name">Maghrib</p>
+          </div>
+          <p class="prayer-left">dans <b>1 h 12</b></p>
+        </div>
+        <p class="prayer-time">18:52</p>
+        <div class="timeline">
+          <div class="track"><span></span></div>
+          <ol class="stops" style="list-style:none;padding:0">
+            <li class="stop done"><i class="dot"></i>Fajr<span class="t">06:31</span></li>
+            <li class="stop done"><i class="dot"></i>Dhuhr<span class="t">13:43</span></li>
+            <li class="stop done"><i class="dot"></i>Asr<span class="t">16:31</span></li>
+            <li class="stop next"><i class="dot"></i>Maghrib<span class="t">18:52</span></li>
+            <li class="stop"><i class="dot"></i>Isha<span class="t">20:24</span></li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- Adhkar du soir -->
+      <article class="card adhkar" aria-label="Adhkar du soir">
+        <div class="row">
+          <span class="label">Adhkar du soir</span>
+          <span class="chip">1 sur 3</span>
+        </div>
+        <p class="arabic">بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ</p>
+        <p class="translit">Bismillahi alladhi la yadurru ma'a ismihi shay'un fil-ardi wa la fis-sama'i wa huwa as-sami'u al-'alim</p>
+        <p class="meaning">Au nom d’Allah, avec le nom de qui rien ne peut nuire sur terre ni dans le ciel. Il est Celui qui entend tout et sait tout.</p>
+        <div class="row">
+          <div class="reps" aria-label="1 répétition sur 3"><i class="on"></i><i></i><i></i></div>
+          <button class="btn">Je l'ai dit</button>
+        </div>
+        <p class="proof"><b>Abû Dâwud 5088</b> sahih (al-Albânî) · <b>at-Tirmidhî 3388</b> hasan sahih</p>
+      </article>
+
+      <!-- Coran -->
+      <article class="card quran" aria-label="Lecture du Coran">
+        <span class="label">Reprendre la lecture</span>
+        <p class="surah-ar">الكهف</p>
+        <p class="surah-fr">Al-Kahf</p>
+        <p class="meta">Verset 46 sur 110</p>
+        <div class="bar" aria-hidden="true"><span></span></div>
+        <button class="btn">Continuer</button>
+      </article>
+
+      <!-- Cycle -->
+      <article class="card cycle" aria-label="Suivi du cycle">
+        <div>
+          <span class="label" style="color:var(--mauve)">Cycle</span>
+          <h3>Jour 3 · prière et jeûne en pause</h3>
+          <p>Les jeûnes manqués s'ajoutent à ton qada. Rien à rattraper pour la prière.</p>
+        </div>
+        <div class="week" aria-label="Semaine">
+          <div class="day period">sam<b>17</b></div>
+          <div class="day period">dim<b>18</b></div>
+          <div class="day today">lun<b>19</b></div>
+          <div class="day">mar<b>20</b></div>
+          <div class="day">mer<b>21</b></div>
+          <div class="day">jeu<b>22</b></div>
+          <div class="day">ven<b>23</b></div>
+        </div>
+        <p class="privacy"><svg><use href="#i-lock"/></svg>Tes données de cycle sont enregistrées dans ton compte, pour les retrouver sur tous tes appareils.</p>
+      </article>
+
+      <button class="add-module">+ Ajouter un module à cet écran</button>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Navigation principale">
+  <a href="#" aria-current="page"><svg><use href="#i-sun"/></svg><span>Aujourd'hui</span></a>
+  <a href="#" aria-label="Coran"><svg><use href="#i-book"/></svg><span>Coran</span></a>
+  <a href="#" aria-label="Adhkar"><svg><use href="#i-beads"/></svg><span>Adhkar</span></a>
+  <a href="#" aria-label="Cycle"><svg><use href="#i-moon"/></svg><span>Cycle</span></a>
+  <a href="#" aria-label="Plus"><svg><use href="#i-grid"/></svg><span>Plus</span></a>
+</nav>
+
+</body>
+</html>
