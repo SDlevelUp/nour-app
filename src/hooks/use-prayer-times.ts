@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 
 const storageKey = "nour-prayer-preferences";
 
-// Méthode imposée (décision du 2026-10-19) : Ligue islamique mondiale (MWL),
-// Fajr à 18° et Isha à 17° sous l'horizon (paramètres AlAdhan, méthode 3).
-// Quand le soleil ne descend pas assez en été, AlAdhan applique la règle
-// « angle based » (latitudeAdjustmentMethod=3), fixée ici explicitement.
+// Réglages imposés (décision du 2026-10-19) : ceux de la mosquée Al-Houda
+// d'Antony sur Mawaqit, Fajr et Isha à 15° sous l'horizon et Maghrib 4 minutes
+// après le coucher du soleil (AlAdhan : méthode personnalisée 99). Quand le
+// soleil ne descend pas assez, AlAdhan applique la règle « angle based »
+// (latitudeAdjustmentMethod=3), fixée ici explicitement.
 export const prayerCalculation = {
-  method: 3,
+  method: 99,
   latitudeAdjustmentMethod: 3,
-  label: "Ligue islamique mondiale (MWL)",
-  fajrAngle: 18,
-  ishaAngle: 17,
+  label: "Fajr et Isha à 15°, Maghrib + 4 min",
+  referenceMosque: "mosquée Al-Houda d’Antony (Mawaqit)",
+  fajrAngle: 15,
+  ishaAngle: 15,
+  maghribOffsetMinutes: 4,
 } as const;
 
 type Coordinates = {
@@ -141,6 +144,9 @@ export function usePrayerTimes() {
       latitude: String(coordinates.latitude),
       longitude: String(coordinates.longitude),
       method: String(prayerCalculation.method),
+      methodSettings: `${prayerCalculation.fajrAngle},null,${prayerCalculation.ishaAngle}`,
+      // Ordre AlAdhan : Imsak, Fajr, Sunrise, Dhuhr, Asr, Maghrib, Sunset, Isha, Midnight.
+      tune: `0,0,0,0,0,${prayerCalculation.maghribOffsetMinutes},0,0,0`,
       latitudeAdjustmentMethod: String(
         prayerCalculation.latitudeAdjustmentMethod,
       ),

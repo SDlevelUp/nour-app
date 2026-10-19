@@ -2393,7 +2393,9 @@ export default function Dashboard() {
                         <p className="mt-1 text-stone-600">
                           Fajr quand le soleil est à{" "}
                           {prayerCalculation.fajrAngle}° sous l’horizon, Isha
-                          à {prayerCalculation.ishaAngle}°. La même méthode
+                          à {prayerCalculation.ishaAngle}°, Maghrib{" "}
+                          {prayerCalculation.maghribOffsetMinutes} minutes
+                          après le coucher du soleil. La même méthode
                           s’applique à tout le monde dans Nour.
                         </p>
                         <details className="mt-2">
@@ -2402,23 +2404,22 @@ export default function Dashboard() {
                           </summary>
                           <div className="mt-2 space-y-2 text-stone-600">
                             <p>
-                              En astronomie, l’aube commence quand le soleil
-                              est à {prayerCalculation.fajrAngle}° sous
-                              l’horizon : c’est le début du crépuscule
-                              astronomique, la première lueur du jour.
+                              Ce sont les réglages de la{" "}
+                              {prayerCalculation.referenceMosque}. Les
+                              horaires de Nour correspondent donc à ceux
+                              affichés par cette mosquée.
                             </p>
                             <p>
-                              Certains calendriers utilisés en France, comme
-                              celui de l’UOIF, retiennent 12° pour Fajr et pour
-                              Isha. À 12°, le ciel est déjà nettement éclairé :
-                              Fajr tombe plus tard et Isha plus tôt.
+                              Chaque mosquée choisit ses propres angles et
+                              ajoute parfois quelques minutes de précaution.
+                              Si ta mosquée utilise d’autres réglages, un écart
+                              de quelques minutes est possible : en cas de
+                              doute, suis ta mosquée.
                             </p>
                             <p>
-                              En été, dans le nord de la France, le soleil ne
-                              descend pas toujours jusqu’à{" "}
-                              {prayerCalculation.fajrAngle}°. Le calcul applique
-                              alors une règle d’ajustement, et Isha peut tomber
-                              après minuit.
+                              Aux latitudes élevées, quand le soleil ne descend
+                              pas assez sous l’horizon, le calcul applique une
+                              règle d’ajustement.
                             </p>
                           </div>
                         </details>

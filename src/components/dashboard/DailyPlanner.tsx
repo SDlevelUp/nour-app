@@ -245,7 +245,7 @@ export function DailyPlanner({
         <>
           <p className="mt-3 text-sm text-(--n-muted)">
             {prayerTimes
-              ? "Les horaires de prière sont calculés selon ta position (méthode de la Ligue islamique mondiale)."
+              ? "Les horaires de prière sont calculés selon ta position (méthode expliquée dans Réglages)."
               : "Configure ta position dans Réglages pour afficher les horaires de prière locaux."}
           </p>
 
