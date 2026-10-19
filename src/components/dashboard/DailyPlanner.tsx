@@ -1,4 +1,5 @@
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { X } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
@@ -12,6 +13,7 @@ import {
 import { WeeklyPlanner } from "./WeeklyPlanner";
 
 type PlannerEvent = {
+  id?: string;
   time: string;
   displayTime?: string;
   title: string;
@@ -94,6 +96,12 @@ export function DailyPlanner({
   const [isAddingActivity, setIsAddingActivity] = useState(false);
   const [newActivityTitle, setNewActivityTitle] = useState("");
   const [newActivityTime, setNewActivityTime] = useState("12:00");
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const journalActivities = [
     ...(quranSessions ?? []).map((session) => ({
       id: `quran-session-${session._id}`,
@@ -118,11 +126,11 @@ export function DailyPlanner({
   const visiblePlannerEvents = isExcusePeriod
     ? plannerEvents.filter((event) => event.kind !== "prayer")
     : plannerEvents;
-  const eventHours = [
-    ...new Set(
-      visiblePlannerEvents.map((event) => Number(event.time.slice(0, 2))),
-    ),
-  ];
+  const toMinutes = (time: string) =>
+    Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+  const nextEventIndex = visiblePlannerEvents.findIndex(
+    (event) => toMinutes(event.time) > nowMinutes,
+  );
 
   const updateTodayActivities = useCallback(
     (nextActivities: PlannerActivity[]) => {
@@ -131,6 +139,10 @@ export function DailyPlanner({
     },
     [today],
   );
+
+  const removeTodayActivity = (id: string) => {
+    updateTodayActivities(activities.filter((activity) => activity.id !== id));
+  };
 
   const addTodayActivity = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -153,71 +165,53 @@ export function DailyPlanner({
   };
 
   return (
-    <section
-      id="dashboard-salah"
-      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-4 sm:p-6"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section id="dashboard-salah" className="n-card scroll-mt-24">
+      <div className="n-page-head">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            {titleOverride ??
-              (view === "day" ? "Planning du jour" : "Vue hebdomadaire")}
-          </p>
-          <h2 className="mt-2 font-serif text-2xl tracking-tight text-stone-900">
-            {view === "day" ? "Planning quotidien" : "Planning de la semaine"}
-          </h2>
+          <span className="n-label">
+            {titleOverride ?? (prayerTimes ? "Horaires de ta ville" : "Horaires indicatifs")}
+          </span>
+          <h1 className="n-page-title">
+            {view === "day" ? "Ta journée" : "Ta semaine"}
+          </h1>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[10px] text-stone-600">
-          {prayerTimes ? "Horaires locaux calculés" : "Horaires indicatifs"}
-        </span>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div
-          className="inline-flex rounded-xl border border-stone-200 bg-stone-50 p-1"
-          role="group"
-          aria-label="Affichage du planning"
-        >
-          {(
-            [
-              { id: "day", label: "Jour" },
-              { id: "week", label: "Semaine" },
-            ] as const
-          ).map(({ id, label }) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="n-seg" role="group" aria-label="Affichage du planning">
+            {(
+              [
+                { id: "day", label: "Jour" },
+                { id: "week", label: "Semaine" },
+              ] as const
+            ).map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setView(id)}
+                aria-pressed={view === id}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {view === "day" && (
             <button
-              key={id}
               type="button"
-              onClick={() => setView(id)}
-              aria-pressed={view === id}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition ${
-                view === id
-                  ? "bg-white text-emerald-900 shadow-sm"
-                  : "text-stone-500 hover:text-stone-800"
-              }`}
+              onClick={() => setIsAddingActivity((open) => !open)}
+              className={`n-btn ${isAddingActivity ? "n-btn-ghost" : ""} px-4! py-2.5! text-sm!`}
+              aria-expanded={isAddingActivity}
             >
-              {label}
+              {isAddingActivity ? "Fermer" : "+ Ajouter"}
             </button>
-          ))}
+          )}
         </div>
-
-        {view === "day" && (
-          <button
-            type="button"
-            onClick={() => setIsAddingActivity((open) => !open)}
-            className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
-            aria-expanded={isAddingActivity}
-          >
-            {isAddingActivity ? "Fermer" : "Ajouter à mon programme"}
-          </button>
-        )}
       </div>
 
       {view === "day" && isAddingActivity && (
         <form
           onSubmit={addTodayActivity}
-          className="mt-3 grid gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 p-4 sm:grid-cols-[minmax(0,1fr)_130px_auto_auto] sm:items-end"
+          className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end"
         >
-          <label className="text-xs font-medium text-foreground">
+          <label className="text-sm font-semibold">
             Ce que je souhaite faire
             <input
               value={newActivityTitle}
@@ -225,31 +219,22 @@ export function DailyPlanner({
               placeholder="Ex. Lire quelques pages"
               maxLength={100}
               required
-              className="mt-1.5 h-10 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+              autoFocus
+              className="n-input mt-1.5"
             />
           </label>
-          <label className="text-xs font-medium text-foreground">
+          <label className="text-sm font-semibold">
             Heure
             <input
               type="time"
               value={newActivityTime}
               onChange={(event) => setNewActivityTime(event.target.value)}
               required
-              className="mt-1.5 h-10 w-full rounded-xl border border-violet-100 bg-white px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+              className="n-input mt-1.5"
             />
           </label>
-          <button
-            type="submit"
-            className="h-10 rounded-xl bg-violet-800 px-4 text-xs font-semibold text-white transition hover:bg-violet-900"
-          >
+          <button type="submit" className="n-btn n-btn-sage h-11">
             Ajouter
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsAddingActivity(false)}
-            className="h-10 rounded-xl px-3 text-xs font-medium text-muted-foreground transition hover:bg-white"
-          >
-            Annuler
           </button>
         </form>
       )}
@@ -258,69 +243,75 @@ export function DailyPlanner({
         <WeeklyPlanner onTodayActivitiesChange={updateTodayActivities} />
       ) : (
         <>
-          <p className="mt-3 text-xs leading-5 text-stone-500">
+          <p className="mt-3 text-sm text-(--n-muted)">
             {prayerTimes
               ? "Les horaires de prière sont calculés selon ta position (méthode de la Ligue islamique mondiale)."
               : "Configure ta position dans Réglages pour afficher les horaires de prière locaux."}
           </p>
 
           {isExcusePeriod && (
-            <div className="mt-4 flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-950">
-              <span>
-                Période d'indisponibilité active. Focus sur l'écoute du Coran et
-                l'étude de la science.
-              </span>
-            </div>
+            <p className="n-chip mt-4">
+              Période d’indisponibilité active : les prières sont masquées.
+              Focus sur l’écoute du Coran et l’étude.
+            </p>
           )}
 
-          <div className="mt-5 overflow-hidden rounded-2xl bg-white">
-            {eventHours.map((hour) => {
-              const events = visiblePlannerEvents.filter(
-                (event) => Number(event.time.slice(0, 2)) === hour,
-              );
-
+          <ol className="n-agenda mt-6" aria-label="Programme du jour">
+            {visiblePlannerEvents.map((event, index) => {
+              const state =
+                index === nextEventIndex
+                  ? "next"
+                  : nextEventIndex === -1 || index < nextEventIndex
+                    ? "past"
+                    : "upcoming";
               return (
-                <div
-                  key={hour}
-                  className="grid min-h-19 grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[72px_minmax(0,1fr)]"
-                >
-                  <div className="px-2 pt-3 text-center text-[10px] font-semibold tabular-nums text-stone-400 sm:px-4">
-                    {String(hour).padStart(2, "0")}:00
-                  </div>
-                  <div className="space-y-1 p-1.5 sm:p-2">
-                    {events.map(
-                      ({ time, displayTime, title, detail, kind }) => (
-                        <article
-                          key={`${kind}-${title}`}
-                          className={`rounded-xl px-3 py-3 ${
-                            kind === "prayer"
-                              ? "bg-[#F5F2EE]"
-                              : kind.endsWith("-session")
-                                ? "bg-emerald-50/50"
-                                : "bg-white"
-                          }`}
-                        >
-                          <div className="flex items-start justify-center gap-3">
-                            <span className="mt-0.5 text-[10px] font-semibold tabular-nums text-stone-600">
-                              {displayTime ?? time}
-                            </span>
-                            <div className="text-center">
-                              <h3 className="text-xs font-semibold text-stone-900 sm:text-sm">
-                                {title}
-                              </h3>
-                              <p className="mt-0.5 text-[10px] leading-4 text-stone-600 sm:text-xs">
-                                {detail}
-                              </p>
-                            </div>
-                          </div>
-                        </article>
-                      ),
+                <li key={event.id ?? `${event.kind}-${event.title}`}>
+                  {index === nextEventIndex && (
+                    <p className="n-now" aria-label="Maintenant">
+                      Maintenant · {now.toTimeString().slice(0, 5)}
+                    </p>
+                  )}
+                  <div
+                    className="n-agenda-item"
+                    data-state={state}
+                    data-kind={event.kind === "prayer" ? "prayer" : "activity"}
+                  >
+                    <span className="n-agenda-time">
+                      {event.displayTime ?? event.time}
+                    </span>
+                    <span className="n-agenda-rail" aria-hidden="true">
+                      <i className="n-agenda-dot" />
+                    </span>
+                    <div className="n-agenda-body">
+                      <p className="n-agenda-title">{event.title}</p>
+                      <p className="n-agenda-detail">
+                        {state === "next" ? "À venir · " : ""}
+                        {event.detail}
+                      </p>
+                    </div>
+                    {event.kind === "custom" && event.id ? (
+                      <button
+                        type="button"
+                        onClick={() => removeTodayActivity(event.id!)}
+                        className="n-icon-btn"
+                        aria-label={`Retirer « ${event.title} » du programme`}
+                        title="Retirer du programme"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    ) : (
+                      <span />
                     )}
                   </div>
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ol>
+          {visiblePlannerEvents.length === 0 && (
+            <p className="mt-6 text-[15px] text-(--n-muted)">
+              Rien de prévu pour l’instant. Ajoute ce que tu souhaites faire aujourd’hui.
+            </p>
+          )}
         </>
       )}
     </section>

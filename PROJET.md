@@ -55,7 +55,7 @@ Côté Convex (`npx convex env set`) :
 ## Feuille de route
 
 - Priorités issues du questionnaire (voir `docs/analyse-questionnaire-2026-10.md`), dans l'ordre décidé le 2026-10-19 :
-  1. Refonte du design du dashboard (esthétique, navigation, rendu « trop IA ») : direction dans `docs/direction-design-2026-10.md`, maquette `docs/maquette/aujourdhui.html` validée le 2026-10-19 (titres en Sora). Fait : navigation, écran « Aujourd'hui » et page publique (Landing). Reste : restyler les autres écrans (Coran, Adhkar, Cycle, Science, Planning, Notes, Réglages).
+  1. Refonte du design du dashboard (esthétique, navigation, rendu « trop IA ») : direction dans `docs/direction-design-2026-10.md`, maquette `docs/maquette/aujourdhui.html` validée le 2026-10-19 (titres en Sora). Fait : navigation, écran « Aujourd'hui », page publique (Landing), Planning (vue Jour) et Coran. Reste : Adhkar, Cycle, Science, Notes, Réglages et la vue Semaine du Planning. Principe demandé : « comme l'accueil, interactif sans être trop compliqué ».
   2. Preuves des adhkar : fait (voir journal). Élargir la liste avec d'autres adhkar authentifiés : [À CONFIRMER].
   3. Fiche « Pendant les règles » : brouillon sourcé dans `docs/contenu-regles-brouillon.md`, à faire relire avant intégration.
   4. Page « Notre démarche » (qui est derrière l'app, minhaj, relecture, pas de publicité) : [À CONFIRMER : informations à fournir].
@@ -73,6 +73,8 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-19 : nouveau dashboard en place (navigation groupée, barre d'onglets mobile + « Plus », écran « Aujourd'hui » avec prochaine prière, adhkar du moment, reprise du Coran, cycle, modules personnalisables ; onglet « Adhkar » dédié). Horaires de prière : méthode MWL imposée (l'UOIF était la valeur par défaut), choix de méthode retiré des Réglages et remplacé par une explication.
 - 2026-10-19 : page publique (`src/pages/Landing.tsx`) refaite avec le nouveau design (classe racine `n-landing`, sans nuages, effet verre ni ombres violettes) : accroche « Une routine douce, à ton rythme », aperçu de la prochaine prière (horaires d'exemple signalés), principes, fonctionnalités, 3 étapes, FAQ enrichie (sources des invocations, méthode MWL, données). Anciennes règles CSS `.landing-*` retirées de `src/index.css`. Logo déplacé dans `src/components/NourMark.tsx`.
 - 2026-10-19 : page publique : « Selon le Coran et la Sunna authentique » mis en avant dans l'accroche, principes « Fidèle au Coran et à la Sunna authentique, selon la compréhension des pieux prédécesseurs » et « Sans publicité » (validés par Sarah).
+- 2026-10-19 : déploiement en production : `main` (`4744dc3`) poussé, Vercel « Production » réussi selon GitHub, `npx convex deploy` fait. Le domaine `muslim-dhikr-companion-main.vercel.app` sert pourtant encore la version de 06:05 : domaine probablement pas rattaché au dernier déploiement de production [À CONFIRMER dans Vercel].
+- 2026-10-19 : Planning (vue Jour) en frise verticale (passé estompé, prochain moment mis en avant, repère « Maintenant », activités ajoutées supprimables) ; Coran en deux colonnes (liste des sourates avec recherche à gauche, sourate complète verset par verset à droite, clic sur un verset = écoute à partir de là, lecteur audio fixe, options repliables) ; journal de lecture replié. Correction : sourates mecquoises affichées « médinoises » (casse de `revelationType`).
 
 ## Problèmes connus
 
@@ -87,4 +89,5 @@ Côté Convex (`npx convex env set`) :
 - Les règles CSS globales `.dashboard-shell [class*="rounded-"]`, `[class*="text-stone-"]`… réécrivent les classes Tailwind de l'ancien design ; le nouveau design utilise les classes `n-*` pour y échapper. À supprimer une fois tous les écrans restylés.
 - Connexion Google en production : erreur Google « 401 invalid_client / The OAuth client was not found ». `GOOGLE_CLIENT_ID` est bien défini dans Convex (format valide, projet Google Cloud 899304556650) : le client OAuth n'existe plus côté Google Cloud. À recréer, puis à remettre dans Convex (constaté le 2026-10-19).
 - Connexion par e-mail en production : `NOUR_MAILER_URL` et `NOUR_MAILER_API_KEY` ne sont pas définies dans Convex, l'envoi du code échoue (constaté le 2026-10-19).
+- Traduction française du Coran : chargée depuis `raw.githubusercontent.com/mehdi-stark/Coran-Quran` ; traducteur non identifié et non affiché [À CONFIRMER : quelle traduction, et faut-il en choisir une sourcée].
 - Entrée « Notre démarche » prévue dans la navigation, pas encore ajoutée faute de contenu [À CONFIRMER : qui est derrière l'app, minhaj, relecture].

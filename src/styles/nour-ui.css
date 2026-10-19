@@ -559,3 +559,391 @@
 .n-faq[open] summary::after {
   content: "–";
 }
+
+/* ---------- En-tête de page commun ---------- */
+
+.n-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.n-page-title {
+  margin-top: 10px;
+  font-family: var(--n-font-display);
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Sélecteur à segments (Jour / Semaine…) */
+.n-seg {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--n-line);
+  border-radius: 999px;
+  background: var(--n-bg);
+  padding: 4px;
+}
+
+.n-seg button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 8px 16px;
+  color: var(--n-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.n-seg button[aria-pressed="true"] {
+  background: var(--n-ink);
+  color: var(--n-bg);
+}
+
+.n-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-sm);
+  background: var(--n-paper);
+  padding: 0 12px;
+  color: var(--n-ink);
+  font-size: 15px;
+}
+
+.n-input:focus-visible {
+  outline: 2px solid var(--n-sage);
+  outline-offset: 1px;
+}
+
+/* ---------- Agenda du jour ---------- */
+
+.n-agenda {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.n-agenda-item {
+  display: grid;
+  grid-template-columns: 64px 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0 12px;
+  padding: 12px 0;
+  transition: opacity 0.2s ease;
+}
+
+.n-agenda-item[data-state="past"] {
+  opacity: 0.45;
+}
+
+.n-agenda-time {
+  padding-top: 2px;
+  font-family: var(--n-font-display);
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.n-agenda-rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-self: stretch;
+}
+
+.n-agenda-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -24px;
+  width: 1px;
+  background: var(--n-line);
+}
+
+.n-agenda-item:last-child .n-agenda-rail::before {
+  display: none;
+}
+
+.n-agenda-dot {
+  position: relative;
+  margin-top: 6px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--n-line);
+  border-radius: 50%;
+  background: var(--n-paper);
+}
+
+.n-agenda-item[data-kind="prayer"] .n-agenda-dot {
+  border-color: var(--n-sage);
+  background: var(--n-sage);
+}
+
+.n-agenda-item[data-state="next"] .n-agenda-dot {
+  box-shadow: 0 0 0 5px var(--n-sage-tint);
+}
+
+.n-agenda-body {
+  min-width: 0;
+  border-radius: var(--n-radius-sm);
+}
+
+.n-agenda-item[data-state="next"] .n-agenda-body {
+  background: var(--n-sage-tint);
+  margin: -8px 0;
+  padding: 8px 12px;
+}
+
+.n-agenda-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.n-agenda-detail {
+  margin-top: 2px;
+  color: var(--n-muted);
+  font-size: 14px;
+}
+
+.n-now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  color: var(--n-mauve-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.n-now::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--n-mauve);
+}
+
+.n-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--n-muted);
+}
+
+.n-icon-btn:hover {
+  background: var(--n-sage-tint);
+  color: var(--n-ink);
+}
+
+@media (max-width: 640px) {
+  .n-agenda-item {
+    grid-template-columns: 52px 16px minmax(0, 1fr) auto;
+    gap: 0 8px;
+  }
+  .n-agenda-time {
+    font-size: 14px;
+  }
+}
+
+/* ---------- Lecteur du Coran ---------- */
+
+.n-quran {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .n-quran {
+    grid-template-columns: 300px minmax(0, 1fr);
+    align-items: start;
+  }
+  .n-quran-aside {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.n-surah-list {
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 12px -6px 0;
+  padding: 0 6px;
+}
+
+@media (min-width: 1024px) {
+  .n-surah-list {
+    max-height: calc(100vh - 210px);
+  }
+}
+
+.n-surah-item {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: var(--n-radius-sm);
+  background: transparent;
+  padding: 8px;
+  color: var(--n-ink);
+  text-align: left;
+}
+
+.n-surah-item:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-surah-item[aria-current="true"] {
+  border-color: var(--n-sage);
+  background: var(--n-sage-tint);
+}
+
+.n-surah-num {
+  position: relative;
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  color: var(--n-sage);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.n-surah-num svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.n-surah-name-ar {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: 20px;
+  color: var(--n-sage-dark);
+}
+
+.dark-dashboard .n-surah-name-ar {
+  color: var(--n-sage);
+}
+
+.n-ayah {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--n-line);
+  background: transparent;
+  padding: 22px 8px;
+  color: var(--n-ink);
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.n-ayah:hover {
+  background: color-mix(in srgb, var(--n-sage-tint) 55%, transparent);
+}
+
+.n-ayah[data-active="true"] {
+  border-radius: var(--n-radius-sm);
+  border-bottom-color: transparent;
+  background: var(--n-sage-tint);
+}
+
+.n-ayah-arabic {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: clamp(24px, 2.8vw, 32px);
+  line-height: 2.1;
+  direction: rtl;
+  text-align: right;
+}
+
+.n-ayah-num {
+  display: inline-flex;
+  min-width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: 10px;
+  border: 1.5px solid var(--n-sage);
+  border-radius: 999px;
+  color: var(--n-sage);
+  font-family: var(--n-font-display);
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: middle;
+  direction: ltr;
+}
+
+.n-ayah-translit {
+  margin-top: 10px;
+  color: var(--n-sage);
+  font-size: 15px;
+  font-style: italic;
+}
+
+.n-ayah-translation {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.n-player {
+  position: sticky;
+  bottom: 12px;
+  z-index: 5;
+  margin-top: 16px;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-lg);
+  background: var(--n-paper);
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(31, 42, 34, 0.12);
+}
+
+@media (max-width: 1023px) {
+  .n-player {
+    bottom: calc(max(14px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+.n-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--n-line);
+  border-radius: 999px;
+  background: transparent;
+  padding: 7px 14px;
+  color: var(--n-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.n-toggle[aria-pressed="true"] {
+  border-color: var(--n-sage);
+  background: var(--n-sage-tint);
+  color: var(--n-ink);
+}
+
+.n-select {
+  height: 40px;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-sm);
+  background: var(--n-paper);
+  padding: 0 10px;
+  color: var(--n-ink);
+  font-size: 14px;
+}
