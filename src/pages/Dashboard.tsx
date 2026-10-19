@@ -1143,141 +1143,190 @@ export default function Dashboard() {
                   {activeView === "science" && <ScienceJournal />}
 
                   {activeView === "adhkar" && (
-                    <details
-                      id="dashboard-routine"
-                      open
-                      className="scroll-mt-24 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 [&:not([open])]:hidden"
-                    >
-                      <summary className="sr-only">
-                        <div className="mb-4 flex items-center justify-between gap-4">
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                              Adhkar authentiques
-                            </p>
-                            <h2 className="mt-2 font-serif text-xl tracking-tight">
-                              Ouvrir les invocations du matin et du soir
-                            </h2>
-                          </div>
+                    <div id="dashboard-routine" className="scroll-mt-24 space-y-5">
+                      <div className="n-page-head px-1">
+                        <div>
+                          <span className="n-label">Matin et soir</span>
+                          <h1 className="n-page-title">Adhkar</h1>
                         </div>
-                      </summary>
-
-                      <h1 className="n-display mb-4 text-2xl">Adhkar du matin et du soir</h1>
-                      <div className="flex gap-2 rounded-full border border-stone-200 bg-stone-50 p-1">
-                        {(
-                          [
-                            {
-                              id: "morning",
-                              label: "Invocations du matin",
-                            },
-                            {
-                              id: "evening",
-                              label: "Invocations du soir",
-                            },
-                          ] as const
-                        ).map(({ id, label }) => {
-                          const progress = adhkarProgress?.find(
-                            (entry) => entry.session === id,
-                          );
-                          const completed = Math.min(
-                            progress?.currentIndex ?? 0,
-                            adhkarBySession[id].length,
-                          );
-                          return (
-                            <button
-                              key={id}
-                              type="button"
-                              onClick={() => setAdhkarSession(id)}
-                              aria-pressed={adhkarSession === id}
-                              className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-xs font-medium transition sm:text-sm ${
-                                adhkarSession === id
-                                  ? "bg-[#523B46] text-white shadow-sm"
-                                  : "text-muted-foreground hover:text-foreground"
-                              }`}
-                            >
-                              <span className="truncate">{label}</span>
-                              <span className="shrink-0 text-[10px]">
-                                {completed}/{adhkarBySession[id].length}
-                              </span>
-                            </button>
-                          );
-                        })}
+                        <div className="n-seg" role="group" aria-label="Moment des invocations">
+                          {(
+                            [
+                              { id: "morning", label: "Matin" },
+                              { id: "evening", label: "Soir" },
+                            ] as const
+                          ).map(({ id, label }) => {
+                            const progress = adhkarProgress?.find(
+                              (entry) => entry.session === id,
+                            );
+                            const completed = Math.min(
+                              progress?.currentIndex ?? 0,
+                              adhkarBySession[id].length,
+                            );
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={() => setAdhkarSession(id)}
+                                aria-pressed={adhkarSession === id}
+                              >
+                                {label}{" "}
+                                <span className="font-normal opacity-70">
+                                  {completed}/{adhkarBySession[id].length}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
 
-                      <div className="mt-4 rounded-3xl border border-stone-200 bg-white p-4 sm:p-6">
+                      <div
+                        className="n-steps"
+                        role="progressbar"
+                        aria-label="Avancement de la routine"
+                        aria-valuemin={0}
+                        aria-valuemax={adhkarSequence.length}
+                        aria-valuenow={Math.min(
+                          sessionProgress?.currentIndex ?? 0,
+                          adhkarSequence.length,
+                        )}
+                      >
+                        {adhkarSequence.map((_, index) => (
+                          <span
+                            key={index}
+                            data-state={
+                              index < (sessionProgress?.currentIndex ?? 0)
+                                ? "done"
+                                : index === (sessionProgress?.currentIndex ?? 0)
+                                  ? "current"
+                                  : "todo"
+                            }
+                          />
+                        ))}
+                      </div>
+
+                      <article className="n-card n-rise p-5! sm:p-8!">
                         {adhkarProgress === undefined ? (
-                          <p className="py-10 text-center text-sm text-muted-foreground">
+                          <p className="py-10 text-center text-[15px] text-(--n-muted)" role="status">
                             Chargement de ta routine…
                           </p>
                         ) : currentInvocation ? (
                           <>
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-900">
-                                Invocation{" "}
-                                {(sessionProgress?.currentIndex ?? 0) + 1} sur{" "}
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <span className="n-label">
+                                Invocation {(sessionProgress?.currentIndex ?? 0) + 1} sur{" "}
                                 {adhkarSequence.length}
                               </span>
-                              <span className="text-xs text-muted-foreground">
-                                À réciter {currentInvocation.repetitions} fois
-                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  className="n-toggle"
+                                  aria-pressed={showAdhkarTransliteration}
+                                  onClick={() =>
+                                    setShowAdhkarTransliteration((value) => !value)
+                                  }
+                                >
+                                  Phonétique
+                                </button>
+                                <button
+                                  type="button"
+                                  className="n-toggle"
+                                  aria-pressed={showAdhkarTranslation}
+                                  onClick={() =>
+                                    setShowAdhkarTranslation((value) => !value)
+                                  }
+                                >
+                                  Traduction
+                                </button>
+                              </div>
                             </div>
-                            <div
-                              className="mt-5 text-right text-2xl leading-[2.2] text-foreground sm:text-3xl"
+
+                            <h2 className="n-display mt-6 text-[22px] leading-snug">
+                              {currentInvocation.title}
+                            </h2>
+                            <p
+                              className="n-arabic mt-4 text-[26px] leading-[2.2] sm:text-[32px]"
                               lang="ar"
-                              dir="rtl"
                             >
                               {currentInvocation.arabic}
-                            </div>
-                            <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-600">
-                              <label className="inline-flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={showAdhkarTransliteration}
-                                  onChange={(event) =>
-                                    setShowAdhkarTransliteration(
-                                      event.target.checked,
-                                    )
-                                  }
-                                />
-                                Translittération
-                              </label>
-                              <label className="inline-flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={showAdhkarTranslation}
-                                  onChange={(event) =>
-                                    setShowAdhkarTranslation(
-                                      event.target.checked,
-                                    )
-                                  }
-                                />
-                                Traduction
-                              </label>
-                            </div>
-                            <h3 className="study-prose mt-5 text-xl">
-                              {currentInvocation.title}
-                            </h3>
+                            </p>
                             {showAdhkarTransliteration && (
-                              <p className="study-prose mt-2 text-sm italic text-muted-foreground">
+                              <p className="mt-4 text-[15px] italic text-(--n-sage)">
                                 {currentInvocation.transliteration}
                               </p>
                             )}
                             {showAdhkarTranslation && (
-                              <p className="study-prose mt-3 text-sm text-foreground">
+                              <p className="mt-3 text-[16px] leading-relaxed">
                                 {currentInvocation.meaning}
                               </p>
                             )}
-                            <details className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">
-                              <summary className="cursor-pointer font-medium text-stone-800">
-                                Preuve
-                              </summary>
+
+                            <div className="mt-8 flex flex-col items-center gap-4">
+                              <button
+                                type="button"
+                                className="n-counter"
+                                data-complete={isInvocationComplete}
+                                disabled={
+                                  isSavingAdhkar ||
+                                  adhkarProgress === undefined ||
+                                  isInvocationComplete
+                                }
+                                onClick={() => void recordCurrentAdhkarRepetition()}
+                                aria-label={
+                                  isInvocationComplete
+                                    ? "Invocation terminée"
+                                    : `J’ai récité, ${currentRepetitionCount} sur ${currentInvocation.repetitions}`
+                                }
+                              >
+                                <svg viewBox="0 0 120 120" aria-hidden="true">
+                                  <circle cx="60" cy="60" r="54" className="n-counter-track" />
+                                  <circle
+                                    cx="60"
+                                    cy="60"
+                                    r="54"
+                                    className="n-counter-fill"
+                                    style={{
+                                      strokeDashoffset:
+                                        339.3 *
+                                        (1 -
+                                          Math.min(
+                                            currentRepetitionCount /
+                                              currentInvocation.repetitions,
+                                            1,
+                                          )),
+                                    }}
+                                  />
+                                </svg>
+                                <span className="relative">
+                                  <b>{currentRepetitionCount}</b>
+                                  <small>sur {currentInvocation.repetitions}</small>
+                                </span>
+                              </button>
+                              <p className="text-center text-[14px] text-(--n-muted)">
+                                {isInvocationComplete
+                                  ? "Invocation terminée."
+                                  : "Touche le cercle à chaque récitation."}
+                              </p>
+                              <button
+                                type="button"
+                                disabled={!isInvocationComplete || isSavingAdhkar}
+                                onClick={() => void continueAdhkar()}
+                                className="n-btn n-btn-sage px-6! disabled:opacity-40"
+                              >
+                                Invocation suivante
+                              </button>
+                            </div>
+
+                            <details className="n-proof mt-8">
+                              <summary>Preuve</summary>
                               <dl className="mt-3 space-y-1.5">
                                 <div>
-                                  <dt className="inline font-medium">Rapporteur : </dt>
+                                  <dt className="inline font-semibold">Rapporteur : </dt>
                                   <dd className="inline">{currentInvocation.proof.narrator}</dd>
                                 </div>
                                 {currentInvocation.proof.sources.map((source) => (
                                   <div key={`${source.collection}-${source.number}`}>
-                                    <dt className="inline font-medium">
+                                    <dt className="inline font-semibold">
                                       {source.collection} {source.number} :{" "}
                                     </dt>
                                     <dd className="inline">
@@ -1289,80 +1338,32 @@ export default function Dashboard() {
                                 ))}
                                 {currentInvocation.proof.note && (
                                   <div>
-                                    <dt className="inline font-medium">Note : </dt>
+                                    <dt className="inline font-semibold">Note : </dt>
                                     <dd className="inline">{currentInvocation.proof.note}</dd>
                                   </div>
                                 )}
-                                <p className="text-stone-500">
-                                  Numérotation et classifications reprises de sunnah.com.
-                                </p>
                                 <div>
-                                  <dt className="inline font-medium">Moment : </dt>
-                                  <dd className="inline">{currentInvocation.moment === "morning" ? "Matin" : "Soir"}</dd>
-                                </div>
-                                <div>
-                                  <dt className="inline font-medium">Répétitions : </dt>
+                                  <dt className="inline font-semibold">Répétitions : </dt>
                                   <dd className="inline">{currentInvocation.repetitions}</dd>
                                 </div>
                               </dl>
-                            </details>
-
-                            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                              <Button
-                                type="button"
-                                variant={
-                                  isInvocationComplete ? "outline" : "default"
-                                }
-                                disabled={
-                                  isSavingAdhkar ||
-                                  adhkarProgress === undefined ||
-                                  isInvocationComplete
-                                }
-                                onClick={() =>
-                                  void recordCurrentAdhkarRepetition()
-                                }
-                                className={`min-h-11 flex-1 rounded-full ${isInvocationComplete ? "" : "bg-[#523B46] text-white hover:bg-[#3D2A34]"}`}
-                              >
-                                {isInvocationComplete ? (
-                                  <>Invocation terminée</>
-                                ) : (
-                                  `J’ai récité (${currentRepetitionCount}/${currentInvocation.repetitions})`
-                                )}
-                              </Button>
-                              <Button
-                                type="button"
-                                disabled={
-                                  !isInvocationComplete || isSavingAdhkar
-                                }
-                                onClick={() => void continueAdhkar()}
-                                className="min-h-11 flex-1 rounded-full bg-[#523B46] text-white hover:bg-[#3D2A34]"
-                              >
-                                Invocation suivante
-                              </Button>
-                            </div>
-                            {!isInvocationComplete && (
-                              <p className="mt-3 text-center text-xs text-muted-foreground">
-                                Marque chaque récitation ; tu pourras continuer
-                                une fois le nombre demandé atteint.
+                              <p className="mt-2 text-(--n-muted)">
+                                Numérotation et classifications reprises de sunnah.com.
                               </p>
-                            )}
+                            </details>
                           </>
                         ) : (
-                          <div className="py-8 text-center">
-                            <h3 className="mt-4 font-serif text-2xl">
-                              Routine terminée, bravo
-                            </h3>
-                            <p className="mt-2 text-sm text-muted-foreground">
+                          <div className="py-10 text-center">
+                            <h2 className="n-display text-[24px]">Routine terminée</h2>
+                            <p className="mt-2 text-[15px] text-(--n-muted)">
                               Tu as terminé les invocations{" "}
-                              {adhkarSession === "morning"
-                                ? "du matin"
-                                : "du soir"}{" "}
+                              {adhkarSession === "morning" ? "du matin" : "du soir"}{" "}
                               aujourd’hui.
                             </p>
                           </div>
                         )}
-                      </div>
-                    </details>
+                      </article>
+                    </div>
                   )}
                 </>
               )}

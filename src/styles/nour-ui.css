@@ -948,3 +948,113 @@
   color: var(--n-ink);
   font-size: 14px;
 }
+
+/* ---------- Adhkar ---------- */
+
+.n-steps {
+  display: flex;
+  gap: 4px;
+}
+
+.n-steps > span {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--n-line);
+  transition: background 0.3s ease;
+}
+
+.n-steps > span[data-state="done"] {
+  background: var(--n-sage);
+}
+
+.n-steps > span[data-state="current"] {
+  background: var(--n-mauve);
+}
+
+.n-counter {
+  position: relative;
+  display: flex;
+  width: 132px;
+  height: 132px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--n-sage-tint);
+  color: var(--n-ink);
+  text-align: center;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.n-counter:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+.n-counter:focus-visible {
+  outline: 2px solid var(--n-sage);
+  outline-offset: 4px;
+}
+
+.n-counter svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.n-counter-track,
+.n-counter-fill {
+  fill: none;
+  stroke-width: 6;
+}
+
+.n-counter-track {
+  stroke: var(--n-line);
+}
+
+.n-counter-fill {
+  stroke: var(--n-sage);
+  stroke-linecap: round;
+  stroke-dasharray: 339.3;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.n-counter b {
+  display: block;
+  font-family: var(--n-font-display);
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.n-counter small {
+  display: block;
+  margin-top: 4px;
+  color: var(--n-muted);
+  font-size: 13px;
+}
+
+.n-counter[data-complete="true"] {
+  background: var(--n-sage-dark);
+  color: var(--n-on-dark);
+}
+
+.n-counter[data-complete="true"] small {
+  color: var(--n-on-dark-muted);
+}
+
+.n-proof {
+  border-top: 1px solid var(--n-line);
+  padding-top: 14px;
+  color: var(--n-ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.n-proof summary {
+  cursor: pointer;
+  color: var(--n-muted);
+  font-weight: 600;
+}
