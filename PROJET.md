@@ -75,6 +75,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-19 : page publique : « Selon le Coran et la Sunna authentique » mis en avant dans l'accroche, principes « Fidèle au Coran et à la Sunna authentique, selon la compréhension des pieux prédécesseurs » et « Sans publicité » (validés par Sarah).
 - 2026-10-19 : déploiement en production : `main` (`4744dc3`) poussé, Vercel « Production » réussi selon GitHub, `npx convex deploy` fait. Le domaine `muslim-dhikr-companion-main.vercel.app` sert pourtant encore la version de 06:05 : domaine probablement pas rattaché au dernier déploiement de production [À CONFIRMER dans Vercel].
 - 2026-10-19 : Planning (vue Jour) en frise verticale (passé estompé, prochain moment mis en avant, repère « Maintenant », activités ajoutées supprimables) ; Coran en deux colonnes (liste des sourates avec recherche à gauche, sourate complète verset par verset à droite, clic sur un verset = écoute à partir de là, lecteur audio fixe, options repliables) ; journal de lecture replié. Correction : sourates mecquoises affichées « médinoises » (casse de `revelationType`).
+- 2026-10-19 : cause réelle de l'erreur Google « invalid_client » : le site Vercel utilisait le déploiement Convex `adjoining-hamster-203` (inutilisé, sans variables) au lieu de `useful-anaconda-844`. `VITE_CONVEX_URL` (Production) corrigée dans Vercel. Pré-rendu de la page publique sans analyse des dépendances Vite (`scripts/prerender-landing.mjs`), qui inondait les logs Vercel d'avertissements « Request is outdated ». Fin des branches de fonctionnalité : tout se fait désormais sur `main`.
 
 ## Problèmes connus
 
@@ -87,7 +88,7 @@ Côté Convex (`npx convex env set`) :
 - Traductions françaises des adhkar : pas encore relues par une personne de science [À CONFIRMER].
 - Méthode MWL en été dans le nord de la France : le soleil ne descend pas toujours à 18°, AlAdhan applique l'ajustement « angle based » ; à Paris le 21 juin 2026, Fajr 03:26 et Isha 00:11 (contre 04:13 et 23:32 avec l'UOIF).
 - Les règles CSS globales `.dashboard-shell [class*="rounded-"]`, `[class*="text-stone-"]`… réécrivent les classes Tailwind de l'ancien design ; le nouveau design utilise les classes `n-*` pour y échapper. À supprimer une fois tous les écrans restylés.
-- Connexion Google en production : erreur Google « 401 invalid_client / The OAuth client was not found ». `GOOGLE_CLIENT_ID` est bien défini dans Convex (format valide, projet Google Cloud 899304556650) : le client OAuth n'existe plus côté Google Cloud. À recréer, puis à remettre dans Convex (constaté le 2026-10-19).
+- Connexion Google en production : erreur « 401 invalid_client » due au mauvais déploiement Convex utilisé par Vercel (`adjoining-hamster-203`). `VITE_CONVEX_URL` corrigée le 2026-10-19, connexion à retester après redéploiement.
 - Connexion par e-mail en production : `NOUR_MAILER_URL` et `NOUR_MAILER_API_KEY` ne sont pas définies dans Convex, l'envoi du code échoue (constaté le 2026-10-19).
 - Traduction française du Coran : chargée depuis `raw.githubusercontent.com/mehdi-stark/Coran-Quran` ; traducteur non identifié et non affiché [À CONFIRMER : quelle traduction, et faut-il en choisir une sourcée].
 - Entrée « Notre démarche » prévue dans la navigation, pas encore ajoutée faute de contenu [À CONFIRMER : qui est derrière l'app, minhaj, relecture].
