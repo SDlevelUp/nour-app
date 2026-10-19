@@ -311,6 +311,22 @@ export default function Dashboard() {
         note.archived !== true,
     )
     .slice(0, 3);
+  const clockDate = new Date(clock);
+  const clockMinutes = clockDate.getHours() * 60 + clockDate.getMinutes();
+  const nextPrayerName = prayer.times
+    ? ((
+        [
+          ["Fajr", prayer.times.fajr],
+          ["Dhuhr", prayer.times.dhuhr],
+          ["Asr", prayer.times.asr],
+          ["Maghrib", prayer.times.maghrib],
+          ["Isha", prayer.times.isha],
+        ] as const
+      ).find(([, time]) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes > clockMinutes;
+      })?.[0] ?? null)
+    : null;
   const recentNotes = (personalNotes ?? [])
     .filter((note) => note.archived !== true && note.isTask !== true)
     .sort((a, b) => Number(b.urgent === true) - Number(a.urgent === true))
@@ -1018,60 +1034,55 @@ export default function Dashboard() {
         className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
         {activeView !== "overview" && (
-        <header className="border-b border-[#E7E1D6] bg-white/90">
-          {(
-            <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.6fr)] lg:items-center xl:px-8">
-              <div className="min-w-0">
-                <p className="text-base font-semibold text-stone-900">
-                  {new Intl.DateTimeFormat("fr-FR", {
+        <header className="n-topbar">
+          <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 xl:px-8">
+            <p className="text-[14px]">
+              <span className="font-semibold">
+                {(() => {
+                  const label = new Intl.DateTimeFormat("fr-FR", {
                     weekday: "long",
                     day: "numeric",
                     month: "long",
-                    year: "numeric",
-                  }).format(new Date())}
-                </p>
-                <p className="mt-1 text-[14px] leading-5 text-left text-stone-500">
-                  {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  }).format(new Date())}
-                  <span className="mt-0.5 block text-[14px] text-stone-400">
-                    Date hégirienne indicative
-                  </span>
-                </p>
-              </div>
-
-              <div className="min-w-0">
-                <p className="mb-2 text-[14px] font-semibold uppercase tracking-[0.14em] text-stone-400">
-                  {prayer.times
-                    ? "Horaires calculés pour ta position"
-                    : "Horaires locaux · à configurer"}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { name: "Fajr", time: prayer.times?.fajr },
-                    { name: "Dhuhr", time: prayer.times?.dhuhr },
-                    { name: "Asr", time: prayer.times?.asr },
-                    { name: "Maghrib", time: prayer.times?.maghrib },
-                    { name: "Isha", time: prayer.times?.isha },
-                  ].map(({ name, time }) => (
-                    <span
-                      key={name}
-                      className="inline-flex w-fit items-center gap-1 rounded-xl border border-stone-200/80 bg-white/70 px-1.5 py-1 text-[14px] text-stone-600"
-                    >
-                      <span className="inline-flex items-center gap-2.5">
-                        <span className="font-medium">{name}</span>
-                        <span className="tabular-nums text-stone-500">
-                          {time ?? (prayer.isLoading ? "…" : "--:--")}
-                        </span>
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+                  }).format(clock);
+                  return label.charAt(0).toUpperCase() + label.slice(1);
+                })()}
+              </span>
+              <span className="text-(--n-muted)">
+                {" · "}
+                {new Intl.DateTimeFormat("fr-FR-u-ca-islamic", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }).format(clock)}
+              </span>
+            </p>
+            {prayer.times ? (
+              <ul className="n-topbar-times" aria-label="Horaires de prière du jour">
+                {(
+                  [
+                    ["Fajr", prayer.times.fajr],
+                    ["Dhuhr", prayer.times.dhuhr],
+                    ["Asr", prayer.times.asr],
+                    ["Maghrib", prayer.times.maghrib],
+                    ["Isha", prayer.times.isha],
+                  ] as const
+                ).map(([name, time]) => (
+                  <li key={name} data-next={nextPrayerName === name}>
+                    <span>{name}</span>
+                    <b>{time}</b>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <button
+                type="button"
+                onClick={() => navigateToView("settings")}
+                className="n-link text-sm"
+              >
+                {prayer.isLoading ? "Chargement des horaires…" : "Afficher les horaires de prière"}
+              </button>
+            )}
+          </div>
         </header>
         )}
 

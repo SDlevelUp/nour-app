@@ -55,7 +55,7 @@ Côté Convex (`npx convex env set`) :
 ## Feuille de route
 
 - Priorités issues du questionnaire (voir `docs/analyse-questionnaire-2026-10.md`), dans l'ordre décidé le 2026-10-19 :
-  1. Refonte du design du dashboard (esthétique, navigation, rendu « trop IA ») : direction dans `docs/direction-design-2026-10.md`, maquette `docs/maquette/aujourdhui.html` validée le 2026-10-19 (titres en Sora). Fait : navigation, écran « Aujourd'hui », page publique (Landing), Planning (vue Jour), Coran, Adhkar, Cycle, Notes, Réglages et Science. Reste : la vue Semaine du Planning. Principe demandé : « comme l'accueil, interactif sans être trop compliqué ».
+  1. Refonte du design du dashboard (esthétique, navigation, rendu « trop IA ») : direction dans `docs/direction-design-2026-10.md`, maquette `docs/maquette/aujourdhui.html` validée le 2026-10-19 (titres en Sora). Fait : navigation, écran « Aujourd'hui », page publique (Landing), Planning (vue Jour), Coran, Adhkar, Cycle, Notes, Réglages, Science et Planning (Jour et Semaine) : refonte terminée le 2026-10-19. Principe demandé : « comme l'accueil, interactif sans être trop compliqué ».
   2. Preuves des adhkar : fait (voir journal). Élargir la liste avec d'autres adhkar authentifiés : [À CONFIRMER].
   3. Fiche « Pendant les règles » : brouillon sourcé dans `docs/contenu-regles-brouillon.md`, à faire relire avant intégration.
   4. Page « Notre démarche » (qui est derrière l'app, minhaj, relecture, pas de publicité) : [À CONFIRMER : informations à fournir].
@@ -83,6 +83,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-19 : pages Cycle et Notes au nouveau design. Cycle : carte « Prochaines règles estimées », statistiques, calendrier et fiche de la période côte à côte, compteur de qada avec barre d’avancement (texte « TODO » visible remplacé par un renvoi vers une personne de science). Notes : carte « Nouvelle note » (boutons « Ajouter à mes tâches » et « Importante »), filtres en segments, post-it aux coins arrondis.
 - 2026-10-19 : page Réglages au nouveau design (horaires du jour affichés dans la carte « Horaires de prière », rappels « Adhkar du matin » et « Adhkar du soir »), formulaire de modification des post-it restylé. Composants shadcn Card, Input, Textarea et Button retirés de `Dashboard.tsx`.
 - 2026-10-19 : page Science bénéfique au nouveau design, en trois onglets (Séances, Livres, Apprentissage), formulaires d’ajout repliables, livres numérotés avec flèches pour réordonner. Module Apprentissage restylé ; le texte « TODO » visible par les utilisatrices remplacé par « À compléter ».
+- 2026-10-19 : vue Semaine du Planning au nouveau design (7 jours côte à côte avec défilement horizontal sur mobile, jour courant en vert foncé, activités colorées par type), bandeau du haut des pages restylé (date, date hégirienne, horaires du jour avec la prochaine prière en évidence), formulaire « Noter une lecture » du Coran restylé. La refonte du design couvre désormais toutes les pages du dashboard.
 
 ## Problèmes connus
 

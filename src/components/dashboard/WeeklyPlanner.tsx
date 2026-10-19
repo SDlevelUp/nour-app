@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
@@ -280,95 +277,74 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
     }
   };
 
-  const weekLabel = `${dates[0].toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} – ${dates[6].toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}`;
+  const weekLabel = `${dates[0].toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} – ${dates[6].toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
 
   return (
-    <div className="mt-5">
+    <div className="mt-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 className="text-base font-semibold text-stone-800">
-            Semaine du {weekLabel}
-          </h3>
-          <p className="mt-1 text-[15px] leading-5 text-stone-500">
-            Déplace une activité sur un autre jour ou modifie son heure. Les
-            horaires de prière restent calculés à part.
-          </p>
-        </div>
         <div className="flex items-center gap-1">
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="icon"
+            className="n-icon-btn"
             onClick={() => changeWeek(-1)}
             aria-label="Semaine précédente"
           >
             <ChevronLeft className="size-4" />
-          </Button>
-          <Button
+          </button>
+          <h3 className="n-display px-1 text-[17px]">{weekLabel}</h3>
+          <button
             type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => changeWeek(-weekOffset)}
-            disabled={weekOffset === 0}
-          >
-            Aujourd’hui
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
+            className="n-icon-btn"
             onClick={() => changeWeek(1)}
             aria-label="Semaine suivante"
           >
             <ChevronRight className="size-4" />
-          </Button>
+          </button>
+          {weekOffset !== 0 && (
+            <button
+              type="button"
+              className="n-link ml-2 text-sm"
+              onClick={() => changeWeek(-weekOffset)}
+            >
+              Cette semaine
+            </button>
+          )}
         </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 text-[15px] text-stone-500">
-          Activités répétées chaque jour par défaut
-        </span>
-        <Button
+        <button
           type="button"
-          variant="outline"
-          size="sm"
           onClick={() => {
             setNewActivityDate(
-              dates.some((date) => dateKey(date) === today)
-                ? today
-                : firstDateKey,
+              dates.some((date) => dateKey(date) === today) ? today : firstDateKey,
             );
             setIsAdding((open) => !open);
           }}
-          className="gap-1.5"
+          aria-expanded={isAdding}
+          className="n-btn n-btn-ghost px-4! py-2.5! text-sm!"
         >
+          <Plus className="size-4" />
           Ajouter une activité
-        </Button>
+        </button>
       </div>
 
       {isAdding && (
-        <form
-          onSubmit={addActivity}
-          className="mt-3 grid gap-3 rounded-2xl bg-[#F5F2EE] p-4 sm:grid-cols-2"
-        >
-          <label className="text-base font-medium text-stone-700">
+        <form onSubmit={addActivity} className="n-card grid gap-3 sm:grid-cols-[minmax(0,1fr)_200px_120px]">
+          <label className="grid gap-1 text-[13px] font-semibold">
             Activité
-            <Input
+            <input
               value={newActivityTitle}
               onChange={(event) => setNewActivityTitle(event.target.value)}
               maxLength={100}
               placeholder="Ex. Révision d’une sourate"
               required
-              className="mt-1.5 bg-white text-base md:text-base"
+              className="n-input"
             />
           </label>
-          <label className="text-base font-medium text-stone-700">
+          <label className="grid gap-1 text-[13px] font-semibold">
             Jour
             <select
               value={newActivityDate}
               onChange={(event) => setNewActivityDate(event.target.value)}
-              className="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-base"
+              className="n-select h-11! w-full"
             >
               {dates.map((date) => {
                 const key = dateKey(date);
@@ -384,234 +360,173 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
               })}
             </select>
           </label>
-          <label className="text-base font-medium text-stone-700">
+          <label className="grid gap-1 text-[13px] font-semibold">
             Heure
-            <Input
+            <input
               type="time"
               value={newActivityTime}
               onChange={(event) => setNewActivityTime(event.target.value)}
               required
-              className="mt-1.5 bg-white text-base md:text-base"
+              className="n-input"
             />
           </label>
-          <label className="text-base font-medium text-stone-700">
-            Détail{" "}
-            <span className="font-normal text-stone-500">(facultatif)</span>
-            <Textarea
+          <label className="grid gap-1 text-[13px] font-semibold sm:col-span-3">
+            Détail (facultatif)
+            <input
               value={newActivityDetail}
               onChange={(event) => setNewActivityDetail(event.target.value)}
               maxLength={180}
-              rows={1}
               placeholder="Une précision ou un objectif"
-              className="mt-1.5 min-h-10 bg-white text-base md:text-base"
+              className="n-input font-normal"
             />
           </label>
-          <div className="flex justify-end gap-2 sm:col-span-2">
-            <Button
+          <div className="flex items-center justify-end gap-3 sm:col-span-3">
+            <button
               type="button"
-              variant="ghost"
+              className="n-link text-sm text-(--n-muted)!"
               onClick={() => setIsAdding(false)}
             >
               Annuler
-            </Button>
-            <Button type="submit" className="gap-1.5 bg-emerald-900">
+            </button>
+            <button type="submit" className="n-btn n-btn-sage">
               Ajouter
-            </Button>
+            </button>
           </div>
         </form>
       )}
 
-      <div className="mt-4 pb-2">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-          {dates.map((date) => {
-            const key = dateKey(date);
-            const storedActivities = activitiesByDate[key] ?? [];
-            const journalActivities = journalActivitiesByDate.get(key) ?? [];
-            const activities =
-              quranSessions === undefined || scienceSessions === undefined
-                ? storedActivities
-                : includeJournalActivities(storedActivities, journalActivities);
-            const isCurrentDay = key === today;
-            return (
-              <section
-                key={key}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  moveActivity(key);
-                }}
-                aria-label={`Activités du ${date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}`}
-                className={`min-h-72 rounded-2xl border p-3 ${
-                  isCurrentDay
-                    ? "border-emerald-300 bg-emerald-50/50"
-                    : "border-stone-200 bg-stone-50/60"
-                }`}
-              >
-                <div className="border-b border-stone-200 pb-2 text-center">
-                  <p className="text-[15px] font-medium capitalize text-stone-500">
-                    {date.toLocaleDateString("fr-FR", { weekday: "short" })}
-                  </p>
-                  <p
-                    className={`mt-0.5 text-base font-semibold ${isCurrentDay ? "text-emerald-900" : "text-stone-800"}`}
-                  >
-                    {date.toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </p>
-                </div>
-                <div className="mt-3 space-y-2.5">
-                  {activities.map((activity) => {
-                    const isJournalSession =
-                      activity.kind === "quran-session" ||
-                      activity.kind === "science-session";
-                    return (
-                      <article
-                        key={activity.id}
-                        draggable
-                        onDragStart={() =>
-                          setDraggedActivity({
-                            date: key,
-                            activityId: activity.id,
-                          })
-                        }
-                        onDragEnd={() => setDraggedActivity(null)}
-                        className={`rounded-xl border bg-white p-3 shadow-sm ${
-                          activity.kind === "custom"
-                            ? "border-[#D8CBD0]"
-                            : isJournalSession
-                              ? "border-emerald-200 bg-emerald-50/50"
-                              : "border-stone-200"
-                        } cursor-grab active:cursor-grabbing ${draggedActivity?.activityId === activity.id ? "opacity-40" : ""}`}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          {isJournalSession ? (
-                            <>
-                              <Input
-                                type="time"
-                                value={activity.time}
-                                onChange={(event) =>
-                                  void updateJournalSchedule(
-                                    activity,
-                                    key,
-                                    event.target.value,
-                                  )
-                                }
-                                disabled={pendingJournalAction === activity.id}
-                                aria-label={`Heure de ${activity.title}`}
-                                className="h-8 w-28 bg-stone-50 px-2 text-[15px] tabular-nums"
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  void deleteJournalActivity(activity)
-                                }
-                                disabled={pendingJournalAction === activity.id}
-                                aria-label={`Supprimer ${activity.title} du journal et du planning`}
-                                className="ml-auto rounded p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
-                              >
-                                Supprimer
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <select
-                                value={activity.time}
-                                onChange={(event) =>
-                                  changeTime(
-                                    key,
-                                    activity.id,
-                                    event.target.value,
-                                  )
-                                }
-                                aria-label={`Heure de ${activity.title}`}
-                                className="min-w-0 rounded border-0 bg-stone-50 px-1.5 py-1 text-[15px] font-semibold tabular-nums text-stone-700"
-                              >
-                                {!times.includes(activity.time) && (
-                                  <option value={activity.time}>
-                                    {activity.time}
-                                  </option>
-                                )}
-                                {times.map((time) => (
-                                  <option key={time} value={time}>
-                                    {time}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                type="button"
-                                onClick={() => removeActivity(key, activity.id)}
-                                aria-label={`Supprimer ${activity.title}`}
-                                className="ml-auto rounded p-1 text-stone-400 hover:bg-red-50 hover:text-red-700"
-                              >
-                                Supprimer
-                              </button>
-                            </>
-                          )}
-                        </div>
-                        <p className="mt-2 text-base font-semibold leading-5 text-stone-900">
-                          {activity.title}
-                        </p>
-                        {activity.detail && (
-                          <p className="mt-1 line-clamp-3 text-[15px] leading-5 text-stone-500">
-                            {activity.detail}
-                          </p>
-                        )}
-                        <label className="mt-2 block">
-                          <span className="sr-only">
-                            Déplacer {activity.title} vers un autre jour
-                          </span>
-                          <select
-                            value={key}
-                            disabled={
-                              isJournalSession &&
-                              pendingJournalAction === activity.id
-                            }
+      <div className="n-weekgrid">
+        {dates.map((date) => {
+          const key = dateKey(date);
+          const storedActivities = activitiesByDate[key] ?? [];
+          const journalActivities = journalActivitiesByDate.get(key) ?? [];
+          const activities =
+            quranSessions === undefined || scienceSessions === undefined
+              ? storedActivities
+              : includeJournalActivities(storedActivities, journalActivities);
+          const isCurrentDay = key === today;
+          return (
+            <section
+              key={key}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                moveActivity(key);
+              }}
+              aria-label={`Activités du ${date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}`}
+              className="n-weekday"
+              data-today={isCurrentDay}
+            >
+              <header className="n-weekday-head">
+                <span>{date.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
+                <b>{date.getDate()}</b>
+              </header>
+              <div className="space-y-2 p-2">
+                {activities.map((activity) => {
+                  const isJournalSession =
+                    activity.kind === "quran-session" || activity.kind === "science-session";
+                  return (
+                    <article
+                      key={activity.id}
+                      draggable
+                      onDragStart={() => setDraggedActivity({ date: key, activityId: activity.id })}
+                      onDragEnd={() => setDraggedActivity(null)}
+                      className="n-week-item"
+                      data-kind={activity.kind}
+                      data-dragging={draggedActivity?.activityId === activity.id}
+                    >
+                      <div className="flex items-center gap-1">
+                        {isJournalSession ? (
+                          <input
+                            type="time"
+                            value={activity.time}
                             onChange={(event) =>
-                              isJournalSession
-                                ? void updateJournalSchedule(
-                                    activity,
-                                    event.target.value,
-                                    activity.time,
-                                  )
-                                : moveActivityBetweenDates(
-                                    key,
-                                    activity.id,
-                                    event.target.value,
-                                  )
+                              void updateJournalSchedule(activity, key, event.target.value)
                             }
-                            className="w-full rounded border border-stone-100 bg-white px-2 py-1.5 text-[15px] text-stone-600 disabled:opacity-50"
+                            disabled={pendingJournalAction === activity.id}
+                            aria-label={`Heure de ${activity.title}`}
+                            className="n-week-time"
+                          />
+                        ) : (
+                          <select
+                            value={activity.time}
+                            onChange={(event) => changeTime(key, activity.id, event.target.value)}
+                            aria-label={`Heure de ${activity.title}`}
+                            className="n-week-time"
                           >
-                            {dates.map((targetDate) => {
-                              const targetKey = dateKey(targetDate);
-                              return (
-                                <option key={targetKey} value={targetKey}>
-                                  {targetDate.toLocaleDateString("fr-FR", {
-                                    weekday: "short",
-                                    day: "numeric",
-                                  })}
-                                </option>
-                              );
-                            })}
+                            {!times.includes(activity.time) && (
+                              <option value={activity.time}>{activity.time}</option>
+                            )}
+                            {times.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
+                              </option>
+                            ))}
                           </select>
-                        </label>
-                      </article>
-                    );
-                  })}
-                  {activities.length === 0 && (
-                    <p className="rounded-lg border border-dashed border-stone-200 px-2 py-6 text-center text-[15px] text-stone-400">
-                      Dépose une activité ici
-                    </p>
-                  )}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            isJournalSession
+                              ? void deleteJournalActivity(activity)
+                              : removeActivity(key, activity.id)
+                          }
+                          disabled={isJournalSession && pendingJournalAction === activity.id}
+                          aria-label={
+                            isJournalSession
+                              ? `Supprimer ${activity.title} du journal et du planning`
+                              : `Supprimer ${activity.title}`
+                          }
+                          className="n-icon-btn ml-auto size-7!"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                      <p className="mt-1.5 text-[14px] font-semibold leading-5">{activity.title}</p>
+                      {activity.detail && (
+                        <p className="mt-0.5 line-clamp-2 text-[13px] leading-5 text-(--n-muted)">
+                          {activity.detail}
+                        </p>
+                      )}
+                      <label className="mt-2 block">
+                        <span className="sr-only">Déplacer {activity.title} vers un autre jour</span>
+                        <select
+                          value={key}
+                          disabled={isJournalSession && pendingJournalAction === activity.id}
+                          onChange={(event) =>
+                            isJournalSession
+                              ? void updateJournalSchedule(activity, event.target.value, activity.time)
+                              : moveActivityBetweenDates(key, activity.id, event.target.value)
+                          }
+                          className="n-week-move"
+                        >
+                          {dates.map((targetDate) => {
+                            const targetKey = dateKey(targetDate);
+                            return (
+                              <option key={targetKey} value={targetKey}>
+                                {targetKey === key ? "Déplacer vers…" : targetDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </label>
+                    </article>
+                  );
+                })}
+                {activities.length === 0 && <p className="n-week-empty">Dépose une activité ici</p>}
+              </div>
+            </section>
+          );
+        })}
       </div>
-      <p className="text-[15px] text-stone-400">
-        Fais glisser une activité vers un autre jour ou utilise le menu de
-        déplacement. Ta semaine est conservée sur cet appareil.
+      <p className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[13px] text-(--n-muted)">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="n-week-dot" data-kind="custom" /> Mes activités
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="n-week-dot" data-kind="quran-session" /> Lectures et études notées
+        </span>
+        <span>Glisse une activité vers un autre jour. Ta semaine est conservée sur cet appareil.</span>
       </p>
     </div>
   );
