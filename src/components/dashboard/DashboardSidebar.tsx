@@ -2,10 +2,8 @@ import {
   CirclePause,
   LayoutGrid,
   LogOut,
-  MoonStar,
   PanelLeft,
   Plus,
-  Sun,
   X,
 } from "lucide-react";
 import { Fragment, useState } from "react";
@@ -19,8 +17,6 @@ import {
 
 type DashboardSidebarProps = {
   activeView: DashboardView;
-  firstName: string;
-  email?: string;
   hasUnreadNotes: boolean;
   isExcusePeriod: boolean;
   isCollapsed: boolean;
@@ -37,8 +33,6 @@ const moreItems = dashboardNavigation.filter((item) => item.group !== "daily");
 
 export function DashboardSidebar({
   activeView,
-  firstName,
-  email,
   hasUnreadNotes,
   isExcusePeriod,
   isCollapsed,
@@ -50,9 +44,6 @@ export function DashboardSidebar({
   onSignOut,
 }: DashboardSidebarProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const initials = firstName
-    ? firstName.slice(0, 1).toLocaleUpperCase("fr-FR")
-    : "N";
   const isMoreActive = moreItems.some((item) => item.view === activeView);
 
   const excuseToggle = (
@@ -138,20 +129,6 @@ export function DashboardSidebar({
             </button>
             <button
               type="button"
-              onClick={() => onDarkModeChange(!isDarkMode)}
-              aria-pressed={isDarkMode}
-              aria-label="Mode nuit"
-              data-tip={isDarkMode ? "Mode jour" : "Mode nuit"}
-              className="n-rail-item"
-            >
-              {isDarkMode ? (
-                <Sun className="size-4.5" strokeWidth={1.7} />
-              ) : (
-                <MoonStar className="size-4.5" strokeWidth={1.7} />
-              )}
-            </button>
-            <button
-              type="button"
               onClick={onCollapse}
               aria-label={isCollapsed ? "Déplier le menu" : "Replier le menu"}
               data-tip={isCollapsed ? "Déplier le menu" : "Replier le menu"}
@@ -159,9 +136,6 @@ export function DashboardSidebar({
             >
               <PanelLeft className="size-4.5" strokeWidth={1.7} />
             </button>
-            <span className="n-rail-avatar" title={firstName || email || "Mon profil"}>
-              {initials}
-            </span>
           </div>
         </div>
 
@@ -193,25 +167,6 @@ export function DashboardSidebar({
 
             <div className="mt-auto space-y-3">
               <div className="n-panel p-3">{excuseToggle}</div>
-              <div className="flex items-center justify-between gap-2 px-2">
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">
-                    {firstName || "Mon profil"}
-                  </span>
-                  <span className="block truncate text-xs text-(--n-muted)">
-                    {email || "Espace personnel"}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  onClick={onSignOut}
-                  className="n-icon-btn shrink-0"
-                  aria-label="Se déconnecter"
-                  title="Se déconnecter"
-                >
-                  <LogOut className="size-4" />
-                </button>
-              </div>
             </div>
           </div>
         )}

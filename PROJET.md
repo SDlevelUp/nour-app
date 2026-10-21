@@ -33,7 +33,7 @@ Copier `.env.example` en `.env` et le remplir avant de lancer. Autres scripts : 
 - `src/convex/` : schéma (`schema.ts`), auth (`auth.ts`, `auth.config.ts`, `auth/emailOtp.ts`), et données par compte (`adhkarProgress`, `quranProgress`, `scienceProgress`, `scienceBooks`, `scienceLearning`, `cycleTracking`, `personalNotes`, `users`). Textes des adhkar dans `adhkarData.ts`.
 - `scripts/prerender-landing.mjs` : pré-rendu de la landing page pour le SEO, lancé à la fin de `build` (avec `public/robots.txt` et `public/sitemap.xml`).
 - `src/convex/_generated/` : à garder dans git (nécessaire au build Vercel).
-- Données stockées dans le navigateur (pas dans Convex) : modules affichés sur « Aujourd'hui » (`nour-today-modules`), activités du planning, position et école de calcul de l'Asr. Passage des modules dans le compte possible plus tard (décision du 2026-10-19 : navigateur pendant la phase de test, offre Convex gratuite).
+- Données stockées dans le navigateur (pas dans Convex) : modules affichés sur « Aujourd'hui » (`nour-today-modules`), activités du planning, position et école de calcul de l'Asr, annonces lues (`nour-annonces-vues`). Passage des modules dans le compte possible plus tard (décision du 2026-10-19 : navigateur pendant la phase de test, offre Convex gratuite).
 
 ## Variables d'environnement
 
@@ -90,6 +90,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-21 : menus dépliables (Preuve, Pourquoi cette méthode ?, Options d’écoute, Symptômes notés) : triangle natif remplacé par un chevron fin (dessin Lucide chevron-down) qui pivote à l’ouverture, règle CSS commune dans `nour-ui.css`.
 - 2026-10-21 : typographie fixée par Sarah : Sora pour tous les titres (h1 à h6, en plus des classes `n-display`), Urbanist pour le texte courant ; ancienne police Lora de `.study-prose` remplacée par Urbanist.
 - 2026-10-21 : FAQ de la page publique : « + » et « – » remplacés par le même chevron fin que le dashboard.
+- 2026-10-21 : haut du dashboard refait sur proposition de Sarah : salam complet en arabe (السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ) et en phonétique, « à ton rythme » retiré, date sous le salam ; en haut à droite, cloche des nouveautés (annonces dans `src/data/annonces.ts`, une annonce = un déploiement, « lu » mémorisé sur l’appareil via `nour-annonces-vues`, décision du 2026-10-21) et menu du profil (nom, e-mail, mode nuit, déconnexion) dans `TopActions.tsx`. Profil et mode nuit retirés de la barre latérale.
 
 ## Problèmes connus
 

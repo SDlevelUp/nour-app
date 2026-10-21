@@ -210,18 +210,19 @@ export function TodayView({
 
   return (
     <div id="dashboard-home" className="scroll-mt-24 pb-6">
-      <header className="n-rise flex flex-wrap items-end justify-between gap-4">
-        <h1 className="n-display text-[clamp(32px,5vw,50px)] leading-[1.05] text-(--n-ink)">
-          As-salâmu ʿalayki{firstName ? `, ${firstName}` : ""},
-          <br />
-          <span className="text-(--n-sage)">à ton rythme.</span>
+      <header className="n-rise">
+        <p className="n-greeting-ar" lang="ar" dir="rtl">
+          السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
+        </p>
+        <h1 className="n-display mt-2 max-w-4xl text-[clamp(28px,4vw,42px)] leading-[1.1] text-(--n-ink)">
+          As-salâmu ʿalaykum wa raḥmatullâhi wa barakâtuh
+          {firstName && <span className="text-(--n-sage)">, {firstName}</span>}
         </h1>
-        <p className="text-[15px] text-(--n-muted) sm:text-right">
-          <strong className="block text-[17px] font-semibold text-(--n-ink)">
-            {gregorian}
-          </strong>
+        <p className="mt-3 text-[15px] text-(--n-muted)">
+          <span className="font-semibold text-(--n-ink)">{gregorian}</span>
+          {" · "}
           {hijri}
-          <span className="block text-xs">Date hégirienne indicative</span>
+          <span className="text-[13px]"> (date hégirienne indicative)</span>
         </p>
       </header>
 

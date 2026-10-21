@@ -1,6 +1,7 @@
 ﻿import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
+import { TopActions } from "@/components/dashboard/TopActions";
 import {
   dashboardNavigation,
   type DashboardView,
@@ -1018,8 +1019,6 @@ export default function Dashboard() {
     >
       <DashboardSidebar
         activeView={activeView}
-        firstName={firstName || ""}
-        email={user?.email}
         hasUnreadNotes={hasUnreadNotes}
         isExcusePeriod={isExcusePeriod}
         isCollapsed={isSidebarCollapsed}
@@ -1033,9 +1032,10 @@ export default function Dashboard() {
       <div
         className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
-        {activeView !== "overview" && (
-        <header className="n-topbar">
-          <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 xl:px-8">
+        <header className={`n-topbar ${activeView === "overview" ? "n-topbar-plain" : ""}`}>
+          <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 xl:px-8">
+            {activeView !== "overview" && (
+            <>
             <p className="text-[14px]">
               <span className="font-semibold">
                 {(() => {
@@ -1082,12 +1082,22 @@ export default function Dashboard() {
                 {prayer.isLoading ? "Chargement des horaires…" : "Afficher les horaires de prière"}
               </button>
             )}
+            </>
+            )}
+            <div className="ml-auto">
+              <TopActions
+                firstName={firstName || ""}
+                email={user?.email}
+                isDarkMode={isDarkMode}
+                onDarkModeChange={setIsDarkMode}
+                onSignOut={() => void handleSignOut()}
+              />
+            </div>
           </div>
         </header>
-        )}
 
         <div
-          className={`mx-auto min-h-[calc(100vh-100px)] bg-background px-4 pb-32 sm:px-6 lg:pb-12 xl:px-8 ${activeView === "overview" ? "max-w-295 pt-8 lg:pt-10" : "max-w-[1600px] pt-6"}`}
+          className={`mx-auto min-h-[calc(100vh-100px)] bg-background px-4 pb-32 sm:px-6 lg:pb-12 xl:px-8 ${activeView === "overview" ? "max-w-295 pt-2" : "max-w-[1600px] pt-6"}`}
         >
           <div className="grid items-start gap-6 xl:gap-8 xl:grid-cols-1">
             <section className="min-w-0 space-y-4">

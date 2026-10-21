@@ -1994,3 +1994,129 @@
 .dashboard-shell details > summary:hover::after {
   opacity: 1;
 }
+
+/* ---------- En-tête : salam, cloche des nouveautés, menu du profil ---------- */
+
+.n-topbar-plain {
+  border-bottom: 0;
+  background: transparent;
+}
+
+.n-greeting-ar {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: clamp(22px, 2.6vw, 28px);
+  line-height: 1.6;
+  color: var(--n-sage);
+  text-align: left;
+}
+
+.n-top-btn,
+.n-top-avatar {
+  position: relative;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+}
+
+.n-top-btn {
+  background: var(--n-paper);
+  color: var(--n-ink);
+  box-shadow: inset 0 0 0 1px var(--n-line);
+  transition: background 0.15s ease;
+}
+
+.n-top-btn:hover,
+.n-top-btn[aria-expanded="true"] {
+  background: var(--n-sage-tint);
+}
+
+.n-top-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  display: flex;
+  min-width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--n-bg);
+  border-radius: 999px;
+  background: var(--n-mauve);
+  padding: 0 4px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.n-top-avatar {
+  background: var(--n-sage-dark);
+  color: var(--n-on-dark);
+  font-size: 14px;
+  font-weight: 700;
+  transition: box-shadow 0.15s ease;
+}
+
+.n-top-avatar:hover,
+.n-top-avatar[aria-expanded="true"] {
+  box-shadow: 0 0 0 3px var(--n-sage-tint);
+}
+
+.n-top-btn:focus-visible,
+.n-top-avatar:focus-visible,
+.n-popover-row:focus-visible {
+  outline: 2px solid var(--n-sage);
+  outline-offset: 2px;
+}
+
+.n-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  width: min(340px, calc(100vw - 32px));
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-lg);
+  background: var(--n-paper);
+  padding: 14px;
+  color: var(--n-ink);
+  font-size: 14px;
+  box-shadow: 0 18px 40px -12px rgba(31, 42, 34, 0.25);
+  animation: n-rise 0.2s ease both;
+}
+
+.n-popover-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  padding: 9px 6px;
+  color: var(--n-ink);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.n-popover-row:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-annonce {
+  border-top: 1px solid var(--n-line);
+  padding: 12px 4px;
+  line-height: 1.45;
+}
+
+.n-annonce:first-child {
+  border-top: 0;
+}
+
+.n-annonce time {
+  color: var(--n-sage);
+  font-size: 12px;
+  font-weight: 600;
+}
