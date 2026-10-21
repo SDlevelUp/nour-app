@@ -214,7 +214,7 @@ export function TodayView({
         <p className="n-greeting-ar" lang="ar" dir="rtl">
           السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
         </p>
-        <h1 className="n-display mt-2 max-w-4xl text-[clamp(28px,4vw,42px)] leading-[1.1] text-(--n-ink)">
+        <h1 className="n-display mt-1 text-[clamp(20px,2.1vw,28px)] leading-[1.2] text-(--n-ink) xl:whitespace-nowrap">
           As-salâmu ʿalaykum wa raḥmatullâhi wa barakâtuh
           {firstName && <span className="text-(--n-sage)">, {firstName}</span>}
         </h1>
