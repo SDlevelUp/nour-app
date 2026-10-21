@@ -3,7 +3,9 @@ import {
   type QuranPlaybackProgress,
 } from "@/components/dashboard/QuranAudioReader";
 import type { QuranResumePosition } from "@/components/dashboard/quranPlaybackResume";
+import { ComposerCard } from "@/components/dashboard/ComposerCard";
 import { api } from "@/convex/_generated/api";
+import { PenLine } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
@@ -126,13 +128,7 @@ export function QuranJournal({
         onOpen={onOpen}
       />
 
-      <details className="n-card" hidden={!isActive}>
-        <summary className="cursor-pointer">
-          <span className="n-display text-xl">Noter une lecture</span>
-          <span className="mt-1 block text-[15px] text-(--n-muted)">
-            Pour garder la trace d’un passage lu en dehors du lecteur.
-          </span>
-        </summary>
+      <ComposerCard title="Noter une lecture" hint="Pour garder la trace d’un passage lu en dehors du lecteur." icon={PenLine} hidden={!isActive}>
       <form
         onSubmit={(event) => void saveEntry(event)}
         className="mt-5 space-y-4"
@@ -197,7 +193,7 @@ export function QuranJournal({
           </button>
         </div>
       </form>
-      </details>
+      </ComposerCard>
 
       <div className="n-card" hidden={!isActive}>
         <h2 className="n-display text-xl">Lectures récentes</h2>

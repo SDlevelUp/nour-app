@@ -1,7 +1,8 @@
 import { api } from "@/convex/_generated/api";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, LibraryBig, PenLine, Plus } from "lucide-react";
+import { ComposerCard } from "@/components/dashboard/ComposerCard";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LearningModule } from "@/components/dashboard/LearningModule";
@@ -28,6 +29,9 @@ export function ScienceJournal() {
   const [source, setSource] = useState("");
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
+  const [showSource, setShowSource] = useState(false);
+  const [showUrl, setShowUrl] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [pendingDelete, setPendingDelete] =
     useState<Id<"scienceStudyLogs"> | null>(null);
@@ -43,6 +47,23 @@ export function ScienceJournal() {
   const [pendingBookAction, setPendingBookAction] = useState<string | null>(
     null,
   );
+
+  const [{ todayDate, sevenDaysAgo }] = useState(() => {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 6);
+    return {
+      todayDate: todayKey(),
+      sevenDaysAgo: new Intl.DateTimeFormat("fr-CA").format(weekStart),
+    };
+  });
+  const sessionsLast7Days = (entries ?? []).filter(
+    (entry) => entry.date >= sevenDaysAgo && entry.date <= todayDate,
+  ).length;
+  const sessionsThisMonth = (entries ?? []).filter((entry) =>
+    entry.date.startsWith(todayDate.slice(0, 7)),
+  ).length;
+  const latestEntry = entries?.[0];
 
   const upcomingBooks = (books ?? [])
     .filter((book) => book.status !== "read")
@@ -220,98 +241,151 @@ export function ScienceJournal() {
 
       {tab === "sessions" && (
         <>
-          <details className="n-card" open={entries !== undefined && entries.length === 0}>
-            <summary className="cursor-pointer">
-              <span className="n-display text-[20px]">Noter une séance</span>
-              <span className="mt-1 block text-[15px] text-(--n-muted)">
-                Un cours suivi, une leçon lue : garde-en la trace.
-              </span>
-            </summary>
-            <form onSubmit={(event) => void saveEntry(event)} className="mt-5 space-y-4">
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_170px_120px]">
-                <label className="grid gap-1 text-[13px] font-semibold">
-                  Cours ou livre étudié
-                  <input
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                    maxLength={160}
-                    placeholder="Ex. Les 40 hadiths de l’imam an-Nawawi"
-                    required
-                    className="n-input"
-                  />
-                </label>
-                <label className="grid gap-1 text-[13px] font-semibold">
-                  Date
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(event) => setDate(event.target.value)}
-                    required
-                    className="n-input"
-                  />
-                </label>
-                <label className="grid gap-1 text-[13px] font-semibold">
-                  Heure
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(event) => setTime(event.target.value)}
-                    required
-                    className="n-input"
-                  />
-                </label>
-              </div>
-              <label className="grid gap-1 text-[13px] font-semibold">
-                Leçon ou chapitre suivi
-                <input
-                  value={lesson}
-                  onChange={(event) => setLesson(event.target.value)}
-                  maxLength={200}
-                  placeholder="Ex. Hadith 3 — Les piliers de l’islam"
-                  required
-                  className="n-input"
-                />
-              </label>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="grid gap-1 text-[13px] font-semibold">
-                  Enseignant ou source (facultatif)
+          <div className="grid items-start gap-4 lg:grid-cols-3">
+            <ComposerCard
+              title="Noter une séance"
+              hint="Un cours suivi, une leçon lue : garde-en la trace."
+              icon={PenLine}
+              defaultOpen={entries !== undefined && entries.length === 0}
+              className="lg:col-span-2"
+            >
+              <form onSubmit={(event) => void saveEntry(event)} className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Cours ou livre
+                    <input
+                      value={title}
+                      onChange={(event) => setTitle(event.target.value)}
+                      maxLength={160}
+                      placeholder="Ex. Les 40 hadiths d’an-Nawawi"
+                      required
+                      className="n-input"
+                    />
+                  </label>
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Leçon ou chapitre
+                    <input
+                      value={lesson}
+                      onChange={(event) => setLesson(event.target.value)}
+                      maxLength={200}
+                      placeholder="Ex. Hadith 3, les piliers de l’islam"
+                      required
+                      className="n-input"
+                    />
+                  </label>
+                </div>
+
+                <div className="flex flex-wrap items-end gap-3">
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Date
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(event) => setDate(event.target.value)}
+                      required
+                      className="n-input w-auto!"
+                    />
+                  </label>
+                  <label className="grid gap-1 text-[13px] font-semibold">
+                    Heure
+                    <input
+                      type="time"
+                      value={time}
+                      onChange={(event) => setTime(event.target.value)}
+                      required
+                      className="n-input w-auto!"
+                    />
+                  </label>
+                  <div className="flex flex-wrap gap-2 pb-1">
+                    {(
+                      [
+                        ["source", "Enseignant", showSource, setShowSource],
+                        ["url", "Lien", showUrl, setShowUrl],
+                        ["notes", "Notes", showNotes, setShowNotes],
+                      ] as const
+                    ).map(([id, label, isShown, setShown]) => (
+                      <button
+                        key={id}
+                        type="button"
+                        className="n-toggle"
+                        aria-pressed={isShown}
+                        onClick={() => setShown(!isShown)}
+                      >
+                        {isShown ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {showSource && (
                   <input
                     value={source}
                     onChange={(event) => setSource(event.target.value)}
                     maxLength={160}
+                    aria-label="Enseignant ou source"
                     placeholder="Nom de l’enseignant ou de la chaîne"
                     className="n-input"
                   />
-                </label>
-                <label className="grid gap-1 text-[13px] font-semibold">
-                  Lien du cours (facultatif, HTTPS)
+                )}
+                {showUrl && (
                   <input
                     type="url"
                     value={url}
                     onChange={(event) => setUrl(event.target.value)}
+                    aria-label="Lien du cours"
                     placeholder="https://…"
                     className="n-input"
                   />
-                </label>
+                )}
+                {showNotes && (
+                  <textarea
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                    maxLength={2000}
+                    aria-label="Notes à retenir"
+                    placeholder="Résumé, idées importantes ou questions…"
+                    className="n-input n-textarea"
+                  />
+                )}
+
+                <div className="flex items-center justify-end gap-3 pt-1">
+                  {showNotes && (
+                    <span className="mr-auto text-[13px] tabular-nums text-(--n-muted)">
+                      {notes.length}/2 000
+                    </span>
+                  )}
+                  <button type="submit" disabled={isSaving} className="n-btn n-btn-sage disabled:opacity-40">
+                    {isSaving ? "Enregistrement…" : "Ajouter la séance"}
+                  </button>
+                </div>
+              </form>
+            </ComposerCard>
+
+            <article className="n-card n-card-dark">
+              <span className="n-label">Ton rythme</span>
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="n-display text-[36px] leading-none">{sessionsLast7Days}</p>
+                  <p className="mt-1 text-[13px] text-(--n-on-dark-muted)">7 derniers jours</p>
+                </div>
+                <div>
+                  <p className="n-display text-[36px] leading-none">{sessionsThisMonth}</p>
+                  <p className="mt-1 text-[13px] text-(--n-on-dark-muted)">ce mois-ci</p>
+                </div>
               </div>
-              <label className="grid gap-1 text-[13px] font-semibold">
-                Notes à retenir (facultatif)
-                <textarea
-                  value={notes}
-                  onChange={(event) => setNotes(event.target.value)}
-                  maxLength={2000}
-                  placeholder="Résumé, idées importantes ou questions…"
-                  className="n-input n-textarea font-normal"
-                />
-              </label>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[13px] tabular-nums text-(--n-muted)">{notes.length}/2 000</span>
-                <button type="submit" disabled={isSaving} className="n-btn n-btn-sage disabled:opacity-40">
-                  {isSaving ? "Enregistrement…" : "Ajouter la séance"}
-                </button>
-              </div>
-            </form>
-          </details>
+              <p className="mt-5 border-t border-white/15 pt-4 text-[14px] text-(--n-on-dark-muted)">
+                {latestEntry ? (
+                  <>
+                    Dernière étude :{" "}
+                    <b className="font-semibold text-(--n-on-dark)">{latestEntry.title}</b>
+                  </>
+                ) : (
+                  "Ta première séance apparaîtra ici."
+                )}
+              </p>
+            </article>
+          </div>
 
           <div>
             <h2 className="n-display px-1 text-[22px]">Études récentes</h2>
@@ -368,13 +442,7 @@ export function ScienceJournal() {
 
       {tab === "books" && (
         <>
-          <details className="n-card" open={books !== undefined && books.length === 0}>
-            <summary className="cursor-pointer">
-              <span className="n-display text-[20px]">Ajouter un livre</span>
-              <span className="mt-1 block text-[15px] text-(--n-muted)">
-                Garde tes prochaines lectures dans l’ordre qui te convient.
-              </span>
-            </summary>
+          <ComposerCard title="Ajouter un livre" hint="Garde tes prochaines lectures dans l’ordre qui te convient." icon={LibraryBig} defaultOpen={books !== undefined && books.length === 0}>
             <form onSubmit={(event) => void saveBook(event)} className="mt-5 grid gap-3 sm:grid-cols-2">
               <label className="grid gap-1 text-[13px] font-semibold">
                 Titre
@@ -415,7 +483,7 @@ export function ScienceJournal() {
                 </button>
               </div>
             </form>
-          </details>
+          </ComposerCard>
 
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 px-1">

@@ -1,4 +1,6 @@
+import { ComposerCard } from "@/components/dashboard/ComposerCard";
 import { api } from "@/convex/_generated/api";
+import { NotebookPen } from "lucide-react";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
@@ -115,14 +117,7 @@ export function LearningModule() {
 
   return (
     <div className="space-y-5">
-      <details className="n-card" open={items !== undefined && items.length === 0}>
-        <summary className="cursor-pointer">
-          <span className="n-display text-[20px]">Nouvelle fiche</span>
-          <span className="mt-1 block text-[15px] text-(--n-muted)">
-            Un matn à apprendre par portions, ou un hadith à documenter. Nour ne fournit
-            aucun contenu ici : complète chaque fiche avec un contenu vérifié.
-          </span>
-        </summary>
+      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions, ou un hadith à documenter. Nour ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
         <form onSubmit={(event) => void save(event)} className="mt-5 space-y-4">
           <div className="n-seg" role="group" aria-label="Type de fiche">
             <button type="button" aria-pressed={kind === "matn"} onClick={() => setKind("matn")}>
@@ -195,7 +190,7 @@ export function LearningModule() {
             </button>
           </div>
         </form>
-      </details>
+      </ComposerCard>
 
       <div>
         <h2 className="n-display px-1 text-[22px]">Mes fiches</h2>
