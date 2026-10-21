@@ -278,7 +278,7 @@
 }
 
 .study-prose {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   line-height: 1.6;
 }
 
@@ -410,8 +410,9 @@
   h4,
   h5,
   h6 {
-    font-family: "Urbanist", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700;
+    /* Titres en Sora, texte courant en Urbanist (choix de Sarah, 2026-10-21). */
+    font-family: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
     letter-spacing: -0.02em;
   }
 
