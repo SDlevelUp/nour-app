@@ -1951,3 +1951,37 @@
 .n-composer-body > form.mt-5 {
   margin-top: 0;
 }
+
+/* ---------- Menus dépliables : chevron fin (icône Lucide chevron-down) ---------- */
+
+.dashboard-shell details > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.dashboard-shell details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dashboard-shell details > summary::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  flex: none;
+  background: currentColor;
+  opacity: 0.6;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-shell details[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.dashboard-shell details > summary:hover::after {
+  opacity: 1;
+}
