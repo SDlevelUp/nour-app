@@ -89,6 +89,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-21 : Science, onglet Séances en bento : carte « Noter une séance » (cours et leçon, date et heure, puis « + Enseignant », « + Lien », « + Notes » à la demande) et carte « Ton rythme » (séances des 7 derniers jours et du mois, dernière étude, calculées depuis les séances enregistrées). Nouveau composant `ComposerCard` (icône Lucide, bouton « + » qui pivote en « × ») à la place des <details> natifs sur Séances, Livres, Apprentissage et « Noter une lecture » du Coran.
 - 2026-10-21 : menus dépliables (Preuve, Pourquoi cette méthode ?, Options d’écoute, Symptômes notés) : triangle natif remplacé par un chevron fin (dessin Lucide chevron-down) qui pivote à l’ouverture, règle CSS commune dans `nour-ui.css`.
 - 2026-10-21 : typographie fixée par Sarah : Sora pour tous les titres (h1 à h6, en plus des classes `n-display`), Urbanist pour le texte courant ; ancienne police Lora de `.study-prose` remplacée par Urbanist.
+- 2026-10-21 : FAQ de la page publique : « + » et « – » remplacés par le même chevron fin que le dashboard.
 
 ## Problèmes connus
 
