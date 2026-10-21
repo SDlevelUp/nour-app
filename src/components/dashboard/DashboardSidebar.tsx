@@ -1,5 +1,14 @@
-import { ChevronLeft, ChevronRight, LayoutGrid, LogOut, MoonStar, X } from "lucide-react";
-import { useState } from "react";
+import {
+  CirclePause,
+  LayoutGrid,
+  LogOut,
+  MoonStar,
+  PanelLeft,
+  Plus,
+  Sun,
+  X,
+} from "lucide-react";
+import { Fragment, useState } from "react";
 import { NourMark } from "@/components/NourMark";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -67,152 +76,144 @@ export function DashboardSidebar({
   return (
     <>
       <aside
-        className={`n-sidebar fixed inset-y-0 left-0 z-40 hidden flex-col py-6 transition-[width,padding] duration-300 ease-in-out lg:flex ${
-          isCollapsed ? "w-18 items-center px-2" : "w-65 px-4"
+        className={`n-rail-shell fixed inset-y-0 left-0 z-40 hidden transition-[width] duration-300 ease-in-out lg:flex ${
+          isCollapsed ? "w-18" : "w-65"
         }`}
       >
-        <div
-          className={`flex w-full items-center ${
-            isCollapsed ? "justify-center" : "justify-between"
-          }`}
-        >
+        {/* Rail d'icônes */}
+        <div className="n-rail">
           <button
             type="button"
             onClick={() => onNavigate("overview")}
-            className={`flex items-center text-left ${isCollapsed ? "" : "gap-2.5 px-2"}`}
+            className="n-rail-logo"
             aria-label="Nour, aujourd’hui"
-            title={isCollapsed ? "Nour, aujourd’hui" : undefined}
+            data-tip="Nour"
           >
-            <NourMark className="size-8 text-(--n-sage)" />
-            {!isCollapsed && <span className="n-display text-2xl">Nour</span>}
+            <NourMark className="size-7 text-(--n-sage)" />
           </button>
-          {!isCollapsed && (
+
+          <button
+            type="button"
+            onClick={() => onNavigate("notes")}
+            className="n-rail-add"
+            aria-label="Nouvelle note"
+            data-tip="Nouvelle note"
+          >
+            <Plus className="size-4.5" strokeWidth={2.2} />
+          </button>
+
+          <nav aria-label="Navigation principale" className="n-rail-nav">
+            {dashboardNavigation.map(({ label, view, icon: Icon }, index) => (
+              <Fragment key={view}>
+                {index > 0 && dashboardNavigation[index - 1].group !== dashboardNavigation[index].group && (
+                  <span className="n-rail-sep" aria-hidden="true" />
+                )}
+                <button
+                  type="button"
+                  onClick={() => onNavigate(view)}
+                  aria-current={activeView === view ? "page" : undefined}
+                  aria-label={label}
+                  data-tip={label}
+                  className="n-rail-item"
+                >
+                  <Icon className="size-4.5" strokeWidth={1.7} />
+                  {view === "notes" && hasUnreadNotes && (
+                    <span className="n-rail-dot" role="status" aria-label="Nouvelle note non consultée" />
+                  )}
+                </button>
+              </Fragment>
+            ))}
+          </nav>
+
+          <div className="n-rail-foot">
+            <button
+              type="button"
+              onClick={() => onExcusePeriodChange(!isExcusePeriod)}
+              aria-pressed={isExcusePeriod}
+              aria-label="Indisponibilité légale (‘Udhr)"
+              data-tip={isExcusePeriod ? "‘Udhr activé" : "‘Udhr"}
+              className="n-rail-item"
+            >
+              <CirclePause className="size-4.5" strokeWidth={1.7} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDarkModeChange(!isDarkMode)}
+              aria-pressed={isDarkMode}
+              aria-label="Mode nuit"
+              data-tip={isDarkMode ? "Mode jour" : "Mode nuit"}
+              className="n-rail-item"
+            >
+              {isDarkMode ? (
+                <Sun className="size-4.5" strokeWidth={1.7} />
+              ) : (
+                <MoonStar className="size-4.5" strokeWidth={1.7} />
+              )}
+            </button>
             <button
               type="button"
               onClick={onCollapse}
-              className="n-nav-item w-auto! p-1.5!"
-              aria-label="Replier la barre latérale"
-              title="Replier la barre latérale"
+              aria-label={isCollapsed ? "Déplier le menu" : "Replier le menu"}
+              data-tip={isCollapsed ? "Déplier le menu" : "Replier le menu"}
+              className="n-rail-item"
             >
-              <ChevronLeft className="size-4" />
+              <PanelLeft className="size-4.5" strokeWidth={1.7} />
             </button>
-          )}
-        </div>
-
-        <nav aria-label="Navigation principale" className="mt-8 w-full space-y-6">
-          {dashboardNavigationGroups.map((group) => (
-            <div key={group.id}>
-              {!isCollapsed && <p className="n-nav-heading">{group.label}</p>}
-              <div className="space-y-0.5">
-                {dashboardNavigation
-                  .filter((item) => item.group === group.id)
-                  .map(({ label, view, icon: Icon }) => (
-                    <button
-                      key={view}
-                      type="button"
-                      onClick={() => onNavigate(view)}
-                      aria-current={activeView === view ? "page" : undefined}
-                      data-collapsed={isCollapsed}
-                      title={isCollapsed ? label : undefined}
-                      aria-label={isCollapsed ? label : undefined}
-                      className="n-nav-item"
-                    >
-                      <Icon className="size-4.5 shrink-0" strokeWidth={1.8} />
-                      {!isCollapsed && <span>{label}</span>}
-                      {view === "notes" && hasUnreadNotes && (
-                        <span
-                          className={`n-unread ${isCollapsed ? "absolute right-2 top-2" : "ml-auto"}`}
-                          role="status"
-                          aria-label="Nouvelle note non consultée"
-                        />
-                      )}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        {!isCollapsed ? (
-          <div className="n-panel mt-6 w-full p-3">{excuseToggle}</div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onExcusePeriodChange(!isExcusePeriod)}
-            aria-pressed={isExcusePeriod}
-            aria-label="Activer ou désactiver l’indisponibilité légale Al-Udhr"
-            title="Indisponibilité légale (‘Udhr)"
-            className="n-nav-item mt-4"
-            data-collapsed="true"
-            aria-current={isExcusePeriod ? "page" : undefined}
-          >
-            <MoonStar className="size-4" />
-          </button>
-        )}
-
-        <div className={`mt-auto w-full ${isCollapsed ? "flex flex-col items-center gap-2" : ""}`}>
-          {!isCollapsed && (
-            <div className="flex items-center gap-3 px-2">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--n-sage-tint) text-sm font-semibold">
-                {initials}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold">
-                  {firstName || "Mon profil"}
-                </span>
-                <span className="block truncate text-xs opacity-70">
-                  {email || "Espace personnel"}
-                </span>
-              </span>
-            </div>
-          )}
-          <div className={isCollapsed ? "contents" : "mt-3 flex items-center justify-between px-2"}>
-            {isCollapsed ? (
-              <button
-                type="button"
-                onClick={() => onDarkModeChange(!isDarkMode)}
-                className="n-nav-item"
-                data-collapsed="true"
-                aria-label="Activer ou désactiver le mode nuit"
-                aria-pressed={isDarkMode}
-                title="Mode nuit"
-              >
-                <MoonStar className="size-4" />
-              </button>
-            ) : (
-              <label className="flex items-center gap-2 text-[13px] font-semibold">
-                <Switch
-                  checked={isDarkMode}
-                  onCheckedChange={onDarkModeChange}
-                  aria-label="Activer le mode nuit"
-                />
-                Mode nuit
-              </label>
-            )}
-            <button
-              type="button"
-              onClick={onSignOut}
-              className={`n-nav-item ${isCollapsed ? "" : "w-auto! gap-1.5! px-2! py-1.5! text-[13px]"}`}
-              data-collapsed={isCollapsed}
-              aria-label="Se déconnecter"
-              title="Se déconnecter"
-            >
-              <LogOut className="size-4" />
-              {!isCollapsed && "Quitter"}
-            </button>
+            <span className="n-rail-avatar" title={firstName || email || "Mon profil"}>
+              {initials}
+            </span>
           </div>
         </div>
 
-        {isCollapsed && (
-          <button
-            type="button"
-            onClick={onCollapse}
-            className="absolute right-0 top-1/2 flex size-7 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-(--n-line) bg-(--n-paper) text-(--n-muted) transition hover:text-(--n-ink)"
-            aria-label="Déplier la barre latérale"
-            title="Déplier la barre latérale"
-          >
-            <ChevronRight className="size-4" />
-          </button>
+        {/* Panneau déplié : les pages en texte seul */}
+        {!isCollapsed && (
+          <div className="n-rail-panel">
+            <p className="n-display px-2 text-[20px]">Nour</p>
+            <nav aria-label="Pages" className="mt-6 space-y-5">
+              {dashboardNavigationGroups.map((group) => (
+                <div key={group.id}>
+                  <p className="n-rail-heading">{group.label}</p>
+                  {dashboardNavigation
+                    .filter((item) => item.group === group.id)
+                    .map(({ label, view }) => (
+                      <button
+                        key={view}
+                        type="button"
+                        onClick={() => onNavigate(view)}
+                        aria-current={activeView === view ? "page" : undefined}
+                        className="n-rail-link"
+                      >
+                        {label}
+                        {view === "notes" && hasUnreadNotes && <span className="n-unread ml-auto" />}
+                      </button>
+                    ))}
+                </div>
+              ))}
+            </nav>
+
+            <div className="mt-auto space-y-3">
+              <div className="n-panel p-3">{excuseToggle}</div>
+              <div className="flex items-center justify-between gap-2 px-2">
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">
+                    {firstName || "Mon profil"}
+                  </span>
+                  <span className="block truncate text-xs text-(--n-muted)">
+                    {email || "Espace personnel"}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={onSignOut}
+                  className="n-icon-btn shrink-0"
+                  aria-label="Se déconnecter"
+                  title="Se déconnecter"
+                >
+                  <LogOut className="size-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </aside>
 

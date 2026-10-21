@@ -1,4 +1,3 @@
-import { BookOpen, CalendarClock, GraduationCap, HandHeart, Moon } from "lucide-react";
 import { useState } from "react";
 import { NourMark } from "@/components/NourMark";
 import { adhkarBySession } from "@/convex/adhkarData";
@@ -82,6 +81,28 @@ const sampleTimes = [
 ] as const;
 
 const sampleInvocation = adhkarBySession.morning[0];
+
+// Fragments d'interface pour l'index des fonctionnalités (données d'illustration).
+const sampleSurahs = [
+  [1, "Al-Faatiha", 7, "الفاتحة"],
+  [2, "Al-Baqara", 286, "البقرة"],
+  [3, "Aal-i-Imraan", 200, "آل عمران"],
+] as const;
+
+const sampleWeek = [
+  ["lun", 13, "period"],
+  ["mar", 14, "period"],
+  ["mer", 15, "period"],
+  ["jeu", 16, "today"],
+  ["ven", 17, ""],
+  ["sam", 18, ""],
+  ["dim", 19, ""],
+] as const;
+
+const sampleBooks = [
+  ["Al-Arba‘in an-Nawawiyya", "an-Nawawi", "En cours"],
+  ["Riyad as-Salihin", "an-Nawawi", "À lire"],
+] as const;
 
 function KhatamPattern({ id }: { id: string }) {
   return (
@@ -212,89 +233,154 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Fonctionnalités */}
+      {/* Fonctionnalités : index éditorial, chaque ligne montre un fragment réel de l'interface */}
       <section id="fonctionnalites" className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
         <span className="n-label">L’application</span>
         <h2 className="n-section-title mt-4 max-w-3xl">
           Ta pratique et tes repères, au même endroit.
         </h2>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-6">
-          <article className="n-card flex flex-col gap-4 lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <HandHeart className="size-5 text-(--n-sage)" aria-hidden="true" />
-              <h3 className="n-display text-xl">Adhkar du matin et du soir</h3>
+        <ol className="n-index mt-12">
+          <li className="n-index-row">
+            <span className="n-index-num">01</span>
+            <div>
+              <h3 className="n-index-title">Adhkar du matin et du soir</h3>
+              <p className="n-index-text">
+                Une invocation à la fois, un cercle à toucher à chaque récitation, et la
+                preuve juste en dessous.
+              </p>
             </div>
-            <p className="n-arabic text-[clamp(22px,2.6vw,28px)]" lang="ar">
-              {sampleInvocation.arabic}
-            </p>
-            <p className="text-[15px] italic text-(--n-muted)">
-              {sampleInvocation.transliteration}
-            </p>
-            <p>{sampleInvocation.meaning}</p>
-            <p className="border-t border-(--n-line) pt-3 text-[13px] text-(--n-muted)">
-              {sampleInvocation.proof.sources.map((source, index) => (
-                <span key={`${source.collection}-${source.number}`}>
-                  {index > 0 && " · "}
-                  <b className="font-semibold text-(--n-ink)">
-                    {source.collection} {source.number}
-                  </b>{" "}
-                  {source.grades[0]?.grade}
-                  {source.grades[0] && ` (${source.grades[0].by})`}
+            <div className="n-index-preview">
+              <p className="n-arabic text-[22px] leading-[1.9]" lang="ar">
+                {sampleInvocation.arabic}
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-3 border-t border-(--n-line) pt-3">
+                <p className="text-[12px] text-(--n-muted)">
+                  {sampleInvocation.proof.sources.map((source, index) => (
+                    <span key={`${source.collection}-${source.number}`}>
+                      {index > 0 && " · "}
+                      <b className="font-semibold text-(--n-ink)">
+                        {source.collection} {source.number}
+                      </b>
+                    </span>
+                  ))}
+                </p>
+                <span className="n-mini-ring" aria-hidden="true">
+                  1<small>/{sampleInvocation.repetitions}</small>
                 </span>
+              </div>
+            </div>
+          </li>
+
+          <li className="n-index-row">
+            <span className="n-index-num">02</span>
+            <div>
+              <h3 className="n-index-title">Coran</h3>
+              <p className="n-index-text">
+                Les sourates à gauche, le texte à droite. Touche un verset pour l’écouter,
+                l’écoute continue pendant que tu navigues.
+              </p>
+            </div>
+            <div className="n-index-preview p-2!">
+              {sampleSurahs.map(([number, name, verses, arabic], index) => (
+                <div key={number} className="n-surah-item" aria-current={index === 1}>
+                  <span className="n-surah-num">
+                    <NourMark />
+                    <span className="relative">{number}</span>
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{name}</span>
+                    <span className="block text-[13px] text-(--n-muted)">{verses} versets</span>
+                  </span>
+                  <span className="n-surah-name-ar" lang="ar">
+                    {arabic}
+                  </span>
+                </div>
               ))}
-            </p>
-          </article>
+            </div>
+          </li>
 
-          <article className="n-card n-card-tint flex flex-col gap-3 lg:col-span-2">
-            <BookOpen className="size-5 text-(--n-sage)" aria-hidden="true" />
-            <h3 className="n-display text-xl">Coran</h3>
-            <p className="text-[15px] leading-6 text-(--n-muted)">
-              Écoute la récitation, note les passages lus et reprends ta
-              lecture là où tu t’es arrêtée.
-            </p>
-          </article>
+          <li className="n-index-row">
+            <span className="n-index-num">03</span>
+            <div>
+              <h3 className="n-index-title">Prières et planning</h3>
+              <p className="n-index-text">
+                Les horaires de ta ville, calculés automatiquement, et ta journée en frise
+                autour d’eux.
+              </p>
+            </div>
+            <div className="n-index-preview">
+              <ul className="n-topbar-times">
+                {sampleTimes.map(([name, time]) => (
+                  <li key={name} data-next={name === "Maghrib"}>
+                    <span>{name}</span>
+                    <b>{time}</b>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[12px] text-(--n-muted)">Horaires d’exemple.</p>
+            </div>
+          </li>
 
-          <article className="n-card flex flex-col gap-3 lg:col-span-2">
-            <CalendarClock className="size-5 text-(--n-sage)" aria-hidden="true" />
-            <h3 className="n-display text-xl">Prières et planning</h3>
-            <p className="text-[15px] leading-6 text-(--n-muted)">
-              Les horaires de ta ville et les repères de ta journée, dans un
-              planning clair.
-            </p>
-          </article>
+          <li className="n-index-row">
+            <span className="n-index-num">04</span>
+            <div>
+              <h3 className="n-index-title">Cycle et qada</h3>
+              <p className="n-index-text">
+                Note tes jours, suis les jeûnes à rattraper et adapte ton planning avec le
+                mode Al-‘Udhr.
+              </p>
+            </div>
+            <div className="n-index-preview">
+              <div className="n-week">
+                {sampleWeek.map(([day, date, state]) => (
+                  <span
+                    key={day}
+                    className="n-day"
+                    data-period={state === "period"}
+                    data-today={state === "today"}
+                  >
+                    {day}
+                    <b>{date}</b>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </li>
 
-          <article className="n-card flex flex-col gap-3 lg:col-span-2">
-            <Moon className="size-5 text-(--n-mauve)" aria-hidden="true" />
-            <h3 className="n-display text-xl">Cycle et qada</h3>
-            <p className="text-[15px] leading-6 text-(--n-muted)">
-              Note tes jours, suis les jeûnes à rattraper et adapte ton
-              planning avec le mode Al-‘Udhr.
-            </p>
-          </article>
-
-          <article className="n-card flex flex-col gap-3 lg:col-span-2">
-            <GraduationCap className="size-5 text-(--n-sage)" aria-hidden="true" />
-            <h3 className="n-display text-xl">Science bénéfique</h3>
-            <p className="text-[15px] leading-6 text-(--n-muted)">
-              Tes livres, tes cours et ce que tu retiens, avec la source de
-              chaque note.
-            </p>
-          </article>
-        </div>
+          <li className="n-index-row">
+            <span className="n-index-num">05</span>
+            <div>
+              <h3 className="n-index-title">Science bénéfique</h3>
+              <p className="n-index-text">
+                Tes livres dans l’ordre de lecture, tes cours et ce que tu en retiens.
+              </p>
+            </div>
+            <div className="n-index-preview space-y-2">
+              {sampleBooks.map(([title, author, status], index) => (
+                <div key={title} className="flex items-center gap-3">
+                  <span className="n-book-rank">{index + 1}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{title}</span>
+                    <span className="block text-[13px] text-(--n-muted)">{author}</span>
+                  </span>
+                  <span className="n-chip">{status}</span>
+                </div>
+              ))}
+            </div>
+          </li>
+        </ol>
       </section>
 
       {/* Étapes */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-8 sm:pb-24">
         <span className="n-label">Pour commencer</span>
         <h2 className="n-section-title mt-4">Trois étapes, et c’est prêt.</h2>
-        <ol className="mt-10 grid gap-4 md:grid-cols-3">
+        <ol className="mt-10 grid gap-8 border-t border-(--n-line) pt-8 md:grid-cols-3">
           {steps.map(({ title, text }, index) => (
-            <li key={title} className="n-card">
-              <span className="n-display text-[44px] leading-none text-(--n-sage)">
-                {index + 1}
-              </span>
-              <h3 className="n-display mt-5 text-xl">{title}</h3>
+            <li key={title}>
+              <span className="n-index-num">0{index + 1}</span>
+              <h3 className="n-display mt-3 text-xl">{title}</h3>
               <p className="mt-2 text-[15px] leading-6 text-(--n-muted)">{text}</p>
             </li>
           ))}
