@@ -56,20 +56,20 @@ export function DashboardSidebar({
   const isMoreActive = moreItems.some((item) => item.view === activeView);
 
   const excuseToggle = (
-    <div className="flex items-start gap-2.5">
-      <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-semibold leading-4">
-          Indisponibilité légale (‘Udhr)
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] font-semibold leading-4">
+          Indisponibilité (‘Udhr)
         </span>
-        <span className="mt-1 block text-[12px] leading-4 opacity-70">
-          Masque les créneaux de prière du planning
-        </span>
-      </span>
-      <Switch
-        checked={isExcusePeriod}
-        onCheckedChange={onExcusePeriodChange}
-        aria-label="Activer l’indisponibilité légale Al-Udhr"
-      />
+        <Switch
+          checked={isExcusePeriod}
+          onCheckedChange={onExcusePeriodChange}
+          aria-label="Activer l’indisponibilité légale Al-Udhr"
+        />
+      </div>
+      <p className="mt-1.5 text-[12px] leading-[1.35] opacity-70">
+        Masque les créneaux de prière du planning.
+      </p>
     </div>
   );
 
