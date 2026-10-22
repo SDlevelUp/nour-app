@@ -64,6 +64,20 @@ const faqs = [
       "Notes, lectures et suivi du cycle sont enregistrés dans ton compte et disponibles sur tous tes appareils. La position reste sur l’appareil et sert uniquement au calcul des horaires.",
   },
   {
+    question: "Nour est-elle adaptée aux femmes musulmanes ?",
+    answer:
+      "Oui. Nour inclut le suivi du cycle, le compteur de jours de jeûne à rattraper (qada) et le mode ‘Udhr, qui masque les prières du planning pendant les règles.",
+  },
+  {
+    question: "Quels adhkar contient Nour ?",
+    answer: `${adhkarBySession.morning.length} invocations le matin et ${adhkarBySession.evening.length} le soir, dont la demande de pardon maîtresse (Sayyid al-istighfar), al-Ikhlas, al-Falaq et an-Nas. Chaque invocation affiche son rapporteur, son recueil, son numéro et son degré d’authenticité.`,
+  },
+  {
+    question: "Peut-on écouter le Coran dans Nour ?",
+    answer:
+      "Oui. Les 114 sourates se lisent et s’écoutent verset par verset, avec plusieurs récitateurs. La phonétique et la traduction française s’affichent sous chaque verset. L’écoute continue quand tu changes de page.",
+  },
+  {
     question: "Faut-il installer l’application ?",
     answer:
       "Non. Nour fonctionne dans le navigateur. Tu peux l’ajouter à l’écran d’accueil du téléphone.",
@@ -176,8 +190,9 @@ export default function Landing() {
             Adhkar, Coran et <span className="text-(--n-sage)">prières.</span>
           </h1>
           <p className="mt-5 max-w-xl text-[17px] leading-7 text-(--n-muted)">
-            Horaires de prière calculés selon ta position. Adhkar du matin et du soir
-            avec leurs sources. Lecture et écoute du Coran. Suivi du cycle et du qada.
+            Application musulmane pour les femmes. Horaires de prière calculés selon ta
+            position. Adhkar du matin et du soir avec leurs sources. Lecture et écoute du
+            Coran. Suivi du cycle et du qada. Un rappel des pieux prédécesseurs chaque jour.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a href={authHref} className="n-btn px-6! py-4!">
@@ -252,8 +267,9 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Adhkar du matin et du soir</h3>
               <p className="n-index-text">
-                Une invocation à la fois. Un compteur à toucher à chaque récitation. La
-                preuve sous chaque texte.
+                Dhikr et invocations du matin et du soir, tirés de Sahih al-Bukhari, Sahih
+                Muslim et des recueils de hadiths authentifiés. Une invocation à la fois, un
+                compteur à toucher à chaque récitation, la preuve sous chaque texte.
               </p>
             </div>
             <div className="n-index-preview">
@@ -283,7 +299,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Coran</h3>
               <p className="n-index-text">
-                Sourates à gauche, texte à droite. Touche un verset pour l’écouter. L’écoute
+                Les 114 sourates, verset par verset, en arabe avec phonétique et traduction
+                française. Plusieurs récitateurs. Touche un verset pour l’écouter ; l’écoute
                 continue sur les autres pages.
               </p>
             </div>
@@ -311,8 +328,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Prières et planning</h3>
               <p className="n-index-text">
-                Horaires calculés selon ta position. Planning de la journée organisé autour
-                des prières.
+                Horaires de prière (Fajr, Dhuhr, Asr, Maghrib, Isha) calculés selon ta
+                position. Planning de la journée organisé autour des prières.
               </p>
             </div>
             <div className="n-index-preview">
@@ -333,8 +350,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Cycle et qada</h3>
               <p className="n-index-text">
-                Jours de règles et jeûnes à rattraper. Le mode ‘Udhr masque les prières du
-                planning.
+                Suivi des règles, estimation des prochaines règles et compteur de jeûnes à
+                rattraper (qada). Le mode ‘Udhr masque les prières du planning.
               </p>
             </div>
             <div className="n-index-preview">
@@ -359,7 +376,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Science bénéfique</h3>
               <p className="n-index-text">
-                Livres à lire, cours suivis et notes de révision.
+                Livres à lire, cours suivis, notes de révision et matn à mémoriser par
+                portions.
               </p>
             </div>
             <div className="n-index-preview space-y-2">
