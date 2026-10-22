@@ -11,7 +11,6 @@ export const prayerCalculation = {
   method: 99,
   latitudeAdjustmentMethod: 3,
   label: "Fajr et Isha à 15°, Maghrib + 4 min",
-  referenceMosque: "mosquée Al-Houda d’Antony (Mawaqit)",
   fajrAngle: 15,
   ishaAngle: 15,
   maghribOffsetMinutes: 4,

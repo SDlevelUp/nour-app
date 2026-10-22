@@ -61,6 +61,6 @@ export const annonces: Annonce[] = [
     id: "2026-10-19-horaires",
     date: "2026-10-19",
     title: "Horaires de prière ajustés",
-    text: "Les horaires suivent désormais les réglages de la mosquée Al-Houda d’Antony (Fajr et Isha à 15°, Maghrib + 4 min).",
+    text: "Nouveau calcul des horaires : Fajr et Isha à 15°, Maghrib 4 minutes après le coucher du soleil.",
   },
 ];

@@ -2248,13 +2248,8 @@ export default function Dashboard() {
                         soleil. La même méthode s’applique à tout le monde dans Nour.
                       </p>
                       <details className="n-proof mt-3 border-t-0! pt-0!">
-                        <summary>Pourquoi cette méthode ?</summary>
+                        <summary>Écart avec ta mosquée</summary>
                         <div className="mt-2 space-y-2 text-(--n-muted)">
-                          <p>
-                            Ce sont les réglages de la {prayerCalculation.referenceMosque}. Les
-                            horaires de Nour correspondent donc à ceux affichés par cette
-                            mosquée.
-                          </p>
                           <p>
                             Chaque mosquée choisit ses propres angles et ajoute parfois quelques
                             minutes de précaution. Si ta mosquée utilise d’autres réglages, un
