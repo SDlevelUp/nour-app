@@ -6,7 +6,7 @@
  */
 
 :root {
-  --n-font-display: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  --n-font-display: "Albert Sans", "Urbanist", ui-sans-serif, system-ui, sans-serif;
 }
 
 .dashboard-shell,
@@ -2119,4 +2119,33 @@
   color: var(--n-sage);
   font-size: 12px;
   font-weight: 600;
+}
+
+/* ---------- Rappel du jour ---------- */
+
+.n-rappel {
+  border-color: transparent;
+  background: var(--n-mauve-tint);
+}
+
+.n-rappel .n-label {
+  color: var(--n-mauve-text);
+}
+
+.n-rappel-text {
+  margin-top: 14px;
+  max-width: 62ch;
+  font-family: var(--n-font-display);
+  font-size: clamp(18px, 1.9vw, 22px);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+.n-rappel-text::before {
+  content: "« ";
+}
+
+.n-rappel-text::after {
+  content: " »";
 }

@@ -1,5 +1,5 @@
 /* DO NOT CHANGE */
-@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Sora:wght@500;600&family=Urbanist:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Albert+Sans:wght@500;600;700&family=Urbanist:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/nour-ui.css";
@@ -10,7 +10,7 @@
   --font-sans: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Urbanist", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Albert Sans", "Urbanist", ui-sans-serif, system-ui, sans-serif;
   --radius-xs: var(--radius);
   --radius-sm: var(--radius);
   --radius-md: var(--radius);
@@ -410,8 +410,8 @@
   h4,
   h5,
   h6 {
-    /* Titres en Sora, texte courant en Urbanist (choix de Sarah, 2026-10-21). */
-    font-family: "Sora", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+    /* Titres en Albert Sans, texte courant en Urbanist (choix de Sarah, 2026-10-22). */
+    font-family: "Albert Sans", "Urbanist", ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }

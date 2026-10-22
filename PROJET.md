@@ -12,7 +12,7 @@ Application web d'organisation spirituelle et personnelle : planning avec horair
 - Hébergement front : Vercel (`vercel.json`, réécriture SPA) ; `main.ts` sert aussi `dist/` avec Hono sous Deno.
 - Déploiement du back : le `buildCommand` de `vercel.json` lance `npx convex deploy` avant le build si `CONVEX_DEPLOY_KEY` est définie, sinon il ne construit que le front. Sans cette clé, toute modification de `src/convex/` doit être déployée à la main : `CONVEX_DEPLOYMENT=prod:useful-anaconda-844 npx convex deploy`.
 - Horaires de prière : API AlAdhan (gratuite), réglages imposés de la mosquée Al-Houda d'Antony sur Mawaqit (méthode personnalisée : Fajr 15°, Isha 15°, Maghrib + 4 min, ajustement haute latitude « angle based ») ; constante `prayerCalculation` dans `src/hooks/use-prayer-times.ts`.
-- Design du dashboard : `src/styles/nour-ui.css` (classes `n-*`, mode nuit compris), polices Sora (titres), Urbanist (texte), Amiri et Noto Naskh Arabic (arabe).
+- Design du dashboard : `src/styles/nour-ui.css` (classes `n-*`, mode nuit compris), polices Albert Sans (titres), Urbanist (texte), Amiri et Noto Naskh Arabic (arabe).
 
 ## Démarrage rapide
 
@@ -91,6 +91,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-21 : typographie fixée par Sarah : Sora pour tous les titres (h1 à h6, en plus des classes `n-display`), Urbanist pour le texte courant ; ancienne police Lora de `.study-prose` remplacée par Urbanist.
 - 2026-10-21 : FAQ de la page publique : « + » et « – » remplacés par le même chevron fin que le dashboard.
 - 2026-10-21 : haut du dashboard refait sur proposition de Sarah : salam complet en arabe (السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ) et en phonétique, « à ton rythme » retiré, date sous le salam ; en haut à droite, cloche des nouveautés (annonces dans `src/data/annonces.ts`, une annonce = un déploiement, « lu » mémorisé sur l’appareil via `nour-annonces-vues`, décision du 2026-10-21) et menu du profil (nom, e-mail, mode nuit, déconnexion) dans `TopActions.tsx`. Profil et mode nuit retirés de la barre latérale.
+- 2026-10-22 : titres en Albert Sans (à la place de Sora), texte en Urbanist, sur la page publique et le dashboard. Nouveau module « Rappel du jour » sur « Aujourd’hui » : textes fournis par Sarah uniquement, avec auteur et source, dans `src/data/rappels.ts` (rotation quotidienne, carte masquée si la liste est vide). Premier rappel : Yahya Ibn Mou’adh, Sifat Safwa, v.4/p.341.
 
 ## Problèmes connus
 

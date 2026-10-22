@@ -4,10 +4,12 @@ import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AdhkarInvocation, AdhkarSession } from "@/convex/adhkarData";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
+import { rappelDuJour } from "@/data/rappels";
 
-type TodayModule = "adhkar" | "quran" | "cycle" | "notes" | "tasks";
+type TodayModule = "rappel" | "adhkar" | "quran" | "cycle" | "notes" | "tasks";
 
 const moduleLabels: Record<TodayModule, string> = {
+  rappel: "Rappel du jour",
   adhkar: "Adhkar du moment",
   quran: "Reprendre la lecture",
   cycle: "Cycle",
@@ -16,6 +18,7 @@ const moduleLabels: Record<TodayModule, string> = {
 };
 
 const defaultModules: Record<TodayModule, boolean> = {
+  rappel: true,
   adhkar: true,
   quran: true,
   cycle: true,
@@ -32,6 +35,7 @@ function readModules(): Record<TodayModule, boolean> {
     if (!stored) return defaultModules;
     const value = JSON.parse(stored) as Partial<Record<TodayModule, unknown>>;
     return {
+      rappel: typeof value.rappel === "boolean" ? value.rappel : defaultModules.rappel,
       adhkar: typeof value.adhkar === "boolean" ? value.adhkar : defaultModules.adhkar,
       quran: typeof value.quran === "boolean" ? value.quran : defaultModules.quran,
       cycle: typeof value.cycle === "boolean" ? value.cycle : defaultModules.cycle,
@@ -196,6 +200,8 @@ export function TodayView({
     year: "numeric",
   }).format(date);
 
+  const rappel = rappelDuJour(date);
+
   const week = [-2, -1, 0, 1, 2, 3, 4].map((offset) => {
     const day = offset < 0 ? subDays(date, -offset) : addDays(date, offset);
     const key = format(day, "yyyy-MM-dd");
@@ -291,6 +297,29 @@ export function TodayView({
             </div>
           )}
         </article>
+
+        {modules.rappel && rappel && (
+          <figure className="n-card n-rappel n-rise lg:col-span-6">
+            <span className="n-label">Rappel du jour</span>
+            {rappel.arabic && (
+              <p className="n-arabic mt-4 text-[22px] leading-[1.9]" lang="ar">
+                {rappel.arabic}
+              </p>
+            )}
+            <blockquote className="n-rappel-text">{rappel.text}</blockquote>
+            <figcaption className="mt-4 text-[14px] text-(--n-muted)">
+              <span className="font-semibold text-(--n-ink)">{rappel.author}</span>
+              {" · "}
+              {/^https?:\/\//.test(rappel.source) ? (
+                <a href={rappel.source} target="_blank" rel="noreferrer" className="n-link font-normal">
+                  Source
+                </a>
+              ) : (
+                rappel.source
+              )}
+            </figcaption>
+          </figure>
+        )}
 
         {modules.adhkar && (
           <article
