@@ -51,7 +51,7 @@ const faqs = [
   },
   {
     question: "Comment sont calculés les horaires de prière ?",
-    answer: `Selon ta position, avec les réglages de la ${prayerCalculation.referenceMosque} : Fajr quand le soleil est à ${prayerCalculation.fajrAngle}° sous l’horizon, Isha à ${prayerCalculation.ishaAngle}°, Maghrib ${prayerCalculation.maghribOffsetMinutes} minutes après le coucher du soleil. Si ta mosquée utilise d’autres réglages, un écart de quelques minutes est possible.`,
+    answer: `Automatiquement, selon ta position : autorise la localisation une fois, les horaires de ta ville s’affichent chaque jour. Calcul : Fajr et Isha quand le soleil est à ${prayerCalculation.fajrAngle}° sous l’horizon, Maghrib ${prayerCalculation.maghribOffsetMinutes} minutes après le coucher du soleil. Un écart de quelques minutes avec ta mosquée est possible.`,
   },
   {
     question: "Puis-je faire une pause pendant mes règles ?",
