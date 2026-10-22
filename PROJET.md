@@ -96,6 +96,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-22 : barre latérale simplifiée à la demande de Sarah : une seule colonne ; ouverte, chaque ligne montre l’icône et le texte (avec « Nouvelle note », titres de groupes, ‘Udhr et « Fermer le menu ») ; fermée, icônes seules avec étiquettes au survol. Le double affichage rail + panneau est supprimé (classes `n-side-*` à la place de `n-rail-*`).
 - 2026-10-22 : page Cycle réorganisée sur 12 colonnes sans étirement (le calendrier laissait un grand vide) : calendrier (7) et, à droite, « Prochaines règles estimées » + statistiques en tuiles 2 × 2 (5) ; dessous, « Ta période » (7) et, à droite, qada, notes du cycle et symptômes empilés (5).
 - 2026-10-22 : modification des règles « à la Flo » : bouton « Modifier les règles » sous le calendrier, chaque jour devient une case ronde à cocher ou décocher, puis « Enregistrer les nouvelles règles » ou « Annuler ». Nouvelle mutation `cycleTracking.setPeriodDays` (jours ajoutés et retirés, 400 au maximum), déployée sur anaconda. L’ancienne sélection par plage et la modification par dates de début et de fin sont retirées de l’interface ; hors modification, toucher un jour choisit la date de la note et des observations (« Ce jour-là »). Les modifications visibles s’accompagnent désormais d’une annonce dans la cloche (demande de Sarah).
+- 2026-10-22 : « Aujourd’hui » : prochaine prière (4/6) et rappel du jour (2/6) côte à côte sur ordinateur ; la prière reprend toute la largeur si le rappel est masqué ou absent.
 
 ## Problèmes connus
 

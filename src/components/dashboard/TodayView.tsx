@@ -201,6 +201,7 @@ export function TodayView({
   }).format(date);
 
   const rappel = rappelDuJour(date);
+  const showsRappel = modules.rappel && rappel !== null;
 
   const week = [-2, -1, 0, 1, 2, 3, 4].map((offset) => {
     const day = offset < 0 ? subDays(date, -offset) : addDays(date, offset);
@@ -234,7 +235,7 @@ export function TodayView({
 
       <div className="mt-8 grid gap-4 lg:grid-cols-6">
         {/* Prochaine prière : toujours affichée */}
-        <article className="n-card n-card-dark n-rise lg:col-span-6" aria-label="Prochaine prière">
+        <article className={`n-card n-card-dark n-rise ${showsRappel ? "lg:col-span-4" : "lg:col-span-6"}`} aria-label="Prochaine prière">
           <KhatamPattern />
           {prayerTimes ? (
             <>
@@ -299,7 +300,7 @@ export function TodayView({
         </article>
 
         {modules.rappel && rappel && (
-          <figure className="n-card n-rappel n-rise lg:col-span-6">
+          <figure className="n-card n-rappel n-rise flex flex-col lg:col-span-2">
             <span className="n-label">Rappel du jour</span>
             {rappel.arabic && (
               <p className="n-arabic mt-4 text-[22px] leading-[1.9]" lang="ar">
@@ -307,7 +308,7 @@ export function TodayView({
               </p>
             )}
             <blockquote className="n-rappel-text">{rappel.text}</blockquote>
-            <figcaption className="mt-4 text-[14px] text-(--n-muted)">
+            <figcaption className="mt-auto pt-4 text-[13px] text-(--n-muted)">
               <span className="font-semibold text-(--n-ink)">{rappel.author}</span>
               {" · "}
               {/^https?:\/\//.test(rappel.source) ? (
