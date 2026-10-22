@@ -92,6 +92,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-21 : FAQ de la page publique : « + » et « – » remplacés par le même chevron fin que le dashboard.
 - 2026-10-21 : haut du dashboard refait sur proposition de Sarah : salam complet en arabe (السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ) et en phonétique, « à ton rythme » retiré, date sous le salam ; en haut à droite, cloche des nouveautés (annonces dans `src/data/annonces.ts`, une annonce = un déploiement, « lu » mémorisé sur l’appareil via `nour-annonces-vues`, décision du 2026-10-21) et menu du profil (nom, e-mail, mode nuit, déconnexion) dans `TopActions.tsx`. Profil et mode nuit retirés de la barre latérale.
 - 2026-10-22 : titres en Albert Sans (à la place de Sora), texte en Urbanist, sur la page publique et le dashboard. Nouveau module « Rappel du jour » sur « Aujourd’hui » : textes fournis par Sarah uniquement, avec auteur et source, dans `src/data/rappels.ts` (rotation quotidienne, carte masquée si la liste est vide). Premier rappel : Yahya Ibn Mou’adh, Sifat Safwa, v.4/p.341.
+- 2026-10-22 : calendrier du cycle refait (inspiration Flo, `CycleCalendar.tsx` sur react-day-picker) : plus grand, jours ronds et espacés, règles notées en mauve clair, jours sélectionnés en mauve avec une pastille de coche, aujourd’hui cerclé ; légende « Règles déjà notées » et « Ta sélection ».
 
 ## Problèmes connus
 

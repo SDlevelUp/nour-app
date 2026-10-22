@@ -1,5 +1,5 @@
-﻿import { Calendar } from "@/components/ui/calendar";
-import { Switch } from "@/components/ui/switch";
+﻿import { Switch } from "@/components/ui/switch";
+import { CycleCalendar } from "@/components/dashboard/CycleCalendar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { TopActions } from "@/components/dashboard/TopActions";
 import {
@@ -1476,8 +1476,7 @@ export default function Dashboard() {
 
                   <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
                     <div className="n-card min-w-0 p-3! sm:p-5!">
-                      <Calendar
-                        mode="range"
+                      <CycleCalendar
                         selected={selectedRange}
                         onSelect={(range) => {
                           setSelectedRange(range);
@@ -1486,16 +1485,17 @@ export default function Dashboard() {
                         }}
                         month={calendarMonth}
                         onMonthChange={setCalendarMonth}
-                        locale={fr}
-                        modifiers={{ period: periodDates }}
-                        modifiersClassNames={{
-                          period: "bg-mauve-100 font-semibold text-mauve-800 hover:bg-mauve-200",
-                        }}
-                        className="mx-auto w-full max-w-md"
+                        periodDates={periodDates}
                       />
-                      <p className="mt-2 flex items-center justify-center gap-2 text-[13px] text-(--n-muted)">
-                        <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
-                        Règles déjà notées
+                      <p className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] text-(--n-muted)">
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
+                          Règles déjà notées
+                        </span>
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-block size-3 rounded-full bg-(--n-mauve)" aria-hidden="true" />
+                          Ta sélection
+                        </span>
                       </p>
                     </div>
 

@@ -2149,3 +2149,142 @@
 .n-rappel-text::after {
   content: " »";
 }
+
+/* ---------- Calendrier du cycle (jours ronds, inspiration Flo) ---------- */
+
+.n-cal {
+  width: 100%;
+  color: var(--n-ink);
+}
+
+.n-cal-months,
+.n-cal-month {
+  position: relative;
+  width: 100%;
+}
+
+.n-cal-caption {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.n-cal-caption-label {
+  font-family: var(--n-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.n-cal-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.n-cal-nav-btn {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--n-ink);
+}
+
+.n-cal-nav-btn:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-cal-grid {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+.n-cal-weekday {
+  padding-bottom: 4px;
+  color: var(--n-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.n-cal-cell {
+  padding: 0;
+  text-align: center;
+}
+
+.n-cal-day {
+  position: relative;
+  display: inline-flex;
+  width: clamp(36px, 5.2vw, 48px);
+  height: clamp(36px, 5.2vw, 48px);
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--n-ink);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.n-cal-day:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-cal-day:active {
+  transform: scale(0.94);
+}
+
+.n-cal-day:focus-visible {
+  outline: 2px solid var(--n-sage);
+  outline-offset: 2px;
+}
+
+.n-cal-day[data-outside="true"] {
+  color: var(--n-muted);
+  opacity: 0.5;
+}
+
+.n-cal-day[data-today="true"] {
+  box-shadow: inset 0 0 0 2px var(--n-ink);
+}
+
+.n-cal-day[data-period="true"] {
+  background: var(--n-mauve-tint);
+  color: var(--n-mauve-text);
+}
+
+.n-cal-day[data-selected="true"] {
+  background: var(--n-mauve);
+  color: #ffffff;
+}
+
+.n-cal-check {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--n-paper);
+  border-radius: 999px;
+  background: var(--n-sage-dark);
+  color: #ffffff;
+}
