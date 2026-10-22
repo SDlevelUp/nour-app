@@ -2282,3 +2282,64 @@
   color: #ffffff;
   box-shadow: none;
 }
+
+/* ---------- Réglages : ville des horaires et mosquées proches ---------- */
+
+.n-place-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--n-radius-lg);
+  background: var(--n-sage-tint);
+  padding: 14px 16px;
+  color: var(--n-sage-dark);
+}
+
+.dark-dashboard .n-place-current {
+  color: var(--n-sage);
+}
+
+.n-place-current .text-\(--n-muted\) {
+  color: var(--n-muted);
+}
+
+.n-place-current span.block:last-child {
+  color: var(--n-ink);
+}
+
+.n-place-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--n-line);
+  border-radius: var(--n-radius-sm);
+  overflow: hidden;
+}
+
+.n-place-list > li + li {
+  border-top: 1px solid var(--n-line);
+}
+
+.n-place-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: var(--n-paper);
+  padding: 10px 12px;
+  color: var(--n-ink);
+  text-align: left;
+}
+
+.n-place-item:hover {
+  background: var(--n-sage-tint);
+}
+
+.n-place-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--n-paper);
+  padding: 10px 12px;
+}

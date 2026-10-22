@@ -16,13 +16,15 @@ export const prayerCalculation = {
   maghribOffsetMinutes: 4,
 } as const;
 
-type Coordinates = {
+export type Coordinates = {
   latitude: number;
   longitude: number;
 };
 
 type PrayerPreferences = {
   coordinates: Coordinates | null;
+  // Nom du lieu choisi à la main (ville ou mosquée) ; null = position de l'appareil.
+  placeLabel: string | null;
   school: 0 | 1;
 };
 
@@ -49,6 +51,7 @@ type PrayerTimesState = {
 
 const defaultPreferences: PrayerPreferences = {
   coordinates: null,
+  placeLabel: null,
   school: 0,
 };
 
@@ -76,6 +79,10 @@ function readPreferences(): PrayerPreferences {
 
     return {
       coordinates: hasValidCoordinates ? coordinates : null,
+      placeLabel:
+        hasValidCoordinates && typeof preferences.placeLabel === "string"
+          ? preferences.placeLabel.slice(0, 120)
+          : null,
       school: preferences.school === 1 ? 1 : 0,
     };
   } catch {
@@ -216,6 +223,7 @@ export function usePrayerTimes() {
             latitude: coords.latitude,
             longitude: coords.longitude,
           },
+          placeLabel: null,
         }));
       },
       (error) => {
@@ -241,8 +249,14 @@ export function usePrayerTimes() {
     setPreferences((current) => ({ ...current, school }));
   };
 
+  // Lieu choisi à la main : ville (recherche) ou mosquée proche.
+  const setPlace = (coordinates: Coordinates, label: string) => {
+    setState((current) => ({ ...current, isLoading: true, error: null }));
+    setPreferences((current) => ({ ...current, coordinates, placeLabel: label }));
+  };
+
   const clearLocation = () => {
-    setPreferences((current) => ({ ...current, coordinates: null }));
+    setPreferences((current) => ({ ...current, coordinates: null, placeLabel: null }));
     setState({ times: null, isLoading: false, error: null });
   };
 
@@ -257,6 +271,7 @@ export function usePrayerTimes() {
     error: state.error,
     requestLocation,
     setSchool,
+    setPlace,
     clearLocation,
   };
 }

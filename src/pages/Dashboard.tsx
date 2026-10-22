@@ -32,7 +32,8 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Archive, ArchiveRestore, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, LocateFixed, MapPin, Trash2 } from "lucide-react";
+import { PlaceSearch } from "@/components/dashboard/PlaceSearch";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -2178,38 +2179,45 @@ export default function Dashboard() {
 
                 <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
                   <article className="n-card">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <h2 className="n-display text-[22px]">Horaires de prière</h2>
-                        <p className="mt-1 text-[14px] text-(--n-muted)">
-                          {prayer.preferences.coordinates
-                            ? "Calculés selon ta position."
-                            : "Active ta position pour afficher les horaires de ta ville."}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
+                    <h2 className="n-display text-[22px]">Horaires de prière</h2>
+
+                    {/* Lieu des horaires : bien visible, en tête de carte */}
+                    <div className="n-place-current mt-4">
+                      <MapPin className="size-5 shrink-0" strokeWidth={1.8} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[12px] font-semibold uppercase tracking-[0.1em] text-(--n-muted)">
+                          Ville des horaires
+                        </span>
+                        <span className="block truncate text-[17px] font-semibold">
+                          {prayer.preferences.placeLabel ??
+                            (prayer.preferences.coordinates ? "Ma position actuelle" : "Aucune ville choisie")}
+                        </span>
+                      </span>
+                      {prayer.preferences.coordinates && (
                         <button
                           type="button"
-                          onClick={prayer.requestLocation}
-                          disabled={prayer.isLoading}
-                          className={`n-btn ${prayer.preferences.coordinates ? "n-btn-ghost" : "n-btn-sage"} px-4! py-2.5! text-sm! disabled:opacity-50`}
+                          onClick={prayer.clearLocation}
+                          className="n-link shrink-0 text-sm text-(--n-muted)!"
                         >
-                          {prayer.isLoading
-                            ? "Recherche…"
-                            : prayer.preferences.coordinates
-                              ? "Actualiser ma position"
-                              : "Utiliser ma position"}
+                          Effacer
                         </button>
-                        {prayer.preferences.coordinates && (
-                          <button
-                            type="button"
-                            onClick={prayer.clearLocation}
-                            className="n-link px-2 text-sm text-(--n-muted)!"
-                          >
-                            Effacer
-                          </button>
-                        )}
-                      </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start">
+                      <button
+                        type="button"
+                        onClick={prayer.requestLocation}
+                        disabled={prayer.isLoading}
+                        className={`n-btn ${prayer.preferences.coordinates && !prayer.preferences.placeLabel ? "n-btn-ghost" : "n-btn-sage"} mt-0 px-4! py-3! text-sm! disabled:opacity-50 sm:mt-6`}
+                      >
+                        <LocateFixed className="size-4" />
+                        {prayer.isLoading ? "Recherche…" : "Utiliser ma position"}
+                      </button>
+                      <PlaceSearch
+                        coordinates={prayer.preferences.coordinates}
+                        onSetPlace={prayer.setPlace}
+                      />
                     </div>
 
                     {prayer.error && (
@@ -2279,7 +2287,8 @@ export default function Dashboard() {
                     </label>
 
                     <p className="mt-5 text-[13px] leading-5 text-(--n-muted)">
-                      Ta position reste sur cet appareil et n’est envoyée qu’à{" "}
+                      Ta position ou ta ville reste sur cet appareil, pas dans ton compte Nour.
+                      Elle est envoyée à{" "}
                       <a
                         href="https://aladhan.com/prayer-times-api"
                         target="_blank"
@@ -2288,8 +2297,9 @@ export default function Dashboard() {
                       >
                         AlAdhan
                       </a>{" "}
-                      pour calculer les horaires. Elle n’est pas enregistrée dans ton compte
-                      Nour.
+                      pour calculer les horaires. Le nom tapé dans la recherche est envoyé à
+                      Open-Meteo. Pour les mosquées proches, la position est envoyée à Photon
+                      (OpenStreetMap).
                     </p>
                   </article>
 

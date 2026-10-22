@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-22-ville-et-mosquees",
+    date: "2026-10-22",
+    title: "Choisis ta ville, trouve une mosquée",
+    text: "Dans Réglages : recherche une ville pour tes horaires de prière, ou affiche les mosquées proches avec l’itinéraire.",
+  },
+  {
     id: "2026-10-22-textes",
     date: "2026-10-22",
     title: "Textes réécrits",
