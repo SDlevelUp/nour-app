@@ -1,28 +1,33 @@
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, type ComponentProps } from "react";
-import { DayPicker, type DateRange, type DayButton, type Matcher } from "react-day-picker";
+import { DayPicker, type DayButton } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 
-// Calendrier du cycle : jours ronds et espacés, coche sur les jours sélectionnés
-// (inspiration Flo, demande de Sarah du 2026-10-22).
+// Calendrier du cycle (inspiration Flo, demandes de Sarah du 2026-10-22) :
+// - en lecture, toucher un jour choisit la date (note, observations) ;
+// - en modification, chaque jour devient une case ronde à cocher ou décocher.
 function CycleDayButton({ day, modifiers, ...props }: ComponentProps<typeof DayButton>) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
-  const isSelected = modifiers.selected === true;
+  const isEditing = modifiers.editing === true;
+  const isChecked = isEditing && modifiers.period === true;
   return (
     <button
       ref={ref}
       {...props}
       className="n-cal-day"
-      data-selected={isSelected}
-      data-period={modifiers.period === true}
+      data-editing={isEditing}
+      data-checked={isChecked}
+      data-period={!isEditing && modifiers.period === true}
+      data-picked={!isEditing && modifiers.picked === true}
       data-today={modifiers.today === true}
       data-outside={modifiers.outside === true}
+      aria-pressed={isEditing ? isChecked : undefined}
     >
       <span>{day.date.getDate()}</span>
-      {isSelected && (
+      {isChecked && (
         <span className="n-cal-check" aria-hidden="true">
           <Check className="size-2.5" strokeWidth={3.5} />
         </span>
@@ -32,28 +37,33 @@ function CycleDayButton({ day, modifiers, ...props }: ComponentProps<typeof DayB
 }
 
 export function CycleCalendar({
-  selected,
-  onSelect,
   month,
   onMonthChange,
   periodDates,
+  isEditing,
+  selectedDate,
+  onDayClick,
 }: {
-  selected: DateRange | undefined;
-  onSelect: (range: DateRange | undefined) => void;
   month: Date;
   onMonthChange: (month: Date) => void;
-  periodDates: Matcher;
+  // Règles enregistrées, ou brouillon en cours de modification.
+  periodDates: Date[];
+  isEditing: boolean;
+  selectedDate: Date;
+  onDayClick: (date: Date) => void;
 }) {
   return (
     <DayPicker
-      mode="range"
       locale={fr}
       showOutsideDays
-      selected={selected}
-      onSelect={onSelect}
       month={month}
       onMonthChange={onMonthChange}
-      modifiers={{ period: periodDates }}
+      onDayClick={onDayClick}
+      modifiers={{
+        period: periodDates,
+        picked: selectedDate,
+        editing: () => isEditing,
+      }}
       className="n-cal"
       classNames={{
         months: "n-cal-months",

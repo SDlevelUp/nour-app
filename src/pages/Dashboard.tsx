@@ -37,7 +37,6 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import type { DateRange } from "react-day-picker";
 
 type ReminderPreferences = {
   morning: boolean;
@@ -192,11 +191,8 @@ export default function Dashboard() {
     startOfMonth(new Date()),
   );
   const [selectedDate, setSelectedDate] = useState(() => new Date());
-  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
-  const [editingPeriodRange, setEditingPeriodRange] = useState<{
-    startDate: string;
-    endDate: string;
-  } | null>(null);
+  // Brouillon des jours de règles pendant la modification (null = lecture).
+  const [periodDraft, setPeriodDraft] = useState<Set<string> | null>(null);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [isSavingCycleDay, setIsSavingCycleDay] = useState(false);
   const [personalNoteDraft, setPersonalNoteDraft] = useState("");
@@ -253,8 +249,7 @@ export default function Dashboard() {
   const adhkarProgress = useQuery(api.adhkarProgress.forDate, { date: today });
   const quranEntries = useQuery(api.quranProgress.list, {});
   const saveCycleDay = useMutation(api.cycleTracking.saveDay);
-  const setPeriodRange = useMutation(api.cycleTracking.setPeriodRange);
-  const updatePeriodRange = useMutation(api.cycleTracking.updatePeriodRange);
+  const setPeriodDays = useMutation(api.cycleTracking.setPeriodDays);
   const setLateAlertsEnabled = useMutation(
     api.cycleTracking.setLateAlertsEnabled,
   );
@@ -364,9 +359,6 @@ export default function Dashboard() {
       else runs.push([date]);
       return runs;
     }, []);
-  const selectedPeriodRun = periodRuns.find((run) =>
-    run.includes(selectedDayKey),
-  );
   const cycleNotes = records
     .filter((entry) => entry.note?.trim())
     .sort((first, second) => second.date.localeCompare(first.date));
@@ -635,57 +627,27 @@ export default function Dashboard() {
     }
   };
 
-  const saveSelectedPeriodRange = async () => {
-    if (!selectedRange?.from || !selectedRange.to) return;
-    const startDate = format(selectedRange.from, "yyyy-MM-dd");
-    const endDate = format(selectedRange.to, "yyyy-MM-dd");
-    if (differenceInCalendarDays(selectedRange.to, selectedRange.from) > 59) {
-      toast.error("Sélectionne une plage de 60 jours maximum.");
+  const recordedPeriodKeys = () =>
+    new Set(records.filter((entry) => entry.isPeriodDay).map((entry) => entry.date));
+
+  const startPeriodEdit = () => setPeriodDraft(recordedPeriodKeys());
+
+  const savePeriodEdit = async () => {
+    if (!periodDraft) return;
+    const original = recordedPeriodKeys();
+    const add = [...periodDraft].filter((date) => !original.has(date));
+    const remove = [...original].filter((date) => !periodDraft.has(date));
+    if (add.length === 0 && remove.length === 0) {
+      setPeriodDraft(null);
       return;
     }
-    if (!editingPeriodRange) {
-      const overlapsExistingPeriod = records.some(
-        (entry) =>
-          entry.isPeriodDay && entry.date >= startDate && entry.date <= endDate,
-      );
-      if (overlapsExistingPeriod) {
-        toast.error(
-          "Cette plage contient déjà des jours enregistrés. Clique sur « Modifier les dates de cette période » pour la changer.",
-        );
-        return;
-      }
-    }
-    const isAlreadyRecorded =
-      records
-        .filter((entry) => entry.date >= startDate && entry.date <= endDate)
-        .filter((entry) => entry.isPeriodDay).length ===
-      differenceInCalendarDays(selectedRange.to, selectedRange.from) + 1;
-
     setIsSavingCycleDay(true);
     try {
-      if (editingPeriodRange) {
-        await updatePeriodRange({
-          previousStartDate: editingPeriodRange.startDate,
-          previousEndDate: editingPeriodRange.endDate,
-          startDate,
-          endDate,
-        });
-        setEditingPeriodRange(null);
-        toast.success("Les dates de cette période ont été modifiées.");
-      } else {
-        await setPeriodRange({
-          startDate,
-          endDate,
-          isPeriodDay: !isAlreadyRecorded,
-        });
-        toast.success(
-          isAlreadyRecorded
-            ? "Plage retirée du suivi."
-            : "Plage de règles enregistrée.",
-        );
-      }
+      await setPeriodDays({ add, remove });
+      setPeriodDraft(null);
+      toast.success("Tes règles ont été mises à jour.");
     } catch {
-      toast.error("Impossible d’enregistrer cette plage. Réessaie.");
+      toast.error("Impossible d’enregistrer tes règles. Réessaie.");
     } finally {
       setIsSavingCycleDay(false);
     }
@@ -1436,26 +1398,74 @@ export default function Dashboard() {
                     <div className="lg:col-span-7">
                     <div className="n-card min-w-0 p-3! sm:p-5!">
                       <CycleCalendar
-                        selected={selectedRange}
-                        onSelect={(range) => {
-                          setSelectedRange(range);
-                          const focusedDate = range?.to ?? range?.from;
-                          if (focusedDate) setSelectedDate(focusedDate);
-                        }}
                         month={calendarMonth}
                         onMonthChange={setCalendarMonth}
-                        periodDates={periodDates}
+                        periodDates={
+                          periodDraft ? [...periodDraft].map((date) => parseISO(date)) : periodDates
+                        }
+                        isEditing={periodDraft !== null}
+                        selectedDate={selectedDate}
+                        onDayClick={(day) => {
+                          if (!periodDraft) {
+                            setSelectedDate(day);
+                            return;
+                          }
+                          const key = format(day, "yyyy-MM-dd");
+                          setPeriodDraft((current) => {
+                            const next = new Set(current);
+                            if (next.has(key)) next.delete(key);
+                            else next.add(key);
+                            return next;
+                          });
+                        }}
                       />
-                      <p className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] text-(--n-muted)">
-                        <span className="inline-flex items-center gap-2">
-                          <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
-                          Règles déjà notées
-                        </span>
-                        <span className="inline-flex items-center gap-2">
-                          <span className="inline-block size-3 rounded-full bg-(--n-mauve)" aria-hidden="true" />
-                          Ta sélection
-                        </span>
-                      </p>
+                      {periodDraft ? (
+                        <p className="mt-3 text-center text-[14px] text-(--n-muted)" role="status">
+                          Coche ou décoche tes jours de règles, puis enregistre.
+                        </p>
+                      ) : (
+                        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] text-(--n-muted)">
+                          <span className="inline-flex items-center gap-2">
+                            <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
+                            Règles notées
+                          </span>
+                          <span className="inline-flex items-center gap-2">
+                            <span className="inline-block size-3 rounded-full border-2 border-(--n-sage)" aria-hidden="true" />
+                            Jour choisi
+                          </span>
+                        </p>
+                      )}
+                      <div className="mt-4 flex flex-wrap justify-center gap-3">
+                        {periodDraft ? (
+                          <>
+                            <button
+                              type="button"
+                              className="n-btn n-btn-ghost disabled:opacity-40"
+                              disabled={isSavingCycleDay}
+                              onClick={() => setPeriodDraft(null)}
+                            >
+                              Annuler
+                            </button>
+                            <button
+                              type="button"
+                              className="n-btn n-btn-sage disabled:opacity-40"
+                              disabled={isSavingCycleDay}
+                              onClick={() => void savePeriodEdit()}
+                            >
+                              {isSavingCycleDay ? "Enregistrement…" : "Enregistrer les nouvelles règles"}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            className="n-btn n-btn-sage disabled:opacity-40"
+                            disabled={cycleDays === undefined}
+                            onClick={startPeriodEdit}
+                          >
+                            Modifier les règles
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     </div>
@@ -1503,113 +1513,12 @@ export default function Dashboard() {
                     <div className="lg:col-span-7">
                     <div id="cycle-day-editor" className="n-card min-w-0">
                       <span className="n-label">
-                        {selectedRange?.from
-                          ? selectedRange.to
-                            ? `${format(selectedRange.from, "d MMM", { locale: fr })} – ${format(selectedRange.to, "d MMM yyyy", { locale: fr })}`
-                            : `Début : ${format(selectedRange.from, "d MMMM yyyy", { locale: fr })}`
-                          : format(selectedDate, "EEEE d MMMM yyyy", { locale: fr })}
+                        {format(selectedDate, "EEEE d MMMM yyyy", { locale: fr })}
                       </span>
-                      <h2 className="n-display mt-3 text-[22px]">Ta période</h2>
+                      <h2 className="n-display mt-3 text-[22px]">Ce jour-là</h2>
                       <p className="mt-1 text-[15px] text-(--n-muted)">
-                        {editingPeriodRange
-                          ? "Choisis les nouvelles dates de début et de fin dans le calendrier."
-                          : "Choisis les dates de début et de fin dans le calendrier."}
+                        Touche un jour du calendrier pour y noter tes observations ou une note.
                       </p>
-
-                      {selectedPeriodRun && !editingPeriodRange && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const startDate = selectedPeriodRun[0];
-                            const endDate = selectedPeriodRun[selectedPeriodRun.length - 1];
-                            setEditingPeriodRange({ startDate, endDate });
-                            setSelectedRange({ from: parseISO(startDate), to: parseISO(endDate) });
-                          }}
-                          className="n-link mt-3 text-sm"
-                        >
-                          Modifier les dates de cette période
-                        </button>
-                      )}
-                      {editingPeriodRange && (
-                        <>
-                          <p className="mt-3 text-sm font-semibold text-(--n-sage)">
-                            Modification des dates de cette période
-                          </p>
-                          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                            <label className="grid gap-1 text-[13px] font-semibold">
-                              Début des règles
-                              <input
-                                type="date"
-                                value={
-                                  selectedRange?.from
-                                    ? format(selectedRange.from, "yyyy-MM-dd")
-                                    : editingPeriodRange.startDate
-                                }
-                                onChange={(event) => {
-                                  const value = event.target.value;
-                                  if (!value) return;
-                                  const from = parseISO(value);
-                                  setSelectedRange((current) => ({
-                                    from,
-                                    to: current?.to && current.to >= from ? current.to : from,
-                                  }));
-                                  setSelectedDate(from);
-                                  setCalendarMonth(startOfMonth(from));
-                                }}
-                                className="n-input"
-                              />
-                            </label>
-                            <label className="grid gap-1 text-[13px] font-semibold">
-                              Fin des règles
-                              <input
-                                type="date"
-                                value={
-                                  selectedRange?.to
-                                    ? format(selectedRange.to, "yyyy-MM-dd")
-                                    : editingPeriodRange.endDate
-                                }
-                                min={
-                                  selectedRange?.from
-                                    ? format(selectedRange.from, "yyyy-MM-dd")
-                                    : editingPeriodRange.startDate
-                                }
-                                onChange={(event) => {
-                                  const value = event.target.value;
-                                  if (!value) return;
-                                  const to = parseISO(value);
-                                  setSelectedRange((current) => ({ from: current?.from ?? to, to }));
-                                  setSelectedDate(to);
-                                  setCalendarMonth(startOfMonth(to));
-                                }}
-                                className="n-input"
-                              />
-                            </label>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setEditingPeriodRange(null)}
-                            className="n-link mt-3 text-sm text-(--n-muted)!"
-                          >
-                            Annuler la modification
-                          </button>
-                        </>
-                      )}
-
-                      <button
-                        type="button"
-                        disabled={
-                          cycleDays === undefined ||
-                          isSavingCycleDay ||
-                          !selectedRange?.from ||
-                          !selectedRange.to
-                        }
-                        onClick={() => void saveSelectedPeriodRange()}
-                        className="n-btn n-btn-sage mt-5 w-full disabled:opacity-40"
-                      >
-                        {editingPeriodRange
-                          ? "Enregistrer les nouvelles dates"
-                          : "Enregistrer cette plage de règles"}
-                      </button>
 
                       <div className="mt-6 border-t border-(--n-line) pt-5">
                         <p className="text-[14px] font-semibold">
@@ -1783,7 +1692,6 @@ export default function Dashboard() {
                                 onClick={() => {
                                   const date = parseISO(entry.date);
                                   setSelectedDate(date);
-                                  setSelectedRange(undefined);
                                   setCalendarMonth(startOfMonth(date));
                                   requestAnimationFrame(() =>
                                     document
@@ -1836,8 +1744,7 @@ export default function Dashboard() {
                                   onClick={() => {
                                     const date = parseISO(entry.date);
                                     setSelectedDate(date);
-                                    setSelectedRange(undefined);
-                                    setCalendarMonth(startOfMonth(date));
+                                      setCalendarMonth(startOfMonth(date));
                                     requestAnimationFrame(() =>
                                       document
                                         .getElementById("cycle-day-editor")

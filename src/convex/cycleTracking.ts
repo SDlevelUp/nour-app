@@ -140,6 +140,50 @@ export const setPeriodRange = mutation({
   },
 });
 
+// Modification « à la Flo » : jours cochés et décochés un par un dans le calendrier.
+export const setPeriodDays = mutation({
+  args: {
+    add: v.array(v.string()),
+    remove: v.array(v.string()),
+  },
+  handler: async (ctx, { add, remove }) => {
+    if (add.length + remove.length > 400) {
+      throw new Error("Trop de jours modifiés en une fois.");
+    }
+    add.forEach(assertDate);
+    remove.forEach(assertDate);
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) {
+      throw new Error("Connecte-toi pour modifier tes règles.");
+    }
+
+    const findDay = (date: string) =>
+      ctx.db
+        .query("cycleDays")
+        .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", date))
+        .unique();
+
+    for (const date of remove) {
+      const existing = await findDay(date);
+      if (!existing?.isPeriodDay) continue;
+      if (existing.symptoms.length === 0 && !existing.note) {
+        await ctx.db.delete(existing._id);
+      } else {
+        await ctx.db.patch(existing._id, { isPeriodDay: false });
+      }
+    }
+
+    for (const date of add) {
+      const existing = await findDay(date);
+      if (existing) {
+        if (!existing.isPeriodDay) await ctx.db.patch(existing._id, { isPeriodDay: true });
+      } else {
+        await ctx.db.insert("cycleDays", { userId, date, isPeriodDay: true, symptoms: [] });
+      }
+    }
+  },
+});
+
 export const updatePeriodRange = mutation({
   args: {
     previousStartDate: v.string(),

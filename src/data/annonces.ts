@@ -10,6 +10,24 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-22-modifier-les-regles",
+    date: "2026-10-22",
+    title: "Modifie tes règles jour par jour",
+    text: "Dans Cycle, touche « Modifier les règles », coche ou décoche les jours dans le calendrier, puis « Enregistrer les nouvelles règles ».",
+  },
+  {
+    id: "2026-10-22-calendrier-cycle",
+    date: "2026-10-22",
+    title: "Un calendrier du cycle plus lisible",
+    text: "Plus grand, avec des jours ronds et une page Cycle réorganisée pour tout voir d’un coup d’œil.",
+  },
+  {
+    id: "2026-10-22-rappel-du-jour",
+    date: "2026-10-22",
+    title: "Un rappel chaque jour",
+    text: "Une parole des pieux prédécesseurs, avec sa source, apparaît sur ton écran « Aujourd’hui ».",
+  },
+  {
     id: "2026-10-21-nouveau-menu",
     date: "2026-10-21",
     title: "Un menu plus léger",
