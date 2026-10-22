@@ -26,7 +26,7 @@ export const dashboardNavigationGroups: {
   id: DashboardNavigationGroup;
   label: string;
 }[] = [
-  { id: "daily", label: "Au quotidien" },
+  { id: "daily", label: "Chaque jour" },
   { id: "deeper", label: "Approfondir" },
   { id: "other", label: "Autres" },
 ];

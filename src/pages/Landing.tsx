@@ -7,16 +7,16 @@ const authHref = "/auth?returnTo=%2Fdashboard";
 
 const principles = [
   {
-    title: "Le Coran et la Sunna authentique",
-    text: "Fidèle au Coran et à la Sunna authentique, selon la compréhension des pieux prédécesseurs.",
+    title: "Coran et Sunna authentique",
+    text: "Contenus tirés du Coran et de hadiths authentiques, selon la compréhension des pieux prédécesseurs.",
   },
   {
-    title: "Des sources visibles",
-    text: "Chaque invocation affiche son recueil, son numéro et son degré d’authenticité.",
+    title: "Sources affichées",
+    text: "Chaque invocation indique son rapporteur, son recueil, son numéro et son degré d’authenticité.",
   },
   {
-    title: "Sans pression",
-    text: "Pas de série à tenir, pas de score, pas de retard à rattraper.",
+    title: "Ni série ni score",
+    text: "Aucun compteur de jours consécutifs. Aucun retard à rattraper.",
   },
   {
     title: "Sans publicité",
@@ -26,29 +26,28 @@ const principles = [
 
 const steps = [
   {
-    title: "Crée ton espace",
-    text: "Connecte-toi avec ton adresse e-mail ou ton compte Google.",
+    title: "Crée un compte",
+    text: "Avec une adresse e-mail ou un compte Google.",
   },
   {
-    title: "Autorise ta position",
-    text: "Les horaires de prière de ta ville se calculent automatiquement.",
+    title: "Active la localisation",
+    text: "Les horaires de prière de ta ville s’affichent.",
   },
   {
-    title: "Choisis ce que tu affiches",
-    text: "Garde seulement les modules utiles sur ton écran du jour.",
+    title: "Choisis les modules",
+    text: "Affiche uniquement les cartes utiles sur l’écran « Aujourd’hui ».",
   },
 ];
 
 const faqs = [
   {
-    question: "Est-ce que l’application impose une routine stricte ?",
-    answer:
-      "Non. Nour est pensé pour être bienveillant : le but n’est pas la perfection, mais une présence douce et régulière.",
+    question: "L’application impose-t-elle une routine ?",
+    answer: "Non. Aucun objectif quotidien, aucune série, aucun score.",
   },
   {
     question: "D’où viennent les invocations ?",
     answer:
-      "Des recueils de hadiths. Pour chacune, Nour indique le rapporteur, le recueil, le numéro et le degré d’authenticité, tels que publiés par sunnah.com.",
+      "Des recueils de hadiths. Chaque invocation indique le rapporteur, le recueil, le numéro et le degré d’authenticité publiés par sunnah.com.",
   },
   {
     question: "Comment sont calculés les horaires de prière ?",
@@ -57,19 +56,30 @@ const faqs = [
   {
     question: "Puis-je faire une pause pendant mes règles ?",
     answer:
-      "Oui. Le suivi du cycle et le mode Al-‘Udhr t’aident à adapter ton planning à ta situation.",
+      "Oui. Le mode ‘Udhr masque les créneaux de prière du planning. Le suivi du cycle enregistre les jours de règles.",
   },
   {
     question: "Où sont enregistrées mes données ?",
     answer:
-      "Tes notes, tes lectures et ton suivi du cycle sont enregistrés dans ton compte, pour les retrouver sur tous tes appareils. Ta position reste sur ton appareil : elle sert seulement à calculer les horaires.",
+      "Notes, lectures et suivi du cycle sont enregistrés dans ton compte et disponibles sur tous tes appareils. La position reste sur l’appareil et sert uniquement au calcul des horaires.",
   },
   {
     question: "Faut-il installer l’application ?",
     answer:
-      "Nour est accessible depuis ton navigateur. Tu peux aussi l’ajouter à l’écran d’accueil de ton téléphone.",
+      "Non. Nour fonctionne dans le navigateur. Tu peux l’ajouter à l’écran d’accueil du téléphone.",
   },
 ];
+
+// Données structurées FAQ (schema.org), générées depuis la même liste que la FAQ affichée.
+const faqJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  })),
+}).replace(/</g, "\\u003c");
 
 // Aperçu illustratif : horaires d'exemple, signalés comme tels sous la carte.
 const sampleTimes = [
@@ -146,8 +156,8 @@ export default function Landing() {
           <span className="n-display text-2xl">Nour</span>
         </a>
         <nav className="hidden items-center gap-8 text-[15px] font-medium text-(--n-muted) md:flex">
-          <a className="hover:text-(--n-ink)" href="#esprit">L’esprit Nour</a>
-          <a className="hover:text-(--n-ink)" href="#fonctionnalites">L’application</a>
+          <a className="hover:text-(--n-ink)" href="#esprit">Principes</a>
+          <a className="hover:text-(--n-ink)" href="#fonctionnalites">Fonctionnalités</a>
           <a className="hover:text-(--n-ink)" href="#faq">Questions</a>
         </nav>
         <a href={authHref} className="n-btn n-btn-ghost px-4! py-2.5! text-sm!">
@@ -162,21 +172,19 @@ export default function Landing() {
             <NourMark className="size-4 text-(--n-sage)" />
             Selon le Coran et la Sunna authentique
           </span>
-          <h1 className="n-display mt-5 text-[clamp(40px,6.4vw,72px)] leading-[1.02] tracking-[-0.03em]">
-            Une routine douce,
-            <br />
-            <span className="text-(--n-sage)">à ton rythme.</span>
+          <h1 className="n-display mt-5 text-[clamp(32px,4vw,42px)] leading-[1.1] tracking-[-0.02em]">
+            Adhkar, Coran et <span className="text-(--n-sage)">prières.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-[17px] leading-7 text-(--n-muted) sm:text-lg sm:leading-8">
-            Tes prières, tes adhkar et tes petits pas réunis dans un espace
-            calme, pensé pour la vraie vie et pour ton propre rythme.
+          <p className="mt-5 max-w-xl text-[17px] leading-7 text-(--n-muted)">
+            Horaires de prière calculés selon ta position. Adhkar du matin et du soir
+            avec leurs sources. Lecture et écoute du Coran. Suivi du cycle et du qada.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a href={authHref} className="n-btn px-6! py-4!">
-              Entrer dans mon espace
+              Créer mon espace
             </a>
             <a href="#fonctionnalites" className="n-btn n-btn-ghost px-6! py-4!">
-              Découvrir Nour
+              Voir les fonctionnalités
             </a>
           </div>
         </div>
@@ -235,10 +243,8 @@ export default function Landing() {
 
       {/* Fonctionnalités : index éditorial, chaque ligne montre un fragment réel de l'interface */}
       <section id="fonctionnalites" className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
-        <span className="n-label">L’application</span>
-        <h2 className="n-section-title mt-4 max-w-3xl">
-          Ta pratique et tes repères, au même endroit.
-        </h2>
+        <span className="n-label">Fonctionnalités</span>
+        <h2 className="n-section-title mt-4 max-w-3xl">Ce que contient Nour</h2>
 
         <ol className="n-index mt-12">
           <li className="n-index-row">
@@ -246,8 +252,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Adhkar du matin et du soir</h3>
               <p className="n-index-text">
-                Une invocation à la fois, un cercle à toucher à chaque récitation, et la
-                preuve juste en dessous.
+                Une invocation à la fois. Un compteur à toucher à chaque récitation. La
+                preuve sous chaque texte.
               </p>
             </div>
             <div className="n-index-preview">
@@ -277,8 +283,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Coran</h3>
               <p className="n-index-text">
-                Les sourates à gauche, le texte à droite. Touche un verset pour l’écouter,
-                l’écoute continue pendant que tu navigues.
+                Sourates à gauche, texte à droite. Touche un verset pour l’écouter. L’écoute
+                continue sur les autres pages.
               </p>
             </div>
             <div className="n-index-preview p-2!">
@@ -305,8 +311,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Prières et planning</h3>
               <p className="n-index-text">
-                Les horaires de ta ville, calculés automatiquement, et ta journée en frise
-                autour d’eux.
+                Horaires calculés selon ta position. Planning de la journée organisé autour
+                des prières.
               </p>
             </div>
             <div className="n-index-preview">
@@ -327,8 +333,8 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Cycle et qada</h3>
               <p className="n-index-text">
-                Note tes jours, suis les jeûnes à rattraper et adapte ton planning avec le
-                mode Al-‘Udhr.
+                Jours de règles et jeûnes à rattraper. Le mode ‘Udhr masque les prières du
+                planning.
               </p>
             </div>
             <div className="n-index-preview">
@@ -353,7 +359,7 @@ export default function Landing() {
             <div>
               <h3 className="n-index-title">Science bénéfique</h3>
               <p className="n-index-text">
-                Tes livres dans l’ordre de lecture, tes cours et ce que tu en retiens.
+                Livres à lire, cours suivis et notes de révision.
               </p>
             </div>
             <div className="n-index-preview space-y-2">
@@ -374,8 +380,8 @@ export default function Landing() {
 
       {/* Étapes */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-8 sm:pb-24">
-        <span className="n-label">Pour commencer</span>
-        <h2 className="n-section-title mt-4">Trois étapes, et c’est prêt.</h2>
+        <span className="n-label">Démarrage</span>
+        <h2 className="n-section-title mt-4">Trois étapes</h2>
         <ol className="mt-10 grid gap-8 border-t border-(--n-line) pt-8 md:grid-cols-3">
           {steps.map(({ title, text }, index) => (
             <li key={title}>
@@ -388,9 +394,10 @@ export default function Landing() {
       </section>
 
       {/* Questions */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <section id="faq" className="mx-auto max-w-3xl px-4 pb-16 sm:px-8 sm:pb-24">
         <span className="n-label">Questions</span>
-        <h2 className="n-section-title mt-4">Quelques réponses, tout simplement.</h2>
+        <h2 className="n-section-title mt-4">Questions fréquentes</h2>
         <div className="mt-8 border-t border-(--n-line)">
           {faqs.map(({ question, answer }) => (
             <details key={question} className="n-faq">
@@ -406,13 +413,13 @@ export default function Landing() {
         <div className="n-card n-card-dark flex flex-col items-start gap-6 p-8! sm:p-12! lg:flex-row lg:items-center lg:justify-between">
           <KhatamPattern id="landing-khatam-cta" />
           <h2 className="n-section-title relative max-w-2xl">
-            Le lien ne se mesure pas au nombre de cases cochées.
+            Crée ton espace Nour.
           </h2>
           <a
             href={authHref}
             className="n-btn relative shrink-0 bg-(--n-on-dark)! px-6! py-4! text-(--n-sage-dark)!"
           >
-            Entrer dans mon espace
+            Créer mon espace
           </a>
         </div>
       </section>

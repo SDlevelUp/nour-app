@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-22-textes",
+    date: "2026-10-22",
+    title: "Textes réécrits",
+    text: "Page d’accueil, menu et notifications de rappel : textes plus courts et plus précis.",
+  },
+  {
     id: "2026-10-22-priere-et-rappel",
     date: "2026-10-22",
     title: "Prière et rappel côte à côte",

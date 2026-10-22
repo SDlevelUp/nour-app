@@ -1,11 +1,11 @@
 {
   "name": "Nour",
   "short_name": "Nour",
-  "description": "Nour - Muslim Dhikr Companion",
+  "description": "Adhkar, Coran et horaires de prière.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FBF9F6",
-  "theme_color": "#523B46",
+  "background_color": "#faf7f0",
+  "theme_color": "#3f5a47",
   "icons": [
     {
       "src": "/logo.svg",
@@ -13,5 +13,6 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
-  ]
+  ],
+  "lang": "fr"
 }

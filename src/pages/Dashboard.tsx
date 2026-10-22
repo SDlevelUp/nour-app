@@ -521,20 +521,20 @@ export default function Dashboard() {
           key: "morning",
           enabled: reminders.morning,
           at: reminders.morningTime,
-          title: "Un instant pour toi",
+          title: "Adhkar du matin",
         },
         {
           key: "evening",
           enabled: reminders.evening,
           at: reminders.eveningTime,
-          title: "Une pause en douceur",
+          title: "Adhkar du soir",
         },
       ];
       moments.forEach(({ key, enabled, at, title }) => {
         if (enabled && time === at && firedToday.current[key] !== date) {
           firedToday.current[key] = date;
           new Notification(title, {
-            body: "Ton rappel Nour est disponible.",
+            body: "Ouvre Nour pour réciter les adhkar.",
             tag: `nour-${key}-${date}`,
           });
         }
@@ -751,8 +751,8 @@ export default function Dashboard() {
     const alertKey = `${user?._id ?? "user"}-${format(expectedNextPeriod, "yyyy-MM-dd")}`;
     if (notifiedLateCycle.current === alertKey) return;
     notifiedLateCycle.current = alertKey;
-    new Notification("Petit rappel de suivi", {
-        body: "Ton rappel de suivi est disponible dans Nour.",
+    new Notification("Rappel de suivi", {
+        body: "Un rappel de suivi est disponible dans Nour.",
       tag: `nour-cycle-late-${alertKey}`,
     });
   }, [
