@@ -94,6 +94,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-22 : titres en Albert Sans (à la place de Sora), texte en Urbanist, sur la page publique et le dashboard. Nouveau module « Rappel du jour » sur « Aujourd’hui » : textes fournis par Sarah uniquement, avec auteur et source, dans `src/data/rappels.ts` (rotation quotidienne, carte masquée si la liste est vide). Premier rappel : Yahya Ibn Mou’adh, Sifat Safwa, v.4/p.341.
 - 2026-10-22 : calendrier du cycle refait (inspiration Flo, `CycleCalendar.tsx` sur react-day-picker) : plus grand, jours ronds et espacés, règles notées en mauve clair, jours sélectionnés en mauve avec une pastille de coche, aujourd’hui cerclé ; légende « Règles déjà notées » et « Ta sélection ».
 - 2026-10-22 : barre latérale simplifiée à la demande de Sarah : une seule colonne ; ouverte, chaque ligne montre l’icône et le texte (avec « Nouvelle note », titres de groupes, ‘Udhr et « Fermer le menu ») ; fermée, icônes seules avec étiquettes au survol. Le double affichage rail + panneau est supprimé (classes `n-side-*` à la place de `n-rail-*`).
+- 2026-10-22 : page Cycle réorganisée sur 12 colonnes sans étirement (le calendrier laissait un grand vide) : calendrier (7) et, à droite, « Prochaines règles estimées » + statistiques en tuiles 2 × 2 (5) ; dessous, « Ta période » (7) et, à droite, qada, notes du cycle et symptômes empilés (5).
 
 ## Problèmes connus
 

@@ -1432,7 +1432,34 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.9fr)]">
+                  <div className="grid items-start gap-4 lg:grid-cols-12">
+                    <div className="lg:col-span-7">
+                    <div className="n-card min-w-0 p-3! sm:p-5!">
+                      <CycleCalendar
+                        selected={selectedRange}
+                        onSelect={(range) => {
+                          setSelectedRange(range);
+                          const focusedDate = range?.to ?? range?.from;
+                          if (focusedDate) setSelectedDate(focusedDate);
+                        }}
+                        month={calendarMonth}
+                        onMonthChange={setCalendarMonth}
+                        periodDates={periodDates}
+                      />
+                      <p className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] text-(--n-muted)">
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
+                          Règles déjà notées
+                        </span>
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-block size-3 rounded-full bg-(--n-mauve)" aria-hidden="true" />
+                          Ta sélection
+                        </span>
+                      </p>
+                    </div>
+
+                    </div>
+                    <div className="space-y-4 lg:col-span-5">
                     <article className="n-card n-card-dark n-rise">
                       <span className="n-label">Prochaines règles estimées</span>
                       <p className="n-display mt-4 text-[34px] leading-none">
@@ -1446,7 +1473,7 @@ export default function Dashboard() {
                           : "Note au moins 3 débuts de cycle pour obtenir une estimation."}
                       </p>
                     </article>
-                    <div className="n-card n-rise grid grid-cols-2 gap-5 sm:grid-cols-4">
+                    <div className="n-card n-rise grid grid-cols-2 gap-5">
                       {[
                         { label: "Jours notés", value: String(daysTrackedThisMonth), hint: "ce mois-ci" },
                         { label: "Débuts notés", value: String(periodStarts.length), hint: "au total" },
@@ -1472,33 +1499,8 @@ export default function Dashboard() {
                         ne constituent pas un avis médical.
                       </p>
                     </div>
-                  </div>
-
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-                    <div className="n-card min-w-0 p-3! sm:p-5!">
-                      <CycleCalendar
-                        selected={selectedRange}
-                        onSelect={(range) => {
-                          setSelectedRange(range);
-                          const focusedDate = range?.to ?? range?.from;
-                          if (focusedDate) setSelectedDate(focusedDate);
-                        }}
-                        month={calendarMonth}
-                        onMonthChange={setCalendarMonth}
-                        periodDates={periodDates}
-                      />
-                      <p className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[13px] text-(--n-muted)">
-                        <span className="inline-flex items-center gap-2">
-                          <span className="inline-block size-3 rounded-full bg-(--n-mauve-tint)" aria-hidden="true" />
-                          Règles déjà notées
-                        </span>
-                        <span className="inline-flex items-center gap-2">
-                          <span className="inline-block size-3 rounded-full bg-(--n-mauve)" aria-hidden="true" />
-                          Ta sélection
-                        </span>
-                      </p>
                     </div>
-
+                    <div className="lg:col-span-7">
                     <div id="cycle-day-editor" className="n-card min-w-0">
                       <span className="n-label">
                         {selectedRange?.from
@@ -1686,8 +1688,8 @@ export default function Dashboard() {
                         />
                       </div>
                     </div>
-                  </div>
-
+                    </div>
+                    <div className="space-y-4 lg:col-span-5">
                   <section className="n-card" aria-labelledby="qada-heading">
                     <div className="flex flex-wrap items-end justify-between gap-4">
                       <div>
@@ -1761,8 +1763,6 @@ export default function Dashboard() {
                       personne de science.
                     </p>
                   </section>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
                     <section aria-labelledby="cycle-notes-heading" className="n-card min-w-0">
                       <h2 id="cycle-notes-heading" className="n-display text-[20px]">
                         Notes du cycle
@@ -1862,6 +1862,7 @@ export default function Dashboard() {
                         </ul>
                       )}
                     </details>
+                    </div>
                   </div>
 
                   {cycleDays?.length === 0 && (
