@@ -100,7 +100,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-22 : textes réécrits selon les règles de Sarah (phrases courtes, factuelles, sans marketing ni « au quotidien », « à ton rythme », « petits pas », « tout simplement ») : page publique, groupe de menu « Chaque jour », titres des notifications de rappel. Titres de la page publique réduits (h1 42 px max, h2 32 px max). Référencement sans compte Google : titre et description orientés recherches (adhkar, Coran, horaires de prière), image de partage `public/og.png` (1200 × 630), balises Open Graph et Twitter complètes, nom « Nour » unifié, données structurées WebSite, WebApplication et FAQPage (générée depuis la liste de la FAQ), manifeste et sitemap mis à jour.
 
 ## Problèmes connus
-- Référencement : le site est sur un sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), ce qui limite le référencement. Un domaine à soi est à décider (coût annuel) ; l’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml` (constaté le 2026-10-22).
+- Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.
 
 - `.env` a été suivi par git jusqu'au commit `2260268` : il reste dans l'historique. Il ne contenait que `VITE_CONVEX_URL`, `CONVEX_SITE_URL` et `CONVEX_DEPLOYMENT` (adresses, pas de clé secrète).
 - Le README demande `bun`, mais le repo contient un `package-lock.json` (npm) : gestionnaire de paquets à clarifier.
