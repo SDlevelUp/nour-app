@@ -6,7 +6,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { NourMark } from "@/components/NourMark";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -67,109 +67,88 @@ export function DashboardSidebar({
   return (
     <>
       <aside
-        className={`n-rail-shell fixed inset-y-0 left-0 z-40 hidden transition-[width] duration-300 ease-in-out lg:flex ${
+        className={`n-side fixed inset-y-0 left-0 z-40 hidden flex-col transition-[width] duration-300 ease-in-out lg:flex ${
           isCollapsed ? "w-18" : "w-65"
         }`}
+        data-collapsed={isCollapsed}
       >
-        {/* Rail d'icônes */}
-        <div className="n-rail">
-          <button
-            type="button"
-            onClick={() => onNavigate("overview")}
-            className="n-rail-logo"
-            aria-label="Nour, aujourd’hui"
-            data-tip="Nour"
-          >
-            <NourMark className="size-7 text-(--n-sage)" />
-          </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("overview")}
+          className="n-side-logo"
+          aria-label="Nour, aujourd’hui"
+          data-tip={isCollapsed ? "Nour" : undefined}
+        >
+          <NourMark className="size-7 shrink-0 text-(--n-sage)" />
+          {!isCollapsed && <span className="n-display text-[20px]">Nour</span>}
+        </button>
 
-          <button
-            type="button"
-            onClick={() => onNavigate("notes")}
-            className="n-rail-add"
-            aria-label="Nouvelle note"
-            data-tip="Nouvelle note"
-          >
-            <Plus className="size-4.5" strokeWidth={2.2} />
-          </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("notes")}
+          className="n-side-add"
+          aria-label="Nouvelle note"
+          data-tip={isCollapsed ? "Nouvelle note" : undefined}
+        >
+          <Plus className="size-4.5 shrink-0" strokeWidth={2.2} />
+          {!isCollapsed && <span>Nouvelle note</span>}
+        </button>
 
-          <nav aria-label="Navigation principale" className="n-rail-nav">
-            {dashboardNavigation.map(({ label, view, icon: Icon }, index) => (
-              <Fragment key={view}>
-                {index > 0 && dashboardNavigation[index - 1].group !== dashboardNavigation[index].group && (
-                  <span className="n-rail-sep" aria-hidden="true" />
-                )}
-                <button
-                  type="button"
-                  onClick={() => onNavigate(view)}
-                  aria-current={activeView === view ? "page" : undefined}
-                  aria-label={label}
-                  data-tip={label}
-                  className="n-rail-item"
-                >
-                  <Icon className="size-4.5" strokeWidth={1.7} />
-                  {view === "notes" && hasUnreadNotes && (
-                    <span className="n-rail-dot" role="status" aria-label="Nouvelle note non consultée" />
-                  )}
-                </button>
-              </Fragment>
-            ))}
-          </nav>
+        <nav aria-label="Navigation principale" className="n-side-nav">
+          {dashboardNavigationGroups.map((group, groupIndex) => (
+            <div key={group.id}>
+              {isCollapsed
+                ? groupIndex > 0 && <span className="n-side-sep" aria-hidden="true" />
+                : <p className="n-side-heading">{group.label}</p>}
+              {dashboardNavigation
+                .filter((item) => item.group === group.id)
+                .map(({ label, view, icon: Icon }) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() => onNavigate(view)}
+                    aria-current={activeView === view ? "page" : undefined}
+                    aria-label={isCollapsed ? label : undefined}
+                    data-tip={isCollapsed ? label : undefined}
+                    className="n-side-item"
+                  >
+                    <Icon className="size-4.5 shrink-0" strokeWidth={1.7} />
+                    {!isCollapsed && <span className="truncate">{label}</span>}
+                    {view === "notes" && hasUnreadNotes && (
+                      <span className="n-side-dot" role="status" aria-label="Nouvelle note non consultée" />
+                    )}
+                  </button>
+                ))}
+            </div>
+          ))}
+        </nav>
 
-          <div className="n-rail-foot">
+        <div className="n-side-foot">
+          {isCollapsed ? (
             <button
               type="button"
               onClick={() => onExcusePeriodChange(!isExcusePeriod)}
               aria-pressed={isExcusePeriod}
               aria-label="Indisponibilité légale (‘Udhr)"
               data-tip={isExcusePeriod ? "‘Udhr activé" : "‘Udhr"}
-              className="n-rail-item"
+              className="n-side-item"
             >
-              <CirclePause className="size-4.5" strokeWidth={1.7} />
+              <CirclePause className="size-4.5 shrink-0" strokeWidth={1.7} />
             </button>
-            <button
-              type="button"
-              onClick={onCollapse}
-              aria-label={isCollapsed ? "Déplier le menu" : "Replier le menu"}
-              data-tip={isCollapsed ? "Déplier le menu" : "Replier le menu"}
-              className="n-rail-item"
-            >
-              <PanelLeft className="size-4.5" strokeWidth={1.7} />
-            </button>
-          </div>
+          ) : (
+            <div className="n-panel p-3">{excuseToggle}</div>
+          )}
+          <button
+            type="button"
+            onClick={onCollapse}
+            aria-label={isCollapsed ? "Ouvrir le menu" : "Fermer le menu"}
+            data-tip={isCollapsed ? "Ouvrir le menu" : undefined}
+            className="n-side-item"
+          >
+            <PanelLeft className="size-4.5 shrink-0" strokeWidth={1.7} />
+            {!isCollapsed && <span>Fermer le menu</span>}
+          </button>
         </div>
-
-        {/* Panneau déplié : les pages en texte seul */}
-        {!isCollapsed && (
-          <div className="n-rail-panel">
-            <p className="n-display px-2 text-[20px]">Nour</p>
-            <nav aria-label="Pages" className="mt-6 space-y-5">
-              {dashboardNavigationGroups.map((group) => (
-                <div key={group.id}>
-                  <p className="n-rail-heading">{group.label}</p>
-                  {dashboardNavigation
-                    .filter((item) => item.group === group.id)
-                    .map(({ label, view }) => (
-                      <button
-                        key={view}
-                        type="button"
-                        onClick={() => onNavigate(view)}
-                        aria-current={activeView === view ? "page" : undefined}
-                        className="n-rail-link"
-                      >
-                        {label}
-                        {view === "notes" && hasUnreadNotes && <span className="n-unread ml-auto" />}
-                      </button>
-                    ))}
-                </div>
-              ))}
-            </nav>
-
-            <div className="mt-auto space-y-3">
-              <div className="n-panel p-3">{excuseToggle}</div>
-            </div>
-          </div>
-        )}
       </aside>
 
       {/* Mobile : barre d'onglets en pilule + panneau « Plus » */}
