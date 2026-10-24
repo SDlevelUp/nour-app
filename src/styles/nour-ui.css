@@ -1306,7 +1306,7 @@
 /* Sans bordures : les jours se distinguent par le fond, le jour courant par son en-tête. */
 
 .n-weekgrid {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
 

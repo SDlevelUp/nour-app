@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-24-semaine-5-jours",
+    date: "2026-10-24",
+    title: "Planning plus lisible",
+    text: "Sur ordinateur, la vue Semaine montre 5 jours à la fois. Les flèches font défiler les autres jours.",
+  },
+  {
     id: "2026-10-24-planning-pulse",
     date: "2026-10-24",
     title: "La prochaine activité se repère d’un coup d’œil",

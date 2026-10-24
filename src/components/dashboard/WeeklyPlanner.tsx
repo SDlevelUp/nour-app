@@ -91,6 +91,9 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [selectedDay, setSelectedDay] = useState(today);
   const [openItem, setOpenItem] = useState<string | null>(null);
+  // Grand écran : 5 jours visibles à la fois (demande de Sarah du 2026-10-24).
+  // null = position par défaut (la veille d'aujourd'hui, ou le début de semaine).
+  const [gridStart, setGridStart] = useState<number | null>(null);
   const [newActivityDate, setNewActivityDate] = useState(today);
   const [newActivityTime, setNewActivityTime] = useState("12:00");
   const [newActivityTitle, setNewActivityTitle] = useState("");
@@ -115,6 +118,7 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
     const todayActivities = nextActivities[today];
     if (todayActivities) onTodayActivitiesChange(todayActivities);
     setWeekOffset(nextOffset);
+    setGridStart(null);
   };
 
   const moveActivity = (targetDate: string) => {
@@ -293,6 +297,13 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
     : dates.some((date) => dateKey(date) === today)
       ? today
       : firstDateKey;
+
+  const gridDayCount = 5;
+  const todayIndex = dates.findIndex((date) => dateKey(date) === today);
+  const gridStartIndex =
+    gridStart ??
+    Math.min(Math.max((todayIndex >= 0 ? todayIndex : 0) - 1, 0), dates.length - gridDayCount);
+  const visibleGridDates = dates.slice(gridStartIndex, gridStartIndex + gridDayCount);
 
   const renderActivity = (key: string, activity: PlannerActivity) => {
     const isJournalSession =
@@ -550,8 +561,36 @@ export function WeeklyPlanner({ onTodayActivitiesChange }: WeeklyPlannerProps) {
       </div>
 
       {/* Ordinateur : la semaine entière */}
+      <div className="hidden items-center justify-end gap-1 xl:flex">
+        <span className="mr-2 text-[13px] text-(--n-muted)">
+          {visibleGridDates[0].toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" })} –{" "}
+          {visibleGridDates[visibleGridDates.length - 1].toLocaleDateString("fr-FR", {
+            weekday: "long",
+            day: "numeric",
+          })}
+        </span>
+        <button
+          type="button"
+          className="n-icon-btn"
+          disabled={gridStartIndex === 0}
+          onClick={() => setGridStart(Math.max(0, gridStartIndex - 1))}
+          aria-label="Jour précédent"
+        >
+          <ChevronLeft className="size-4" />
+        </button>
+        <button
+          type="button"
+          className="n-icon-btn"
+          disabled={gridStartIndex >= dates.length - gridDayCount}
+          onClick={() => setGridStart(Math.min(dates.length - gridDayCount, gridStartIndex + 1))}
+          aria-label="Jour suivant"
+        >
+          <ChevronRight className="size-4" />
+        </button>
+      </div>
+
       <div className="n-weekgrid hidden xl:grid">
-        {dates.map((date) => {
+        {visibleGridDates.map((date) => {
           const key = dateKey(date);
           const activities = activitiesFor(key);
           return (
