@@ -4,6 +4,7 @@ import {
 } from "@/components/dashboard/QuranAudioReader";
 import type { QuranResumePosition } from "@/components/dashboard/quranPlaybackResume";
 import { ComposerCard } from "@/components/dashboard/ComposerCard";
+import { QuranDailyCards } from "@/components/dashboard/QuranDailyCards";
 import { api } from "@/convex/_generated/api";
 import { PenLine } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -119,6 +120,8 @@ export function QuranJournal({
           <h1 className="n-page-title">Coran</h1>
         </div>
       </div>
+
+      <QuranDailyCards hidden={!isActive} />
 
       <QuranAudioReader
         isSavingProgress={isSavingAudioProgress}

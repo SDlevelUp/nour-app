@@ -2,6 +2,8 @@
 // Uniquement des textes fournis par Sarah, avec leur source : rien n'est inventé ni généré.
 // Le rappel change chaque jour à minuit et tourne dans l'ordre de la liste.
 // Tant que la liste est vide, la carte n'apparaît pas.
+import { itemOfTheDay } from "./dailyPick";
+
 export type Rappel = {
   id: string;
   text: string; // traduction française
@@ -19,11 +21,4 @@ export const rappels: Rappel[] = [
   },
 ];
 
-// Même rappel pour toute la journée locale, puis le suivant le lendemain.
-export function rappelDuJour(date: Date): Rappel | null {
-  if (rappels.length === 0) return null;
-  const dayNumber = Math.floor(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000,
-  );
-  return rappels[dayNumber % rappels.length];
-}
+export const rappelDuJour = (date: Date): Rappel | null => itemOfTheDay(rappels, date);
