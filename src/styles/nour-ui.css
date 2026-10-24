@@ -531,8 +531,9 @@
 }
 
 .n-faq {
-  border-bottom: 1px solid var(--n-line);
-  padding: 18px 4px;
+  border-radius: 16px;
+  background: var(--n-paper);
+  padding: 18px 20px;
 }
 
 .n-faq summary {
@@ -1593,14 +1594,12 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--n-line);
 }
 
 .n-index-row {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
   gap: 8px 20px;
-  border-bottom: 1px solid var(--n-line);
   padding: 32px 0;
 }
 

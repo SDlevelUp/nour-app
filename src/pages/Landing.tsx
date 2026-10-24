@@ -182,10 +182,6 @@ export default function Landing() {
       {/* Héros */}
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-8 sm:px-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pb-24">
         <div className="n-rise">
-          <span className="inline-flex items-center gap-2 rounded-full border border-(--n-line) bg-(--n-paper) px-3.5 py-2 text-sm font-semibold text-(--n-sage-dark)">
-            <NourMark className="size-4 text-(--n-sage)" />
-            Selon le Coran et la Sunna authentique
-          </span>
           <h1 className="n-display mt-5 text-[clamp(32px,4vw,42px)] leading-[1.1] tracking-[-0.02em]">
             Adhkar, Coran et <span className="text-(--n-sage)">prières.</span>
           </h1>
@@ -245,12 +241,12 @@ export default function Landing() {
       </section>
 
       {/* Principes */}
-      <section id="esprit" className="border-y border-(--n-line)">
+      <section id="esprit">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-10">
           {principles.map(({ title, text }) => (
             <div key={title}>
-              <h2 className="n-display text-xl">{title}</h2>
-              <p className="mt-2 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+              <h2 className="n-display text-lg">{title}</h2>
+              <p className="mt-2 text-[14px] leading-6 text-(--n-muted)">{text}</p>
             </div>
           ))}
         </div>
@@ -276,7 +272,7 @@ export default function Landing() {
               <p className="n-arabic text-[22px] leading-[1.9]" lang="ar">
                 {sampleInvocation.arabic}
               </p>
-              <div className="mt-3 flex items-center justify-between gap-3 border-t border-(--n-line) pt-3">
+              <div className="mt-4 flex items-center justify-between gap-3">
                 <p className="text-[12px] text-(--n-muted)">
                   {sampleInvocation.proof.sources.map((source, index) => (
                     <span key={`${source.collection}-${source.number}`}>
@@ -400,7 +396,7 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-8 sm:pb-24">
         <span className="n-label">Démarrage</span>
         <h2 className="n-section-title mt-4">Trois étapes</h2>
-        <ol className="mt-10 grid gap-8 border-t border-(--n-line) pt-8 md:grid-cols-3">
+        <ol className="mt-10 grid gap-8 md:grid-cols-3">
           {steps.map(({ title, text }, index) => (
             <li key={title}>
               <span className="n-index-num">0{index + 1}</span>
@@ -416,7 +412,7 @@ export default function Landing() {
       <section id="faq" className="mx-auto max-w-3xl px-4 pb-16 sm:px-8 sm:pb-24">
         <span className="n-label">Questions</span>
         <h2 className="n-section-title mt-4">Questions fréquentes</h2>
-        <div className="mt-8 border-t border-(--n-line)">
+        <div className="mt-8 space-y-2">
           {faqs.map(({ question, answer }) => (
             <details key={question} className="n-faq">
               <summary>{question}</summary>
@@ -442,7 +438,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-(--n-line) px-4 py-6 text-center text-sm text-(--n-muted)">
+      <footer className="px-4 py-6 text-center text-sm text-(--n-muted)">
         Nour · Selon le Coran et la Sunna authentique · Sans publicité
       </footer>
     </main>
