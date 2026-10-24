@@ -6,6 +6,7 @@ import { ComposerCard } from "@/components/dashboard/ComposerCard";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LearningModule } from "@/components/dashboard/LearningModule";
+import { passageScienceDuJour } from "@/data/scienceQuotidien";
 
 function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
@@ -21,6 +22,7 @@ export function ScienceJournal() {
   const setBookStatus = useMutation(api.scienceBooks.setStatus);
   const reorderBooks = useMutation(api.scienceBooks.reorder);
   const removeBook = useMutation(api.scienceBooks.remove);
+  const [passage] = useState(() => passageScienceDuJour(new Date()));
   const [tab, setTab] = useState<"sessions" | "books" | "learning">("sessions");
   const [date, setDate] = useState(todayKey);
   const [time, setTime] = useState("10:00");
@@ -238,6 +240,19 @@ export function ScienceJournal() {
           ))}
         </div>
       </div>
+
+      {passage && (
+        <figure className="n-card n-rappel">
+          <span className="n-label">Rappel pour l’étudiant</span>
+          <blockquote className="n-rappel-text">{passage.text}</blockquote>
+          <figcaption className="mt-4 text-[13px] text-(--n-muted)">
+            <span className="font-semibold text-(--n-ink)">{passage.author}</span>
+            {" · "}
+            {passage.book}
+            {passage.page && `, ${passage.page}`}
+          </figcaption>
+        </figure>
+      )}
 
       {tab === "sessions" && (
         <>

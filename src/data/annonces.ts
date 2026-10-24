@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-24-rappel-etudiant",
+    date: "2026-10-24",
+    title: "Un rappel pour l’étudiant",
+    text: "En haut de Science bénéfique : un passage de « La parure de l’étudiant en science religieuse » de Bakr Abou Zayd.",
+  },
+  {
     id: "2026-10-24-mot-du-coran",
     date: "2026-10-24",
     title: "Un mot du Coran chaque jour",
