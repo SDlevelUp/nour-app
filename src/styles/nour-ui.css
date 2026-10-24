@@ -2109,7 +2109,6 @@
 
 .n-rappel-text {
   margin-top: 14px;
-  max-width: 62ch;
   font-family: var(--n-font-display);
   font-size: clamp(16px, 1.25vw, 19px);
   font-weight: 500;
