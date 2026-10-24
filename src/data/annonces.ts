@@ -13,6 +13,12 @@ export const annonces: Annonce[] = [
     id: "2026-10-24-sans-taches-du-jour",
     date: "2026-10-24",
     title: "Écran Aujourd’hui allégé",
+    text: "Le module « Tâches du jour » est retiré. Tes tâches restent dans Notes.",
+  },
+  {
+    id: "2026-10-24-sans-taches-du-jour",
+    date: "2026-10-24",
+    title: "Écran Aujourd’hui allégé",
     text: "Le module « Tâches du jour » est retiré. Tes tâches restent dans Notes, onglet « À faire ».",
   },
   {
