@@ -107,6 +107,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-24 : page Science bénéfique, carte « Rappel pour l’étudiant » en tête (rotation quotidienne, `src/data/scienceQuotidien.ts`). Premier passage fourni par Sarah : Bakr Abou Zayd, « La parure de l’étudiant en science religieuse » [À CONFIRMER : page].
 - 2026-10-24 : texte des rappels sur toute la largeur de la carte ; carte « Mot du Coran » sans ligne de séparation ; Planning (vue Jour) : rond de la prochaine activité en vert, qui pulse (désactivé si l’appareil demande moins d’animations).
 - 2026-10-24 : vue Semaine du Planning sur grand écran : 5 jours visibles au lieu de 7 (veille d’aujourd’hui en premier pour la semaine en cours), flèches jour précédent / jour suivant.
+- 2026-10-24 : module « Tâches du jour » retiré de l’écran « Aujourd’hui » et de « Personnaliser cet écran » (demande de Sarah) ; les tâches restent gérées dans Notes.
 
 ## Problèmes connus
 - Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.

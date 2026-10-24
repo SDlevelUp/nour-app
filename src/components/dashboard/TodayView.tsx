@@ -6,7 +6,7 @@ import type { AdhkarInvocation, AdhkarSession } from "@/convex/adhkarData";
 import type { PrayerTimes } from "@/hooks/use-prayer-times";
 import { rappelDuJour } from "@/data/rappels";
 
-type TodayModule = "rappel" | "adhkar" | "quran" | "cycle" | "notes" | "tasks";
+type TodayModule = "rappel" | "adhkar" | "quran" | "cycle" | "notes";
 
 const moduleLabels: Record<TodayModule, string> = {
   rappel: "Rappel du jour",
@@ -14,7 +14,6 @@ const moduleLabels: Record<TodayModule, string> = {
   quran: "Reprendre la lecture",
   cycle: "Cycle",
   notes: "Mes notes",
-  tasks: "Tâches du jour",
 };
 
 const defaultModules: Record<TodayModule, boolean> = {
@@ -23,7 +22,6 @@ const defaultModules: Record<TodayModule, boolean> = {
   quran: true,
   cycle: true,
   notes: true,
-  tasks: false,
 };
 
 // Réglage enregistré dans le navigateur (décision du 2026-10-19).
@@ -40,7 +38,6 @@ function readModules(): Record<TodayModule, boolean> {
       quran: typeof value.quran === "boolean" ? value.quran : defaultModules.quran,
       cycle: typeof value.cycle === "boolean" ? value.cycle : defaultModules.cycle,
       notes: typeof value.notes === "boolean" ? value.notes : defaultModules.notes,
-      tasks: typeof value.tasks === "boolean" ? value.tasks : defaultModules.tasks,
     };
   } catch {
     return defaultModules;
@@ -127,10 +124,7 @@ type TodayViewProps = {
     expectedNextPeriod: Date | null;
     periodDates: Set<string>;
   };
-  tasks: { id: string; label: string; completed: boolean }[];
   notes: { id: string; title?: string; content: string; cardClass: string; urgent: boolean }[];
-  pendingTaskId: string | null;
-  onToggleTask: (id: string, completed: boolean) => void;
   onOpenAdhkar: (session: AdhkarSession) => void;
   onOpenQuran: () => void;
   onOpenCycle: () => void;
@@ -145,10 +139,7 @@ export function TodayView({
   adhkar,
   quran,
   cycle,
-  tasks,
   notes,
-  pendingTaskId,
-  onToggleTask,
   onOpenAdhkar,
   onOpenQuran,
   onOpenCycle,
@@ -472,39 +463,6 @@ export function TodayView({
             ) : (
               <p className="mt-3 text-[15px] text-(--n-muted)">
                 Aucune note pour l’instant.
-              </p>
-            )}
-          </article>
-        )}
-
-        {modules.tasks && (
-          <article className="n-card n-rise lg:col-span-6" aria-label="Tâches du jour">
-            <div className="flex items-center justify-between gap-3">
-              <span className="n-label">Tâches du jour</span>
-              <button type="button" onClick={onOpenNotes} className="n-link text-sm">
-                Gérer
-              </button>
-            </div>
-            {tasks.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {tasks.map((task) => (
-                  <li key={task.id}>
-                    <label className="flex items-center gap-3 text-[15px]">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        disabled={pendingTaskId === task.id}
-                        onChange={(event) => onToggleTask(task.id, event.target.checked)}
-                        className="size-4 accent-(--n-sage)"
-                      />
-                      {task.label}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-3 text-[15px] text-(--n-muted)">
-                Aucune tâche en cours. Tu peux en ajouter dans Notes.
               </p>
             )}
           </article>

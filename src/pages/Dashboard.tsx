@@ -300,14 +300,6 @@ export default function Dashboard() {
     currentRepetitionCount >= currentInvocation.repetitions;
   const records = cycleDays ?? [];
   const selectedDayKey = format(selectedDate, "yyyy-MM-dd");
-  const todayTasks = (personalNotes ?? [])
-    .filter(
-      (note) =>
-        note.isTask === true &&
-        note.completed !== true &&
-        note.archived !== true,
-    )
-    .slice(0, 3);
   const clockDate = new Date(clock);
   const clockMinutes = clockDate.getHours() * 60 + clockDate.getMinutes();
   const nextPrayerName = prayer.times
@@ -1094,11 +1086,6 @@ export default function Dashboard() {
                         expectedNextPeriod,
                         periodDates: recordedPeriodDates,
                       }}
-                      tasks={todayTasks.map((task) => ({
-                        id: task._id,
-                        label: task.title || task.content.split("\n")[0],
-                        completed: task.completed === true,
-                      }))}
                       notes={recentNotes.map((note) => ({
                         id: note._id,
                         title: note.title,
@@ -1109,13 +1096,6 @@ export default function Dashboard() {
                             (color) => color.value === (note.color ?? "yellow"),
                           )?.card ?? "note-color-yellow",
                       }))}
-                      pendingTaskId={pendingNoteAction}
-                      onToggleTask={(id, completed) =>
-                        void updatePersonalTaskCompletion(
-                          id as Id<"personalNotes">,
-                          completed,
-                        )
-                      }
                       onOpenAdhkar={openAdhkarSession}
                       onOpenQuran={() => {
                         setQuranResumeRequest(quranResumeTarget);
