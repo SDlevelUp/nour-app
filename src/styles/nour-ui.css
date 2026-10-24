@@ -2342,3 +2342,27 @@
   background: var(--n-paper);
   padding: 10px 12px;
 }
+
+/* Planning : le rond de la prochaine activité pulse doucement. */
+.n-agenda-item[data-state="next"] .n-agenda-dot {
+  border-color: var(--n-sage);
+  background: var(--n-sage);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .n-agenda-item[data-state="next"] .n-agenda-dot {
+    animation: n-pulse 2s ease-out infinite;
+  }
+}
+
+@keyframes n-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--n-sage) 70%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--n-sage) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
