@@ -29,7 +29,7 @@ export function QuranDailyCards({ hidden }: { hidden?: boolean }) {
               {mot.arabic.replace(/[ۖ-ۜ]/gu, "")}
             </p>
           </div>
-          <div className="mt-3 border-t border-black/10 pt-3">
+          <div className="mt-3">
             <p className="n-arabic text-[19px] leading-[1.9]" lang="ar">
               {mot.verseArabic}
             </p>
