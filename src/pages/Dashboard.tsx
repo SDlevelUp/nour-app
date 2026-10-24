@@ -247,6 +247,8 @@ export default function Dashboard() {
   const cycleDays = useQuery(api.cycleTracking.list, { fromDate, toDate });
   const cycleSettings = useQuery(api.cycleTracking.getSettings, {});
   const personalNotes = useQuery(api.personalNotes.list, {});
+  const scienceBooks = useQuery(api.scienceBooks.list, {});
+  const [scienceTab, setScienceTab] = useState<"sessions" | "books" | "learning">("sessions");
   const adhkarProgress = useQuery(api.adhkarProgress.forDate, { date: today });
   const quranEntries = useQuery(api.quranProgress.list, {});
   const saveCycleDay = useMutation(api.cycleTracking.saveDay);
@@ -316,6 +318,15 @@ export default function Dashboard() {
         return hours * 60 + minutes > clockMinutes;
       })?.[0] ?? null)
     : null;
+  const sortedScienceBooks = [...(scienceBooks ?? [])].sort((a, b) => a.position - b.position);
+  const scienceBookToResume = (() => {
+    const book =
+      sortedScienceBooks.find((item) => item.status === "in-progress") ??
+      sortedScienceBooks.find((item) => item.status === "to-read");
+    return book && book.status !== "read"
+      ? { title: book.title, author: book.author, status: book.status }
+      : null;
+  })();
   const recentNotes = (personalNotes ?? [])
     .filter((note) => note.archived !== true && note.isTask !== true)
     .sort((a, b) => Number(b.urgent === true) - Number(a.urgent === true))
@@ -757,6 +768,7 @@ export default function Dashboard() {
 
   const navigateToView = (view: DashboardView) => {
     setActiveView(view);
+    setScienceTab("sessions");
     if (view === "notes" && hasUnreadNotes && !isAnonymousUser) {
       void markPersonalNotesRead({}).catch(() => {
         toast.error("Impossible de mettre à jour les notifications de notes.");
@@ -1101,6 +1113,11 @@ export default function Dashboard() {
                         setQuranResumeRequest(quranResumeTarget);
                         navigateToView("quran");
                       }}
+                      scienceBook={scienceBookToResume}
+                      onOpenScienceBooks={() => {
+                        navigateToView("science");
+                        setScienceTab("books");
+                      }}
                       onOpenCycle={() => navigateToView("periods")}
                       onOpenNotes={() => navigateToView("notes")}
                       onOpenSettings={() => navigateToView("settings")}
@@ -1115,7 +1132,7 @@ export default function Dashboard() {
                   )}
 
 
-                  {activeView === "science" && <ScienceJournal />}
+                  {activeView === "science" && <ScienceJournal initialTab={scienceTab} />}
 
                   {activeView === "adhkar" && (
                     <div id="dashboard-routine" className="scroll-mt-24 space-y-5">

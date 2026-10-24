@@ -108,7 +108,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-24 : texte des rappels sur toute la largeur de la carte ; carte « Mot du Coran » sans ligne de séparation ; Planning (vue Jour) : rond de la prochaine activité en vert, qui pulse (désactivé si l’appareil demande moins d’animations).
 - 2026-10-24 : vue Semaine du Planning sur grand écran : 5 jours visibles au lieu de 7 (veille d’aujourd’hui en premier pour la semaine en cours), flèches jour précédent / jour suivant.
 - 2026-10-24 : module « Tâches du jour » retiré de l’écran « Aujourd’hui » et de « Personnaliser cet écran » (demande de Sarah) ; les tâches restent gérées dans Notes.
-- 2026-10-24 : module « Tâches du jour » retiré de l’écran « Aujourd’hui » et de « Personnaliser cet écran » (demande de Sarah) ; les tâches restent gérées dans Notes.
+- 2026-10-24 : carte de lecture d’« Aujourd’hui » en deux parties : « Reprendre la lecture du Coran » (sourate et verset) et « Reprendre la lecture » (livre de Science bénéfique en cours, sinon le prochain à lire, sinon une invitation à choisir un livre) ; ses boutons ouvrent l’onglet Livres (`ScienceJournal` accepte `initialTab`). Doublons d’annonce et de journal laissés par une reprise interrompue supprimés. Note : le pré-rendu local échoue parfois (« Invalid hook call ») quand le serveur de développement réoptimise ses dépendances en même temps ; le build Vercel n’est pas touché.
 
 ## Problèmes connus
 - Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.

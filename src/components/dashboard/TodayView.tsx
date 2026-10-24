@@ -127,6 +127,9 @@ type TodayViewProps = {
   notes: { id: string; title?: string; content: string; cardClass: string; urgent: boolean }[];
   onOpenAdhkar: (session: AdhkarSession) => void;
   onOpenQuran: () => void;
+  // Livre de Science bénéfique : en cours, sinon le prochain à lire.
+  scienceBook: { title: string; author: string; status: "in-progress" | "to-read" } | null;
+  onOpenScienceBooks: () => void;
   onOpenCycle: () => void;
   onOpenNotes: () => void;
   onOpenSettings: () => void;
@@ -142,6 +145,8 @@ export function TodayView({
   notes,
   onOpenAdhkar,
   onOpenQuran,
+  scienceBook,
+  onOpenScienceBooks,
   onOpenCycle,
   onOpenNotes,
   onOpenSettings,
@@ -378,19 +383,55 @@ export function TodayView({
 
         {modules.quran && (
           <article
-            className={`n-card n-card-tint n-rise flex flex-col gap-3 ${modules.adhkar ? "lg:col-span-2" : "lg:col-span-6"}`}
-            aria-label="Lecture du Coran"
+            className={`n-card n-card-tint n-rise flex flex-col ${modules.adhkar ? "lg:col-span-2" : "lg:col-span-6"}`}
+            aria-label="Reprendre la lecture"
           >
-            <span className="n-label">Reprendre la lecture</span>
-            <p className="n-display text-[26px] leading-tight">
-              {quran.surah ?? "Aucune lecture récente"}
-            </p>
-            {quran.detail && (
-              <p className="text-[15px] text-(--n-muted)">{quran.detail}</p>
-            )}
-            <button type="button" onClick={onOpenQuran} className="n-btn n-btn-sage mt-auto self-start">
-              {quran.surah ? "Continuer" : "Ouvrir le Coran"}
-            </button>
+            <div className="flex flex-col gap-2">
+              <span className="n-label">Reprendre la lecture du Coran</span>
+              <p className="n-display mt-1 text-[24px] leading-tight">
+                {quran.surah ?? "Aucune lecture récente"}
+              </p>
+              {quran.detail && (
+                <p className="text-[15px] text-(--n-muted)">{quran.detail}</p>
+              )}
+              <button type="button" onClick={onOpenQuran} className="n-btn n-btn-sage mt-2 self-start">
+                {quran.surah ? "Continuer" : "Ouvrir le Coran"}
+              </button>
+            </div>
+
+            <div className="mt-auto flex flex-col gap-2 border-t border-black/10 pt-5">
+              <span className="n-label">Reprendre la lecture</span>
+              {scienceBook ? (
+                <>
+                  {scienceBook.status === "to-read" && (
+                    <p className="text-[13px] font-semibold text-(--n-muted)">Ta prochaine lecture</p>
+                  )}
+                  <p className="n-display text-[20px] leading-tight">{scienceBook.title}</p>
+                  <p className="text-[14px] text-(--n-muted)">{scienceBook.author}</p>
+                  <button
+                    type="button"
+                    onClick={onOpenScienceBooks}
+                    className="n-btn n-btn-ghost mt-2 self-start px-4! py-2.5! text-sm!"
+                  >
+                    {scienceBook.status === "in-progress" ? "Continuer" : "Commencer"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-[15px] leading-6">
+                    Commence ta prochaine lecture aujourd’hui : quelques pages suffisent pour
+                    reprendre le fil.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={onOpenScienceBooks}
+                    className="n-btn n-btn-ghost mt-2 self-start px-4! py-2.5! text-sm!"
+                  >
+                    Choisir un livre
+                  </button>
+                </>
+              )}
+            </div>
           </article>
         )}
 

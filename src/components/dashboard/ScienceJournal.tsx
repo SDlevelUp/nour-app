@@ -12,7 +12,11 @@ function todayKey() {
   return new Intl.DateTimeFormat("fr-CA").format(new Date());
 }
 
-export function ScienceJournal() {
+export function ScienceJournal({
+  initialTab = "sessions",
+}: {
+  initialTab?: "sessions" | "books" | "learning";
+}) {
   const entries = useQuery(api.scienceProgress.list, {});
   const books = useQuery(api.scienceBooks.list, {});
   const addEntry = useMutation(api.scienceProgress.add);
@@ -23,7 +27,7 @@ export function ScienceJournal() {
   const reorderBooks = useMutation(api.scienceBooks.reorder);
   const removeBook = useMutation(api.scienceBooks.remove);
   const [passage] = useState(() => passageScienceDuJour(new Date()));
-  const [tab, setTab] = useState<"sessions" | "books" | "learning">("sessions");
+  const [tab, setTab] = useState<"sessions" | "books" | "learning">(initialTab);
   const [date, setDate] = useState(todayKey);
   const [time, setTime] = useState("10:00");
   const [title, setTitle] = useState("");

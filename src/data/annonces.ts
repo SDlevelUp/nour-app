@@ -10,10 +10,10 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
-    id: "2026-10-24-sans-taches-du-jour",
+    id: "2026-10-24-reprendre-la-lecture",
     date: "2026-10-24",
-    title: "Écran Aujourd’hui allégé",
-    text: "Le module « Tâches du jour » est retiré. Tes tâches restent dans Notes.",
+    title: "Reprends tes lectures",
+    text: "Sur « Aujourd’hui », la même carte montre où tu en es dans le Coran et ton livre de science en cours.",
   },
   {
     id: "2026-10-24-sans-taches-du-jour",
