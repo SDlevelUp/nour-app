@@ -1392,9 +1392,9 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  <div className="grid items-start gap-4 lg:grid-cols-12">
-                    <div className="lg:col-span-7">
-                    <div className="n-card min-w-0 p-3! sm:p-5!">
+                  <div className="grid gap-4 lg:grid-cols-12">
+                    <div className="flex flex-col lg:col-span-7">
+                    <div className="n-card min-w-0 flex-1 p-3! sm:p-5!">
                       <CycleCalendar
                         month={calendarMonth}
                         onMonthChange={setCalendarMonth}
@@ -1467,7 +1467,7 @@ export default function Dashboard() {
                     </div>
 
                     </div>
-                    <div className="space-y-4 lg:col-span-5">
+                    <div className="n-stack lg:col-span-5">
                     <article className="n-card n-card-dark n-rise">
                       <span className="n-label">Prochaines règles estimées</span>
                       <p className="n-display mt-4 text-[34px] leading-none">
@@ -1508,8 +1508,8 @@ export default function Dashboard() {
                       </p>
                     </div>
                     </div>
-                    <div className="lg:col-span-7">
-                    <div id="cycle-day-editor" className="n-card min-w-0">
+                    <div className="flex flex-col lg:col-span-7">
+                    <div id="cycle-day-editor" className="n-card min-w-0 flex-1">
                       <span className="n-label">
                         {format(selectedDate, "EEEE d MMMM yyyy", { locale: fr })}
                       </span>
@@ -1596,7 +1596,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     </div>
-                    <div className="space-y-4 lg:col-span-5">
+                    <div className="n-stack lg:col-span-5">
                   <section className="n-card" aria-labelledby="qada-heading">
                     <div className="flex flex-wrap items-end justify-between gap-4">
                       <div>

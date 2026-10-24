@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-24-cartes-sans-bordure",
+    date: "2026-10-24",
+    title: "Cartes épurées",
+    text: "Les cartes n’ont plus de contour, et celles de la page Cycle s’alignent.",
+  },
+  {
     id: "2026-10-24-reprendre-la-lecture",
     date: "2026-10-24",
     title: "Reprends tes lectures",
