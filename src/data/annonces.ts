@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-24-mot-du-coran",
+    date: "2026-10-24",
+    title: "Un mot du Coran chaque jour",
+    text: "En haut de la page Coran : un mot, sa traduction et le verset où il apparaît, d’après la traduction mot à mot du Dr Usama Nonnenmacher.",
+  },
+  {
     id: "2026-10-22-ville-et-mosquees",
     date: "2026-10-22",
     title: "Choisis ta ville, trouve une mosquée",

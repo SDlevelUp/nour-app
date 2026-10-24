@@ -2,6 +2,7 @@
 // Uniquement des textes fournis par Sarah depuis ses livres, avec la page :
 // rien n'est inventé ni généré. Tant qu'une liste est vide, sa carte n'apparaît pas.
 import { itemOfTheDay } from "./dailyPick";
+import { motsDuCoranNonnenmacher } from "./motsDuCoranNonnenmacher";
 
 // Extraits de « Le comportement du mémorisateur du Coran » (an-Nawawi, éd. avec Ibn Badis).
 // Droit de citation : extraits courts, toujours avec la page.
@@ -19,17 +20,23 @@ export const livreMemorisateur = {
 
 export const extraitsMemorisateur: ExtraitMemorisateur[] = [];
 
-// Mot du Coran avec sa signification, tirée d'un livre de référence.
+// Mot du Coran du jour : traduction mot à mot du Dr Usama Nonnenmacher
+// (https://github.com/DrUsamaN/CoranMot), reprise sans modification, source citée.
 export type MotDuCoran = {
   id: string;
-  arabic: string; // ex. « الرَّحْمَٰن »
-  transliteration: string; // ex. « Ar-Raḥmân »
-  meaning: string; // définition recopiée du livre
-  verse?: string; // ex. « al-Fâtiha (1:3) »
-  source: string; // livre, auteur et page
+  arabic: string;
+  translation: string;
+  surah: number;
+  verse: number;
+  verseArabic: string;
+  verseTranslation: string;
 };
 
-export const motsDuCoran: MotDuCoran[] = [];
+export const sourceMotsDuCoran = {
+  titre: "Traduction mot à mot du Coran",
+  auteur: "Dr Usama Nonnenmacher",
+  lien: "https://github.com/DrUsamaN/CoranMot",
+};
 
 export const extraitDuJour = (date: Date) => itemOfTheDay(extraitsMemorisateur, date);
-export const motDuJour = (date: Date) => itemOfTheDay(motsDuCoran, date);
+export const motDuJour = (date: Date) => itemOfTheDay(motsDuCoranNonnenmacher, date);
