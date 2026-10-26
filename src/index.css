@@ -3,6 +3,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/nour-ui.css";
+@import "./styles/landing.css";
 @custom-variant dark (&:is(.dark *));
 
 /* DO NOT CHANGE */
