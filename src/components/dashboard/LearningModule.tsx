@@ -117,7 +117,7 @@ export function LearningModule() {
 
   return (
     <div className="space-y-5">
-      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions, ou un hadith à documenter. Nour ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
+      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions, ou un hadith à documenter. Rawdah ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
         <form onSubmit={(event) => void save(event)} className="mt-5 space-y-4">
           <div className="n-seg" role="group" aria-label="Type de fiche">
             <button type="button" aria-pressed={kind === "matn"} onClick={() => setKind("matn")}>

@@ -76,11 +76,11 @@ export function DashboardSidebar({
           type="button"
           onClick={() => onNavigate("overview")}
           className="n-side-logo"
-          aria-label="Nour, aujourd’hui"
-          data-tip={isCollapsed ? "Nour" : undefined}
+          aria-label="Rawdah, aujourd’hui"
+          data-tip={isCollapsed ? "Rawdah" : undefined}
         >
           <NourMark className="size-7 shrink-0 text-(--n-sage)" />
-          {!isCollapsed && <span className="n-display text-[20px]">Nour</span>}
+          {!isCollapsed && <span className="n-display text-[20px]">Rawdah</span>}
         </button>
 
         <button

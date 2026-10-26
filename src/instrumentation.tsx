@@ -212,7 +212,7 @@ export function InstrumentationProvider({
     const handleRejection = async (event: PromiseRejectionEvent) => {
       try {
         const normalizedError = normalizeError(event.reason);
-        console.error("[Nour runtime error]", normalizedError.error);
+        console.error("[Rawdah runtime error]", normalizedError.error);
         setError(normalizedError);
       } catch (error) {
         console.error("Error in handleRejection:", error);

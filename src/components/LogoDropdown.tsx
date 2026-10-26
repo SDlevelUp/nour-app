@@ -33,7 +33,7 @@ export function LogoDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-10 w-10">
-          <MoonStar className="size-5 text-primary" aria-label="Nour" />
+          <MoonStar className="size-5 text-primary" aria-label="Rawdah" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">

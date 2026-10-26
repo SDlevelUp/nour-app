@@ -538,7 +538,7 @@ export default function Dashboard() {
         if (enabled && time === at && firedToday.current[key] !== date) {
           firedToday.current[key] = date;
           new Notification(title, {
-            body: "Ouvre Nour pour réciter les adhkar.",
+            body: "Ouvre Rawdah pour réciter les adhkar.",
             tag: `nour-${key}-${date}`,
           });
         }
@@ -756,7 +756,7 @@ export default function Dashboard() {
     if (notifiedLateCycle.current === alertKey) return;
     notifiedLateCycle.current = alertKey;
     new Notification("Rappel de suivi", {
-        body: "Un rappel de suivi est disponible dans Nour.",
+        body: "Un rappel de suivi est disponible dans Rawdah.",
       tag: `nour-cycle-late-${alertKey}`,
     });
   }, [
@@ -2250,7 +2250,7 @@ export default function Dashboard() {
                         Fajr quand le soleil est à {prayerCalculation.fajrAngle}° sous
                         l’horizon, Isha à {prayerCalculation.ishaAngle}°, Maghrib{" "}
                         {prayerCalculation.maghribOffsetMinutes} minutes après le coucher du
-                        soleil. La même méthode s’applique à tout le monde dans Nour.
+                        soleil. La même méthode s’applique à tout le monde dans Rawdah.
                       </p>
                       <details className="n-proof mt-3 border-t-0! pt-0!">
                         <summary>Écart avec ta mosquée</summary>
@@ -2284,7 +2284,7 @@ export default function Dashboard() {
                     </label>
 
                     <p className="mt-5 text-[13px] leading-5 text-(--n-muted)">
-                      Ta position ou ta ville reste sur cet appareil, pas dans ton compte Nour.
+                      Ta position ou ta ville reste sur cet appareil, pas dans ton compte Rawdah.
                       Elle est envoyée à{" "}
                       <a
                         href="https://aladhan.com/prayer-times-api"
@@ -2326,7 +2326,7 @@ export default function Dashboard() {
                       />
                     </div>
                     <p className="mt-4 text-[13px] leading-5 text-(--n-muted)">
-                      Les rappels fonctionnent lorsque Nour est ouverte. Sur iPhone, les
+                      Les rappels fonctionnent lorsque Rawdah est ouverte. Sur iPhone, les
                       notifications écran verrouillé demandent l’installation sur l’écran
                       d’accueil et un service Web Push, qui n’est pas encore configuré.
                     </p>
@@ -2337,7 +2337,7 @@ export default function Dashboard() {
           </div>
 
           <footer className="mt-10 flex flex-col gap-2 border-t border-(--n-line) pt-5 text-[13px] text-(--n-muted) sm:flex-row sm:items-center sm:justify-between">
-            <span>Nour · Suivi quotidien personnel</span>
+            <span>Rawdah · Suivi quotidien personnel</span>
             <span>
               Ton calendrier est enregistré sur ton compte ; tes préférences de
               rappel sont enregistrées sur cet appareil.

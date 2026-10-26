@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-26-rawdah",
+    date: "2026-10-26",
+    title: "Nour devient Rawdah",
+    text: "L’application change de nom. Ton compte, tes notes et tes réglages ne changent pas.",
+  },
+  {
     id: "2026-10-24-cartes-sans-bordure",
     date: "2026-10-24",
     title: "Cartes épurées",

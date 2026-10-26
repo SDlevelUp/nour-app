@@ -360,7 +360,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             )}
 
             <div className="py-4 px-6 text-center text-xs text-muted-foreground bg-muted border-t rounded-b-lg">
-              Connexion sécurisée par Nour
+              Connexion sécurisée par Rawdah
             </div>
           </Card>
         </div>

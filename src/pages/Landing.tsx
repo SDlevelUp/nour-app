@@ -64,23 +64,23 @@ const faqs = [
       "Notes, lectures et suivi du cycle sont enregistrés dans ton compte et disponibles sur tous tes appareils. La position reste sur l’appareil et sert uniquement au calcul des horaires.",
   },
   {
-    question: "Nour est-elle adaptée aux femmes musulmanes ?",
+    question: "Rawdah est-elle adaptée aux femmes musulmanes ?",
     answer:
-      "Oui. Nour inclut le suivi du cycle, le compteur de jours de jeûne à rattraper (qada) et le mode ‘Udhr, qui masque les prières du planning pendant les règles.",
+      "Oui. Rawdah inclut le suivi du cycle, le compteur de jours de jeûne à rattraper (qada) et le mode ‘Udhr, qui masque les prières du planning pendant les règles.",
   },
   {
-    question: "Quels adhkar contient Nour ?",
+    question: "Quels adhkar contient Rawdah ?",
     answer: `${adhkarBySession.morning.length} invocations le matin et ${adhkarBySession.evening.length} le soir, dont la demande de pardon maîtresse (Sayyid al-istighfar), al-Ikhlas, al-Falaq et an-Nas. Chaque invocation affiche son rapporteur, son recueil, son numéro et son degré d’authenticité.`,
   },
   {
-    question: "Peut-on écouter le Coran dans Nour ?",
+    question: "Peut-on écouter le Coran dans Rawdah ?",
     answer:
       "Oui. Les 114 sourates se lisent et s’écoutent verset par verset, avec plusieurs récitateurs. La phonétique et la traduction française s’affichent sous chaque verset. L’écoute continue quand tu changes de page.",
   },
   {
     question: "Faut-il installer l’application ?",
     answer:
-      "Non. Nour fonctionne dans le navigateur. Tu peux l’ajouter à l’écran d’accueil du téléphone.",
+      "Non. Rawdah fonctionne dans le navigateur. Tu peux l’ajouter à l’écran d’accueil du téléphone.",
   },
 ];
 
@@ -165,9 +165,9 @@ export default function Landing() {
   return (
     <main className={`n-landing ${isDarkMode ? "n-landing-dark" : ""}`}>
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5 sm:px-8">
-        <a href="/" className="flex items-center gap-2.5" aria-label="Nour, accueil">
+        <a href="/" className="flex items-center gap-2.5" aria-label="Rawdah, accueil">
           <NourMark className="size-8 text-(--n-sage)" />
-          <span className="n-display text-2xl">Nour</span>
+          <span className="n-display text-2xl">Rawdah</span>
         </a>
         <nav className="hidden items-center gap-8 text-[15px] font-medium text-(--n-muted) md:flex">
           <a className="hover:text-(--n-ink)" href="#esprit">Principes</a>
@@ -255,7 +255,7 @@ export default function Landing() {
       {/* Fonctionnalités : index éditorial, chaque ligne montre un fragment réel de l'interface */}
       <section id="fonctionnalites" className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
         <span className="n-label">Fonctionnalités</span>
-        <h2 className="n-section-title mt-4 max-w-3xl">Ce que contient Nour</h2>
+        <h2 className="n-section-title mt-4 max-w-3xl">Ce que contient Rawdah</h2>
 
         <ol className="n-index mt-12">
           <li className="n-index-row">
@@ -427,7 +427,7 @@ export default function Landing() {
         <div className="n-card n-card-dark flex flex-col items-start gap-6 p-8! sm:p-12! lg:flex-row lg:items-center lg:justify-between">
           <KhatamPattern id="landing-khatam-cta" />
           <h2 className="n-section-title relative max-w-2xl">
-            Crée ton espace Nour.
+            Crée ton espace Rawdah.
           </h2>
           <a
             href={authHref}
@@ -439,7 +439,7 @@ export default function Landing() {
       </section>
 
       <footer className="px-4 py-6 text-center text-sm text-(--n-muted)">
-        Nour · Selon le Coran et la Sunna authentique · Sans publicité
+        Rawdah · Selon le Coran et la Sunna authentique · Sans publicité
       </footer>
     </main>
   );
