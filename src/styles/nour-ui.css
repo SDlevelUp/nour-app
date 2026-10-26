@@ -2390,3 +2390,10 @@
 .n-stack > :last-child {
   flex: 1;
 }
+
+/* Page publique : profils « Pour qui » */
+.n-audience {
+  border-radius: 16px;
+  background: var(--n-paper);
+  padding: 18px 20px;
+}

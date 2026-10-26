@@ -113,6 +113,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-24 : page publique sans traits de séparation (principes, index des fonctionnalités, étapes, aperçu des adhkar, pied de page) ; questions de la FAQ en blocs clairs arrondis.
 - 2026-10-24 : questions de la FAQ publique en 16 px.
 - 2026-10-26 : l’application s’appelle désormais Rawdah (demande de Sarah) : site, titres d’onglet, balises de partage et données structurées, manifeste, image de partage, notifications, barre latérale, FAQ. Inchangés volontairement : noms techniques (`NourMark`, clés `nour-…` du navigateur pour ne pas effacer les préférences, variables `NOUR_MAILER_*`, nom du dossier et du dépôt), messages d’erreur internes du serveur. À faire hors du code : le texte des e-mails de connexion vient du relais d’envoi Hostinger [À CONFIRMER : y remplacer « Nour » par « Rawdah »].
+- 2026-10-26 : page publique, nouvelle section « Pour qui / Pourquoi » (avant les fonctionnalités, lien « Pour qui » dans le menu) : 3 profils (femme musulmane, étudiante en science, jours de règles) et 5 bénéfices factuels (un seul espace, horaires sans réglage, reprise de lecture, planning adapté aux règles, données sur tous les appareils). La pastille « Selon le Coran et la Sunna authentique » du haut de page a été retirée par Sarah.
 
 ## Problèmes connus
 - Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.

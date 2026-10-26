@@ -24,6 +24,45 @@ const principles = [
   },
 ];
 
+// Section « Pour qui et pourquoi » (demande de Sarah du 2026-10-26).
+const audiences = [
+  {
+    title: "Pour la femme musulmane",
+    text: "Qui veut prier à l’heure, dire ses adhkar du matin et du soir et garder un lien régulier avec le Coran.",
+  },
+  {
+    title: "Pour l’étudiante en science",
+    text: "Qui suit des cours, lit des livres et révise des matn, et veut tout retrouver au même endroit.",
+  },
+  {
+    title: "Pour les jours de règles",
+    text: "Qui veut suivre son cycle, compter ses jeûnes à rattraper et adapter son planning.",
+  },
+];
+
+const benefits = [
+  {
+    title: "Un seul espace",
+    text: "Horaires de prière, adhkar, Coran, cycle, science et notes, sans passer d’une application à l’autre.",
+  },
+  {
+    title: "Des horaires sans réglage",
+    text: "Ta position ou ta ville suffit. Les horaires du jour s’affichent chaque matin.",
+  },
+  {
+    title: "Une lecture qui reprend où tu t’es arrêtée",
+    text: "La sourate, le verset et le livre en cours restent en tête de ton écran.",
+  },
+  {
+    title: "Un planning adapté aux règles",
+    text: "Le mode ‘Udhr masque les prières le temps des règles. Le compteur de qada garde le reste.",
+  },
+  {
+    title: "Tes données sur tous tes appareils",
+    text: "Notes, lectures et suivi du cycle sont enregistrés dans ton compte.",
+  },
+];
+
 const steps = [
   {
     title: "Crée un compte",
@@ -171,6 +210,7 @@ export default function Landing() {
         </a>
         <nav className="hidden items-center gap-8 text-[15px] font-medium text-(--n-muted) md:flex">
           <a className="hover:text-(--n-ink)" href="#esprit">Principes</a>
+          <a className="hover:text-(--n-ink)" href="#pour-qui">Pour qui</a>
           <a className="hover:text-(--n-ink)" href="#fonctionnalites">Fonctionnalités</a>
           <a className="hover:text-(--n-ink)" href="#faq">Questions</a>
         </nav>
@@ -249,6 +289,39 @@ export default function Landing() {
               <p className="mt-2 text-[14px] leading-6 text-(--n-muted)">{text}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Pour qui et pourquoi */}
+      <section id="pour-qui" className="mx-auto max-w-6xl px-4 pt-16 sm:px-8 sm:pt-24">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <span className="n-label">Pour qui</span>
+            <h2 className="n-section-title mt-4">Pensée pour les femmes musulmanes</h2>
+            <ul className="mt-8 space-y-3">
+              {audiences.map(({ title, text }) => (
+                <li key={title} className="n-audience">
+                  <h3 className="n-display text-[18px]">{title}</h3>
+                  <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <span className="n-label">Pourquoi</span>
+            <h2 className="n-section-title mt-4">Ce que Rawdah t’apporte</h2>
+            <ol className="mt-8 space-y-6">
+              {benefits.map(({ title, text }, index) => (
+                <li key={title} className="grid grid-cols-[40px_minmax(0,1fr)] gap-3">
+                  <span className="n-index-num pt-0.5">0{index + 1}</span>
+                  <div>
+                    <h3 className="n-display text-[18px]">{title}</h3>
+                    <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
