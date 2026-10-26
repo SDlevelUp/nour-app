@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { NourMark } from "@/components/NourMark";
 import { adhkarBySession } from "@/convex/adhkarData";
+import { motsDuCoranNonnenmacher } from "@/data/motsDuCoranNonnenmacher";
+import { rappels } from "@/data/rappels";
 import { prayerCalculation } from "@/hooks/use-prayer-times";
 
 const authHref = "/auth?returnTo=%2Fdashboard";
@@ -60,21 +62,6 @@ const benefits = [
   {
     title: "Tes données sur tous tes appareils",
     text: "Notes, lectures et suivi du cycle sont enregistrés dans ton compte.",
-  },
-];
-
-const steps = [
-  {
-    title: "Crée un compte",
-    text: "Avec une adresse e-mail ou un compte Google.",
-  },
-  {
-    title: "Active la localisation",
-    text: "Les horaires de prière de ta ville s’affichent.",
-  },
-  {
-    title: "Choisis les modules",
-    text: "Affiche uniquement les cartes utiles sur l’écran « Aujourd’hui ».",
   },
 ];
 
@@ -144,6 +131,8 @@ const sampleTimes = [
 ] as const;
 
 const sampleInvocation = adhkarBySession.morning[0];
+const sampleWord = motsDuCoranNonnenmacher[0];
+const sampleRappel = rappels[0];
 
 // Fragments d'interface pour l'index des fonctionnalités (données d'illustration).
 const sampleSurahs = [
@@ -209,9 +198,8 @@ export default function Landing() {
           <span className="n-display text-2xl">Rawdah</span>
         </a>
         <nav className="hidden items-center gap-8 text-[15px] font-medium text-(--n-muted) md:flex">
-          <a className="hover:text-(--n-ink)" href="#esprit">Principes</a>
-          <a className="hover:text-(--n-ink)" href="#pour-qui">Pour qui</a>
           <a className="hover:text-(--n-ink)" href="#fonctionnalites">Fonctionnalités</a>
+          <a className="hover:text-(--n-ink)" href="#pour-qui">Pour qui</a>
           <a className="hover:text-(--n-ink)" href="#faq">Questions</a>
         </nav>
         <a href={authHref} className="n-btn n-btn-ghost px-4! py-2.5! text-sm!">
@@ -219,18 +207,19 @@ export default function Landing() {
         </a>
       </header>
 
-      {/* Héros */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-8 sm:px-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pb-24">
-        <div className="n-rise">
+      {/* Héros centré, maquette de téléphone et étiquettes flottantes */}
+      <section className="mx-auto max-w-6xl px-4 pt-10 text-center sm:px-8 sm:pt-16">
+        <div className="n-rise mx-auto max-w-2xl">
+          <span className="n-label justify-center">Application musulmane pour les femmes</span>
           <h1 className="n-display mt-5 text-[clamp(32px,4vw,42px)] leading-[1.1] tracking-[-0.02em]">
             Adhkar, Coran et <span className="text-(--n-sage)">prières.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-[17px] leading-7 text-(--n-muted)">
-            Application musulmane pour les femmes. Horaires de prière calculés selon ta
-            position. Adhkar du matin et du soir avec leurs sources. Lecture et écoute du
-            Coran. Suivi du cycle et du qada. Un rappel des pieux prédécesseurs chaque jour.
+          <p className="mx-auto mt-5 max-w-xl text-[17px] leading-7 text-(--n-muted)">
+            Horaires de prière calculés selon ta position. Adhkar du matin et du soir avec
+            leurs sources. Lecture et écoute du Coran. Suivi du cycle et du qada. Un rappel
+            des pieux prédécesseurs chaque jour.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a href={authHref} className="n-btn px-6! py-4!">
               Créer mon espace
             </a>
@@ -240,112 +229,91 @@ export default function Landing() {
           </div>
         </div>
 
-        <div className="n-rise">
-          <article className="n-card n-card-dark p-7!" aria-label="Aperçu de la prochaine prière">
-            <KhatamPattern id="landing-khatam" />
-            <div className="relative flex items-end justify-between gap-4">
-              <div>
-                <span className="n-label">Prochaine prière</span>
-                <p className="n-display mt-3 text-[26px] leading-none">Maghrib</p>
-              </div>
-              <p className="text-[15px] text-(--n-on-dark-muted)">
-                dans <b className="font-semibold text-white">1 h 12</b>
+        <div className="n-hero-stage n-rise" aria-label="Aperçu de l’écran Aujourd’hui">
+          <span className="n-float" style={{ left: "6%", top: "18%" }}>
+            <b>Fajr</b> 06:31
+          </span>
+          <span className="n-float" style={{ right: "5%", top: "12%" }}>
+            Rappel du jour
+          </span>
+          <span className="n-float" style={{ left: "10%", bottom: "20%" }}>
+            Sourate Yunus · verset 4
+          </span>
+          <span className="n-float n-float-mauve" style={{ right: "8%", bottom: "26%" }}>
+            Mode ‘Udhr
+          </span>
+
+          <div className="n-phone">
+            <div className="n-phone-screen">
+              <p className="n-arabic text-[13px] text-(--n-sage)" lang="ar" dir="rtl">
+                السَّلَامُ عَلَيْكُمْ
               </p>
-            </div>
-            <p className="n-display relative text-[clamp(56px,8vw,88px)] leading-[0.95] tabular-nums tracking-[-0.03em]">
-              18:52
-            </p>
-            <div className="n-timeline">
-              <div className="n-track">
-                <span style={{ width: "62%" }} />
+              <p className="n-display text-left text-[15px]">As-salâmu ʿalaykum</p>
+              <div className="n-phone-prayer">
+                <KhatamPattern id="landing-khatam" />
+                <span className="relative block text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-(--n-on-dark-muted)">
+                  Prochaine prière
+                </span>
+                <span className="relative flex items-end justify-between">
+                  <b className="n-display text-[36px] leading-none">18:52</b>
+                  <span className="text-[12px] text-(--n-on-dark-muted)">Maghrib</span>
+                </span>
+                <span className="relative mt-3 flex justify-between text-[9px] text-(--n-on-dark-muted)">
+                  {sampleTimes.map(([name, time]) => (
+                    <span key={name} className={name === "Maghrib" ? "font-bold text-white" : ""}>
+                      {name}
+                      <br />
+                      {time}
+                    </span>
+                  ))}
+                </span>
               </div>
-              <ol className="n-stops">
-                {sampleTimes.map(([name, time], index) => (
-                  <li
-                    key={name}
-                    className="n-stop"
-                    data-state={index < 3 ? "done" : index === 3 ? "next" : "upcoming"}
-                  >
-                    <i className="n-stop-dot" />
-                    {name}
-                    <span className="n-stop-time">{time}</span>
-                  </li>
-                ))}
-              </ol>
+              <div className="n-phone-card text-left">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-(--n-muted)">
+                  Adhkar du matin
+                </span>
+                <p className="n-arabic mt-1 text-[14px] leading-[1.8]" lang="ar">
+                  {sampleInvocation.arabic}
+                </p>
+              </div>
+              <div className="n-phone-card n-phone-tint text-left">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-(--n-muted)">
+                  Reprendre la lecture du Coran
+                </span>
+                <p className="n-display mt-1 text-[14px]">Yunus · verset 4</p>
+              </div>
             </div>
-          </article>
-          <p className="mt-3 text-center text-[13px] text-(--n-muted)">
-            Aperçu avec des horaires d’exemple.
-          </p>
+          </div>
         </div>
+        <p className="mt-3 text-[13px] text-(--n-muted)">Aperçu avec des données d’exemple.</p>
       </section>
 
-      {/* Principes */}
-      <section id="esprit">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-10">
+      {/* Principes, en bandeau */}
+      <section id="esprit" className="mx-auto max-w-6xl px-4 py-14 sm:px-8">
+        <div className="grid gap-8 text-center sm:grid-cols-2 lg:grid-cols-4">
           {principles.map(({ title, text }) => (
             <div key={title}>
-              <h2 className="n-display text-lg">{title}</h2>
-              <p className="mt-2 text-[14px] leading-6 text-(--n-muted)">{text}</p>
+              <h2 className="n-display text-[17px]">{title}</h2>
+              <p className="mx-auto mt-2 max-w-[26ch] text-[14px] leading-6 text-(--n-muted)">{text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Pour qui et pourquoi */}
-      <section id="pour-qui" className="mx-auto max-w-6xl px-4 pt-16 sm:px-8 sm:pt-24">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <span className="n-label">Pour qui</span>
-            <h2 className="n-section-title mt-4">Pensée pour les femmes musulmanes</h2>
-            <ul className="mt-8 space-y-3">
-              {audiences.map(({ title, text }) => (
-                <li key={title} className="n-audience">
-                  <h3 className="n-display text-[18px]">{title}</h3>
-                  <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <span className="n-label">Pourquoi</span>
-            <h2 className="n-section-title mt-4">Ce que Rawdah t’apporte</h2>
-            <ol className="mt-8 space-y-6">
-              {benefits.map(({ title, text }, index) => (
-                <li key={title} className="grid grid-cols-[40px_minmax(0,1fr)] gap-3">
-                  <span className="n-index-num pt-0.5">0{index + 1}</span>
-                  <div>
-                    <h3 className="n-display text-[18px]">{title}</h3>
-                    <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      {/* Fonctionnalités : index éditorial, chaque ligne montre un fragment réel de l'interface */}
-      <section id="fonctionnalites" className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
-        <span className="n-label">Fonctionnalités</span>
-        <h2 className="n-section-title mt-4 max-w-3xl">Ce que contient Rawdah</h2>
-
-        <ol className="n-index mt-12">
-          <li className="n-index-row">
-            <span className="n-index-num">01</span>
-            <div>
-              <h3 className="n-index-title">Adhkar du matin et du soir</h3>
-              <p className="n-index-text">
-                Dhikr et invocations du matin et du soir, tirés de Sahih al-Bukhari, Sahih
-                Muslim et des recueils de hadiths authentifiés. Une invocation à la fois, un
-                compteur à toucher à chaque récitation, la preuve sous chaque texte.
-              </p>
-            </div>
-            <div className="n-index-preview">
-              <p className="n-arabic text-[22px] leading-[1.9]" lang="ar">
+      {/* Section alternée 1 : adhkar */}
+      <section id="fonctionnalites" className="mx-auto max-w-6xl px-4 py-12 sm:px-8 sm:py-16">
+        <div className="n-split">
+          <div className="n-split-visual">
+            <div className="n-showcase">
+              <div className="flex items-center justify-between">
+                <span className="n-label">Adhkar du matin</span>
+                <span className="n-chip">1 sur {adhkarBySession.morning.length}</span>
+              </div>
+              <p className="n-arabic mt-4 text-[24px] leading-[1.9]" lang="ar">
                 {sampleInvocation.arabic}
               </p>
-              <div className="mt-4 flex items-center justify-between gap-3">
+              <p className="mt-3 text-[14px] italic text-(--n-sage)">{sampleInvocation.transliteration}</p>
+              <div className="mt-5 flex items-center justify-between gap-3">
                 <p className="text-[12px] text-(--n-muted)">
                   {sampleInvocation.proof.sources.map((source, index) => (
                     <span key={`${source.collection}-${source.number}`}>
@@ -361,26 +329,85 @@ export default function Landing() {
                 </span>
               </div>
             </div>
-          </li>
+          </div>
+          <div className="n-split-text">
+            <span className="n-label">Adhkar</span>
+            <h2 className="n-section-title mt-4">Les adhkar du matin et du soir, avec leurs preuves</h2>
+            <p className="mt-4 text-[16px] leading-7 text-(--n-muted)">
+              Dhikr et invocations tirés de Sahih al-Bukhari, Sahih Muslim et des recueils de
+              hadiths authentifiés. Une invocation à la fois. Un compteur à toucher à chaque
+              récitation. Le rapporteur, le recueil, le numéro et le degré d’authenticité sous
+              chaque texte.
+            </p>
+          </div>
+        </div>
+      </section>
 
-          <li className="n-index-row">
-            <span className="n-index-num">02</span>
-            <div>
-              <h3 className="n-index-title">Coran</h3>
-              <p className="n-index-text">
-                Les 114 sourates, verset par verset, en arabe avec phonétique et traduction
-                française. Plusieurs récitateurs. Touche un verset pour l’écouter ; l’écoute
-                continue sur les autres pages.
-              </p>
+      {/* Section alternée 2 : rappels */}
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-8 sm:py-16">
+        <div className="n-split n-split-reverse">
+          <div className="n-split-text">
+            <span className="n-label">Rappels</span>
+            <h2 className="n-section-title mt-4">Deux rappels par jour, rien de plus</h2>
+            <p className="mt-4 text-[16px] leading-7 text-(--n-muted)">
+              Un rappel le matin, un le soir, à l’heure que tu choisis. Une parole des pieux
+              prédécesseurs sur ton écran chaque jour, avec son auteur et sa source.
+            </p>
+          </div>
+          <div className="n-split-visual">
+            <div className="n-notif-stack">
+              <div className="n-notif">
+                <NourMark className="size-8 shrink-0 text-(--n-sage)" />
+                <span className="min-w-0 text-left">
+                  <b className="block text-[14px]">Adhkar du matin</b>
+                  <span className="block text-[13px] text-(--n-muted)">
+                    Ouvre Rawdah pour réciter les adhkar.
+                  </span>
+                </span>
+                <span className="ml-auto text-[12px] text-(--n-muted)">07:00</span>
+              </div>
+              <div className="n-notif">
+                <NourMark className="size-8 shrink-0 text-(--n-sage)" />
+                <span className="min-w-0 text-left">
+                  <b className="block text-[14px]">Adhkar du soir</b>
+                  <span className="block text-[13px] text-(--n-muted)">
+                    Ouvre Rawdah pour réciter les adhkar.
+                  </span>
+                </span>
+                <span className="ml-auto text-[12px] text-(--n-muted)">18:30</span>
+              </div>
+              <div className="n-notif n-notif-quote">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-(--n-mauve-text)">
+                  Rappel du jour
+                </span>
+                <p className="mt-2 text-left text-[14px] leading-6">
+                  « {sampleRappel.text.length > 90 ? `${sampleRappel.text.slice(0, 90).trimEnd()}…` : sampleRappel.text} »
+                </p>
+                <p className="mt-2 text-left text-[12px] text-(--n-muted)">
+                  {sampleRappel.author} · {sampleRappel.source}
+                </p>
+              </div>
             </div>
-            <div className="n-index-preview p-2!">
+          </div>
+        </div>
+      </section>
+
+      {/* Grille des détails */}
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="n-label justify-center">Fonctionnalités</span>
+          <h2 className="n-section-title mt-4">Ce que contient Rawdah</h2>
+        </div>
+        <div className="n-bento mt-10">
+          <article className="n-bento-card">
+            <div className="n-bento-visual p-2!">
               {sampleSurahs.map(([number, name, verses, arabic], index) => (
                 <div key={number} className="n-surah-item" aria-current={index === 1}>
                   <span className="n-surah-num">
                     <NourMark />
                     <span className="relative">{number}</span>
                   </span>
-                  <span className="min-w-0">
+                  <span className="min-w-0 text-left">
                     <span className="block truncate font-semibold">{name}</span>
                     <span className="block text-[13px] text-(--n-muted)">{verses} versets</span>
                   </span>
@@ -390,41 +417,53 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-          </li>
+            <h3 className="n-display mt-5 text-[18px]">Coran</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Les 114 sourates, verset par verset, en arabe avec phonétique et traduction
+              française. Plusieurs récitateurs.
+            </p>
+          </article>
 
-          <li className="n-index-row">
-            <span className="n-index-num">03</span>
-            <div>
-              <h3 className="n-index-title">Prières et planning</h3>
-              <p className="n-index-text">
-                Horaires de prière (Fajr, Dhuhr, Asr, Maghrib, Isha) calculés selon ta
-                position. Planning de la journée organisé autour des prières.
+          <article className="n-bento-card">
+            <div className="n-bento-visual">
+              <div className="n-mini-demo">
+                <span className="n-surah-num">
+                  <NourMark />
+                  <span className="relative">10</span>
+                </span>
+                <span className="min-w-0 flex-1 text-left">
+                  <b className="block text-[14px]">Yunus</b>
+                  <span className="block text-[12px] text-(--n-muted)">Verset 4 / 109</span>
+                </span>
+                <span className="n-mini-demo-play" aria-hidden="true">❚❚</span>
+              </div>
+            </div>
+            <h3 className="n-display mt-5 text-[18px]">L’écoute continue</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Change de page : une petite fenêtre garde la récitation, avec verset et sourate
+              suivants.
+            </p>
+          </article>
+
+          <article className="n-bento-card">
+            <div className="n-bento-visual">
+              <p className="n-arabic text-center text-[34px] leading-[1.5] text-(--n-sage-dark)" lang="ar">
+                {sampleWord.arabic}
+              </p>
+              <p className="mt-1 text-[14px] font-semibold">
+                {sampleWord.translation.replace(/[\s,.;:!»]+$/u, "")}
               </p>
             </div>
-            <div className="n-index-preview">
-              <ul className="n-topbar-times">
-                {sampleTimes.map(([name, time]) => (
-                  <li key={name} data-next={name === "Maghrib"}>
-                    <span>{name}</span>
-                    <b>{time}</b>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-[12px] text-(--n-muted)">Horaires d’exemple.</p>
-            </div>
-          </li>
+            <h3 className="n-display mt-5 text-[18px]">Un mot du Coran par jour</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Le mot, sa traduction et son verset, d’après la traduction mot à mot du Dr Usama
+              Nonnenmacher.
+            </p>
+          </article>
 
-          <li className="n-index-row">
-            <span className="n-index-num">04</span>
-            <div>
-              <h3 className="n-index-title">Cycle et qada</h3>
-              <p className="n-index-text">
-                Suivi des règles, estimation des prochaines règles et compteur de jeûnes à
-                rattraper (qada). Le mode ‘Udhr masque les prières du planning.
-              </p>
-            </div>
-            <div className="n-index-preview">
-              <div className="n-week">
+          <article className="n-bento-card">
+            <div className="n-bento-visual">
+              <div className="n-week n-week-compact">
                 {sampleWeek.map(([day, date, state]) => (
                   <span
                     key={day}
@@ -438,20 +477,35 @@ export default function Landing() {
                 ))}
               </div>
             </div>
-          </li>
+            <h3 className="n-display mt-5 text-[18px]">Cycle et qada</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Suivi des règles, estimation des prochaines règles, jeûnes à rattraper. Le mode
+              ‘Udhr masque les prières du planning.
+            </p>
+          </article>
 
-          <li className="n-index-row">
-            <span className="n-index-num">05</span>
-            <div>
-              <h3 className="n-index-title">Science bénéfique</h3>
-              <p className="n-index-text">
-                Livres à lire, cours suivis, notes de révision et matn à mémoriser par
-                portions.
-              </p>
+          <article className="n-bento-card">
+            <div className="n-bento-visual">
+              <ul className="n-topbar-times justify-center">
+                {sampleTimes.map(([name, time]) => (
+                  <li key={name} data-next={name === "Maghrib"}>
+                    <span>{name}</span>
+                    <b>{time}</b>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="n-index-preview space-y-2">
+            <h3 className="n-display mt-5 text-[18px]">Horaires de prière et mosquées</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Horaires de Fajr à Isha selon ta position ou ta ville. Mosquées proches avec
+              l’itinéraire.
+            </p>
+          </article>
+
+          <article className="n-bento-card">
+            <div className="n-bento-visual space-y-2">
               {sampleBooks.map(([title, author, status], index) => (
-                <div key={title} className="flex items-center gap-3">
+                <div key={title} className="flex items-center gap-3 text-left">
                   <span className="n-book-rank">{index + 1}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{title}</span>
@@ -461,37 +515,64 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-          </li>
-        </ol>
+            <h3 className="n-display mt-5 text-[18px]">Science bénéfique</h3>
+            <p className="mt-1 text-[14px] leading-6 text-(--n-muted)">
+              Livres à lire, cours suivis, notes de révision et matn à mémoriser par portions.
+            </p>
+          </article>
+        </div>
       </section>
 
-      {/* Étapes */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-8 sm:pb-24">
-        <span className="n-label">Démarrage</span>
-        <h2 className="n-section-title mt-4">Trois étapes</h2>
-        <ol className="mt-10 grid gap-8 md:grid-cols-3">
-          {steps.map(({ title, text }, index) => (
-            <li key={title}>
-              <span className="n-index-num">0{index + 1}</span>
-              <h3 className="n-display mt-3 text-xl">{title}</h3>
-              <p className="mt-2 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+      {/* Pour qui */}
+      <section id="pour-qui" className="mx-auto max-w-6xl px-4 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="n-label justify-center">Pour qui</span>
+          <h2 className="n-section-title mt-4">Pensée pour les femmes musulmanes</h2>
+        </div>
+        <ul className="mt-10 grid gap-4 md:grid-cols-3">
+          {audiences.map(({ title, text }) => (
+            <li key={title} className="n-audience">
+              <h3 className="n-display text-[18px]">{title}</h3>
+              <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+            </li>
+          ))}
+        </ul>
+        <ol className="mt-10 grid gap-x-10 gap-y-6 md:grid-cols-2">
+          {benefits.map(({ title, text }, index) => (
+            <li key={title} className="grid grid-cols-[40px_minmax(0,1fr)] gap-3">
+              <span className="n-index-num pt-0.5">0{index + 1}</span>
+              <div>
+                <h3 className="n-display text-[17px]">{title}</h3>
+                <p className="mt-1 text-[15px] leading-6 text-(--n-muted)">{text}</p>
+              </div>
             </li>
           ))}
         </ol>
       </section>
 
-      {/* Questions */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
-      <section id="faq" className="mx-auto max-w-3xl px-4 pb-16 sm:px-8 sm:pb-24">
-        <span className="n-label">Questions</span>
-        <h2 className="n-section-title mt-4">Questions fréquentes</h2>
-        <div className="mt-8 space-y-2">
-          {faqs.map(({ question, answer }) => (
-            <details key={question} className="n-faq">
-              <summary>{question}</summary>
-              <p className="pt-3 text-[15px] leading-7 text-(--n-muted)">{answer}</p>
-            </details>
-          ))}
+      {/* Questions, en deux colonnes */}
+      <section id="faq" className="mx-auto max-w-6xl px-4 py-12 sm:px-8 sm:py-16">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div>
+            <span className="n-label">Questions</span>
+            <h2 className="n-section-title mt-4">Questions fréquentes</h2>
+            <p className="mt-4 max-w-sm text-[15px] leading-6 text-(--n-muted)">
+              Création du compte, horaires, sources des invocations, données : l’essentiel avant
+              de commencer.
+            </p>
+            <a href={authHref} className="n-btn n-btn-sage mt-6 px-5! py-3!">
+              Créer mon espace
+            </a>
+          </div>
+          <div className="space-y-2">
+            {faqs.map(({ question, answer }) => (
+              <details key={question} className="n-faq">
+                <summary>{question}</summary>
+                <p className="pt-3 text-[15px] leading-7 text-(--n-muted)">{answer}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -499,9 +580,7 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-8">
         <div className="n-card n-card-dark flex flex-col items-start gap-6 p-8! sm:p-12! lg:flex-row lg:items-center lg:justify-between">
           <KhatamPattern id="landing-khatam-cta" />
-          <h2 className="n-section-title relative max-w-2xl">
-            Crée ton espace Rawdah.
-          </h2>
+          <h2 className="n-section-title relative max-w-2xl">Crée ton espace Rawdah.</h2>
           <a
             href={authHref}
             className="n-btn relative shrink-0 bg-(--n-on-dark)! px-6! py-4! text-(--n-sage-dark)!"
@@ -511,8 +590,13 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="px-4 py-6 text-center text-sm text-(--n-muted)">
-        Rawdah · Selon le Coran et la Sunna authentique · Sans publicité
+      <footer className="n-footer">
+        <p className="relative z-10 text-sm text-(--n-muted)">
+          Rawdah · Selon le Coran et la Sunna authentique · Sans publicité
+        </p>
+        <span className="n-footer-mark" aria-hidden="true">
+          Rawdah
+        </span>
       </footer>
     </main>
   );

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Rawdah · logo entrelacé</title>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@500;600;700&family=Amiri:wght@700&family=Aref+Ruqaa:wght@700&family=Reem+Kufi:wght@600&family=Urbanist:wght@500&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  body { background: #f6f3ec; font-family: "Urbanist", sans-serif; color: #1f2a22; padding: 40px; }
+  h1 { font-family: "Albert Sans"; font-weight: 600; font-size: 26px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+  .option { border-radius: 22px; overflow: hidden; background: #fffdf9; }
+  .option header { padding: 16px 20px 0; font-weight: 600; font-size: 14px; color: #66705f; letter-spacing: .08em; text-transform: uppercase; }
+  .tile { position: relative; height: 210px; display: flex; align-items: center; justify-content: center; }
+  .tile.dark { background: #3f5a47; }
+  .ar, .lat { position: absolute; line-height: 1; white-space: nowrap; }
+  /* Le mot latin « coupe » l'arabe : un contour de la couleur du fond crée l'entrelacement. */
+  .lat { font-family: "Albert Sans"; font-weight: 700; letter-spacing: -0.02em; paint-order: stroke fill; }
+  p.note { padding: 16px 24px 24px; font-size: 14px; color: #66705f; line-height: 1.5; }
+</style>
+</head>
+<body>
+<h1>Rawdah · روضة entrelacé</h1>
+<div class="grid">
+
+  <section class="option">
+    <header>1 · Ruqʿa</header>
+    <div class="tile">
+      <span class="ar" style="font-family:'Aref Ruqaa';font-size:120px;color:#5d7c65;top:12px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:46px;color:#1f2a22;-webkit-text-stroke:10px #fffdf9;top:118px">Rawdah</span>
+    </div>
+    <div class="tile dark">
+      <span class="ar" style="font-family:'Aref Ruqaa';font-size:120px;color:#c9d6cb;top:12px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:46px;color:#f5f2ea;-webkit-text-stroke:10px #3f5a47;top:118px">Rawdah</span>
+    </div>
+    <p class="note">Écriture cursive, souple et chaleureuse. « Rawdah » traverse le bas des lettres arabes.</p>
+  </section>
+
+  <section class="option">
+    <header>2 · Coufique</header>
+    <div class="tile">
+      <span class="ar" style="font-family:'Reem Kufi';font-weight:600;font-size:118px;color:#5d7c65;top:20px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:44px;color:#1f2a22;-webkit-text-stroke:10px #fffdf9;top:96px">Rawdah</span>
+    </div>
+    <div class="tile dark">
+      <span class="ar" style="font-family:'Reem Kufi';font-weight:600;font-size:118px;color:#c9d6cb;top:20px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:44px;color:#f5f2ea;-webkit-text-stroke:10px #3f5a47;top:96px">Rawdah</span>
+    </div>
+    <p class="note">Écriture géométrique, moderne et nette. Les deux mots se croisent au milieu.</p>
+  </section>
+
+  <section class="option">
+    <header>3 · Naskh</header>
+    <div class="tile">
+      <span class="ar" style="font-family:'Amiri';font-weight:700;font-size:128px;color:#5d7c65;top:-6px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:44px;color:#1f2a22;-webkit-text-stroke:10px #fffdf9;top:110px">Rawdah</span>
+    </div>
+    <div class="tile dark">
+      <span class="ar" style="font-family:'Amiri';font-weight:700;font-size:128px;color:#c9d6cb;top:-6px" lang="ar" dir="rtl">روضة</span>
+      <span class="lat" style="font-size:44px;color:#f5f2ea;-webkit-text-stroke:10px #3f5a47;top:110px">Rawdah</span>
+    </div>
+    <p class="note">Écriture classique, celle des textes du Coran dans l’app. « Rawdah » passe dans la boucle des lettres.</p>
+  </section>
+
+</div>
+</body>
+</html>

@@ -2397,3 +2397,232 @@
   background: var(--n-paper);
   padding: 18px 20px;
 }
+
+/* ---------- Page publique v3 (inspiration : héros centré + maquette) ---------- */
+
+.n-hero-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+  padding: 0 0 8px;
+}
+
+.n-phone {
+  width: 300px;
+  border-radius: 46px;
+  background: #1f2a22;
+  padding: 10px;
+  box-shadow: 0 40px 80px -40px rgba(31, 42, 34, 0.45);
+}
+
+.n-phone-screen {
+  display: flex;
+  min-height: 560px;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 37px;
+  background: var(--n-bg);
+  padding: 34px 16px 18px;
+  color: var(--n-ink);
+}
+
+.n-phone-prayer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--n-sage-dark);
+  padding: 14px;
+  color: var(--n-on-dark);
+}
+
+.n-phone-card {
+  border-radius: 18px;
+  background: var(--n-paper);
+  padding: 12px 14px;
+}
+
+.n-phone-tint {
+  background: var(--n-sage-tint);
+}
+
+.n-float {
+  position: absolute;
+  z-index: 2;
+  display: none;
+  border-radius: 999px;
+  background: var(--n-paper);
+  padding: 9px 16px;
+  font-size: 14px;
+  box-shadow: 0 14px 30px -14px rgba(31, 42, 34, 0.35);
+}
+
+.n-float b {
+  margin-right: 6px;
+}
+
+.n-float-mauve {
+  background: var(--n-mauve-tint);
+  color: var(--n-mauve-text);
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .n-float {
+    display: inline-block;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .n-float {
+    animation: n-float 6s ease-in-out infinite;
+  }
+  .n-float:nth-child(2) { animation-delay: -1.5s; }
+  .n-float:nth-child(3) { animation-delay: -3s; }
+  .n-float:nth-child(4) { animation-delay: -4.5s; }
+}
+
+@keyframes n-float {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.n-split {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .n-split {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .n-split-reverse .n-split-visual {
+    order: 2;
+  }
+}
+
+.n-split-visual {
+  border-radius: 28px;
+  background: var(--n-sage-tint);
+  padding: 28px;
+}
+
+.n-showcase,
+.n-notif {
+  border-radius: 20px;
+  background: var(--n-paper);
+  padding: 20px;
+  box-shadow: 0 18px 40px -26px rgba(31, 42, 34, 0.35);
+}
+
+.n-notif-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.n-notif {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.n-notif-quote {
+  display: block;
+  background: var(--n-mauve-tint);
+}
+
+.n-bento {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 700px) {
+  .n-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .n-bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.n-bento-card {
+  border-radius: 24px;
+  background: var(--n-paper);
+  padding: 20px;
+}
+
+.n-bento-visual {
+  display: flex;
+  min-height: 150px;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 18px;
+  background: var(--n-bg);
+  padding: 16px;
+}
+
+.n-mini-demo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  background: var(--n-paper);
+  padding: 10px 12px;
+  box-shadow: 0 10px 24px -16px rgba(31, 42, 34, 0.35);
+}
+
+.n-mini-demo-play {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--n-sage-dark);
+  color: var(--n-on-dark);
+  font-size: 11px;
+}
+
+.n-footer {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 16px 0;
+  text-align: center;
+}
+
+.n-footer-mark {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--n-font-display);
+  font-size: clamp(80px, 20vw, 260px);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: var(--n-ink);
+  opacity: 0.06;
+  user-select: none;
+}
+
+.n-week-compact {
+  gap: 4px;
+  overflow: visible;
+}
+
+.n-week-compact .n-day {
+  width: auto;
+  flex: 1;
+  padding: 7px 0;
+  font-size: 11px;
+}
+
+.n-week-compact .n-day b {
+  font-size: 16px;
+}
