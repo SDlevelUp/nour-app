@@ -761,11 +761,40 @@
   color: var(--rw-ivory);
 }
 
+.rw-play {
+  cursor: pointer;
+  border: 0;
+}
+
+.rw-play svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rw-icon-pause,
+[data-playing] .rw-icon-play {
+  display: none;
+}
+
+[data-playing] .rw-icon-pause {
+  display: block;
+}
+
+/* La barre suit la lecture (--rw-p mis à jour par le script). */
 .rw-progress {
+  position: relative;
   height: 4px;
   flex: 1;
+  overflow: hidden;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--rw-sage) 38%, var(--rw-line) 38%);
+  background: var(--rw-line);
+}
+
+.rw-progress > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--rw-p, 0%);
+  background: var(--rw-sage);
 }
 
 /* Preuve (Maghrib) */

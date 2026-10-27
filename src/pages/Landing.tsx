@@ -106,6 +106,9 @@ const eveningGrade =
 
 // Asr : al-Kahf (18:10), texte et traduction mot à mot du Dr Usama Nonnenmacher
 // (https://github.com/DrUsamaN/CoranMot), repris sans modification.
+// Al-Kahf 18:10 récité par Saoud al-Shuraim (choix de Sarah, 2026-10-27) ; même source que le lecteur de l’app (alquran.cloud).
+const kahfAudio = "https://cdn.islamic.network/quran/audio/64/ar.saoodshuraym/2150.mp3";
+
 const kahfVerse = {
   arabic:
     "إِذۡ أَوَى ٱلۡفِتۡيَةُ إِلَى ٱلۡكَهۡفِ فَقَالُواْ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحۡمَةٗ وَهَيِّئۡ لَنَا مِنۡ أَمۡرِنَا رَشَدٗا",
@@ -358,10 +361,25 @@ export default function Landing() {
               <p className="mt-2 text-[12px] text-(--rw-muted)">
                 Traduction mot à mot du Dr Usama Nonnenmacher
               </p>
-              <div className="rw-player" aria-hidden="true">
-                <span className="rw-play">❚❚</span>
-                <span className="rw-progress" />
-                <span>Écoute</span>
+              {/* Lecture pilotée par le petit script de index.html : s’arrête quand la carte sort de l’écran. */}
+              <div className="rw-player" data-rw-player>
+                <audio src={kahfAudio} preload="none" />
+                <button
+                  type="button"
+                  className="rw-play"
+                  aria-label="Écouter le verset 10 d’al-Kahf, récité par Saoud al-Shuraim"
+                >
+                  <svg className="rw-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                  </svg>
+                  <svg className="rw-icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" />
+                  </svg>
+                </button>
+                <span className="rw-progress">
+                  <span />
+                </span>
+                <span>Saoud al-Shuraim</span>
               </div>
             </div>
           </div>
