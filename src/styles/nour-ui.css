@@ -917,7 +917,6 @@
   border-radius: var(--n-radius-lg);
   background: var(--n-paper);
   padding: 14px 16px;
-  box-shadow: 0 10px 30px rgba(31, 42, 34, 0.12);
 }
 
 @media (max-width: 1023px) {
@@ -1362,7 +1361,6 @@
 }
 
 .n-week-item[data-open="true"] {
-  box-shadow: 0 6px 20px rgba(31, 42, 34, 0.1);
 }
 
 .n-week-item-main {
@@ -2373,16 +2371,9 @@
   }
 }
 
-/* Cartes du dashboard sans bordure (demande de Sarah du 2026-10-24) :
-   une ombre très légère les détache du fond. */
+/* Cartes du dashboard sans bordure (2026-10-24) ni ombre (2026-10-27) : demandes de Sarah. */
 .dashboard-shell .n-card {
   border-color: transparent;
-  box-shadow: 0 1px 2px rgba(31, 42, 34, 0.04), 0 8px 24px -16px rgba(31, 42, 34, 0.12);
-}
-
-.dashboard-shell .n-card.n-card-dark,
-.dashboard-shell .n-card.n-card-tint,
-.dashboard-shell .n-card.n-rappel {
   box-shadow: none;
 }
 
