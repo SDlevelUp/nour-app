@@ -7,7 +7,7 @@
  */
 
 .rw {
-  --rw-dawn: ##FFFEFA;
+  --rw-dawn: #FFFEFA;
   --rw-day: #e4ecdc;
   --rw-dusk: #ebe4ef;
   --rw-night: #14261d;
@@ -18,6 +18,7 @@
   --rw-mauve: #6b5578;
   --rw-ivory: #f7f4ec;
   --rw-line: #d5d9cf;
+  --rw-card: #f4f1e9; /* cartes et barre de navigation, sur le fond #FFFEFA */
 
   min-height: 100vh;
   /* clip (et non hidden) : coupe ce qui dépasse sans créer une seconde barre de défilement. */
@@ -98,7 +99,7 @@
   gap: 16px;
   margin-top: 16px;
   border-radius: 20px;
-  background: #fffdf9;
+  background: var(--rw-card);
   padding: 8px 8px 8px 20px;
 }
 
@@ -167,7 +168,7 @@
   min-width: 210px;
   border: 1px solid var(--rw-line);
   border-radius: 24px;
-  background: #fffdf9;
+  background: var(--rw-card);
   padding: 8px;
 }
 
@@ -627,7 +628,7 @@
 .rw-device {
   border: 6px solid var(--rw-night);
   border-radius: 36px;
-  background: #fffdf9;
+  background: var(--rw-card);
   padding: 22px;
 }
 
@@ -639,7 +640,7 @@
 
 .rw-panel {
   border-radius: 24px;
-  background: #fffdf9;
+  background: var(--rw-card);
   padding: 24px;
 }
 
@@ -978,6 +979,8 @@
   color: #e4e1d5;
   white-space: nowrap;
   user-select: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
 }
 
 .rw-wordmark-pill {
@@ -1048,7 +1051,7 @@
 .rw-sep::before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 6px;
   left: 0;
   right: 0;
   height: 1px;
@@ -1056,16 +1059,17 @@
   pointer-events: none;
 }
 
+/* Ronds de 13 px au croisement des traits : même couleur et même épaisseur (1 px) que les traits. */
 .rw-sep::after {
   content: "";
   position: absolute;
   top: 0;
-  left: calc(var(--rw-frame) - 4px);
-  right: calc(var(--rw-frame) - 4px);
-  height: 9px;
+  left: calc(var(--rw-frame) - 6px);
+  right: calc(var(--rw-frame) - 6px);
+  height: 13px;
   background:
-    radial-gradient(circle, var(--rw-dawn) 0 3px, var(--rw-line) 3px 4px, transparent 4.5px) left center / 9px 9px no-repeat,
-    radial-gradient(circle, var(--rw-dawn) 0 3px, var(--rw-line) 3px 4px, transparent 4.5px) right center / 9px 9px no-repeat;
+    radial-gradient(circle, var(--rw-dawn) 0 5px, var(--rw-line) 5px 6px, transparent 6.5px) left center / 13px 13px no-repeat,
+    radial-gradient(circle, var(--rw-dawn) 0 5px, var(--rw-line) 5px 6px, transparent 6.5px) right center / 13px 13px no-repeat;
   pointer-events: none;
 }
 
@@ -1073,5 +1077,98 @@
   .rw::before,
   .rw-sep::after {
     display: none;
+  }
+}
+
+/* ---------- Texte d'intro révélé au défilement ---------- */
+
+.rw-intro {
+  padding: 128px 0;
+}
+
+.rw-intro-text {
+  max-width: 920px;
+  font-family: "Albert Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(26px, 3.6vw, 44px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--rw-ink);
+  view-timeline-name: --rw-intro;
+}
+
+/* Le texte se colore mot à mot pendant le défilement (CSS seul, sans JavaScript).
+   Navigateurs sans « animation-timeline » : le texte reste simplement affiché. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rw-intro-text span {
+      background: linear-gradient(90deg, var(--rw-ink) 50%, #cdd2c8 50%);
+      background-size: 200% 100%;
+      background-position: 100% 0;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+      color: transparent;
+      animation: rw-reveal linear both;
+      animation-timeline: --rw-intro;
+      animation-range: entry 60% cover 55%;
+    }
+  }
+}
+
+@keyframes rw-reveal {
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* ---------- Animations d'entrée, subtiles ---------- */
+
+@keyframes rw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes rw-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Héros : le texte monte doucement, élément par élément, puis le téléphone. */
+  .rw-hero-grid > div:first-child > * {
+    animation: rw-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .rw-hero-grid > div:first-child > :nth-child(2) { animation-delay: 0.06s; }
+  .rw-hero-grid > div:first-child > :nth-child(3) { animation-delay: 0.12s; }
+  .rw-hero-grid > div:first-child > :nth-child(4) { animation-delay: 0.18s; }
+  .rw-hero-grid > div:first-child > :nth-child(5) { animation-delay: 0.24s; }
+
+  .rw-phone {
+    animation: rw-rise 1s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .rw-phone-pill {
+    animation: rw-fade 0.6s 0.8s both;
+  }
+
+  .rw-hero-callig {
+    animation: rw-fade 1.6s 0.4s both;
+  }
+
+  /* Sections suivantes : apparition légère quand elles entrent à l'écran. */
+  @supports (animation-timeline: view()) {
+    .rw-moment:not(.rw-hero) .rw-moment-grid > *,
+    .rw-principles > *,
+    .rw-faq,
+    .rw-wordmark-stage {
+      animation: rw-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
   }
 }

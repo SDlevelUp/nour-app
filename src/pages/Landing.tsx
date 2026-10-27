@@ -278,6 +278,19 @@ export default function Landing() {
 
       </section>
 
+      {/* Texte d'intro révélé au défilement : la transition entre l'aube et la journée */}
+      <section className="rw-sep rw-intro">
+        <div className="rw-wrap">
+          <p className="rw-intro-text">
+            <span>
+              De Fajr à Isha, cinq prières rythment ta journée. Rawdah l’organise autour d’elles : tes
+              adhkar, ton Coran, tes cours et ton cycle trouvent leur place entre deux rendez-vous avec
+              Allah, sans pression ni score.
+            </span>
+          </p>
+        </div>
+      </section>
+
       {/* Dhuhr : la journée s'organise */}
       <section id="journee" className="rw-moment rw-sep rw-dhuhr">
         <div className="rw-wrap rw-moment-grid">
