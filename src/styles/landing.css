@@ -92,14 +92,13 @@
 /* Barre de navigation en carte blanche arrondie, sans ombre (inspiration Calyra). */
 .rw-wrap.rw-header {
   position: sticky;
-  top: 8px;
+  top: 16px;
   display: flex;
   width: calc(100% - 32px);
   max-width: 1080px;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 8px;
   border-radius: 20px;
   background: var(--rw-card);
   padding: 8px 8px 8px 20px;
@@ -1077,7 +1076,9 @@
 
 /* Cadre du site : deux traits verticaux au bord du contenu, un trait horizontal entre les sections,
    et un petit rond à chaque croisement (inspiration Calyra). */
+/* Retrait intérieur plutôt qu’une marge sur la barre : une marge « traversait » la page et laissait une bande en haut. */
 .rw {
+  padding-top: 16px;
   --rw-frame: clamp(16px, 2.5vw, 48px); /* traits près des bords de l’écran, loin du contenu */
   position: relative;
 }
