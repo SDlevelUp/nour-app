@@ -11,11 +11,11 @@ const principles = [
   },
   {
     title: "Chaque source affichée",
-    text: "Rapporteur, recueil, numéro et degré d’authenticité.",
+    text: "Rapporteur, recueil, numéro et degré d’authenticité sous chaque invocation.",
   },
   {
     title: "Ni série, ni score",
-    text: "Aucun compteur de jours, aucun retard à rattraper.",
+    text: "Aucun compteur de jours consécutifs, aucun retard à rattraper.",
   },
   {
     title: "Zéro publicité",
@@ -26,22 +26,16 @@ const principles = [
 const profiles = [
   {
     title: "Tu veux prier à l’heure",
-    text: "Dire tes adhkar du matin et du soir, et garder un lien régulier avec le Coran.",
+    text: "Tes horaires, tes adhkar du matin et du soir, et un lien régulier avec le Coran.",
   },
   {
     title: "Tu étudies la science",
-    text: "Tes livres, tes cours, tes notes de révision et tes matn, enfin au même endroit.",
+    text: "Tes livres, tes cours, tes notes de révision et tes matn au même endroit.",
   },
   {
     title: "Tu es en période de règles",
-    text: "Le mode ‘Udhr masque les prières de ton planning. Ton compteur de qada, lui, continue.",
+    text: "Le mode ‘Udhr adapte ton planning. Ton compteur de qada continue.",
   },
-];
-
-const steps = [
-  { title: "Crée ton compte", text: "Avec ton e-mail ou ton compte Google." },
-  { title: "Active la localisation", text: "Les horaires de ta ville s’affichent tout seuls." },
-  { title: "Choisis tes modules", text: "Seulement les cartes utiles sur « Aujourd’hui »." },
 ];
 
 const faqs = [
@@ -100,7 +94,7 @@ const faqJsonLd = JSON.stringify({
   })),
 }).replace(/</g, "\\u003c");
 
-// Aperçus : données d'exemple, signalées comme telles sur la page.
+// Horaires d'exemple (signalés comme tels sur la page).
 const sampleTimes = [
   ["Fajr", "06:31"],
   ["Dhuhr", "13:43"],
@@ -108,17 +102,31 @@ const sampleTimes = [
   ["Maghrib", "18:52"],
   ["Isha", "20:24"],
 ] as const;
+const timeOf = (name: (typeof sampleTimes)[number][0]) =>
+  sampleTimes.find(([prayer]) => prayer === name)?.[1] ?? "";
 
-const sampleInvocation = adhkarBySession.morning[0];
-const sampleSource = sampleInvocation.proof.sources[0];
-const sampleGrade =
-  sampleSource.grades.find((grade) => grade.by === "al-Albani") ?? sampleSource.grades[0];
+// Fajr : invocation du matin, lue dans les données de l'app.
+const morningIndex = Math.max(
+  adhkarBySession.morning.findIndex((item) => item.id === "morning-sovereignty"),
+  0,
+);
+const morningInvocation = adhkarBySession.morning[morningIndex];
+const morningSource = morningInvocation.proof.sources[0];
 
-const sampleSurahs = [
-  { name: "Al-Faatiha", detail: "7 versets", arabic: "الفاتحة", active: false },
-  { name: "Al-Baqara", detail: "286 versets · en écoute", arabic: "البقرة", active: true },
-  { name: "Aal-i-Imraan", detail: "200 versets", arabic: "آل عمران", active: false },
-];
+// Maghrib : invocation du soir et sa preuve, lues dans les données de l'app.
+const eveningInvocation = adhkarBySession.evening[0];
+const eveningSource = eveningInvocation.proof.sources[0];
+const eveningGrade =
+  eveningSource.grades.find((grade) => grade.by === "al-Albani") ?? eveningSource.grades[0];
+
+// Asr : al-Kahf (18:10), texte et traduction mot à mot du Dr Usama Nonnenmacher
+// (https://github.com/DrUsamaN/CoranMot), repris sans modification.
+const kahfVerse = {
+  arabic:
+    "إِذۡ أَوَى ٱلۡفِتۡيَةُ إِلَى ٱلۡكَهۡفِ فَقَالُواْ رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحۡمَةٗ وَهَيِّئۡ لَنَا مِنۡ أَمۡرِنَا رَشَدٗا",
+  translation:
+    "Quand se sont réfugiés les jeunes gens vers la grotte et ont ensuite dit : « Notre Maître ! Donne-nous de Ta part de la miséricorde et facilite pour nous de notre affaire de la bonne guidance.",
+};
 
 const sampleWeek = [
   ["lun", 13, "period"],
@@ -130,241 +138,227 @@ const sampleWeek = [
   ["dim", 19, ""],
 ] as const;
 
-// Motif décoratif : étoile à 8 branches (deux carrés, dont un tourné à 45°).
-function StarPattern() {
-  return (
-    <svg className="rw-hero-pattern" aria-hidden="true">
-      <defs>
-        <pattern id="rw-stars" width="56" height="56" patternUnits="userSpaceOnUse">
-          <rect x="16" y="16" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
-          <rect
-            x="16"
-            y="16"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            transform="rotate(45 28 28)"
-          />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#rw-stars)" />
-    </svg>
-  );
-}
-
 export default function Landing() {
   return (
     <main className="rw">
-      <div className="px-4">
-        <nav className="rw-nav" aria-label="Navigation principale">
+      {/* Fajr : l'aube */}
+      <section className="rw-moment rw-fajr rw-hero">
+        <span className="rw-ar rw-hero-callig" aria-hidden="true">
+          رَوْضَة
+        </span>
+
+        <header className="rw-wrap rw-header relative z-10">
           <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
-            <NourMark className="size-7 text-(--rw-green)" />
+            <NourMark className="size-7 text-(--rw-sage)" />
             Rawdah
           </a>
-          <div className="rw-nav-links">
-            <a href="#principes">Principes</a>
-            <a href="#fonctionnalites">Fonctionnalités</a>
+          <nav className="rw-nav" aria-label="Navigation principale">
+            <a href="#journee">La journée</a>
+            <a href="#sources">Nos sources</a>
             <a href="#faq">Questions</a>
-          </div>
-          <a href={authHref} className="rw-btn rw-btn-ink">
+          </nav>
+          <a href={authHref} className="rw-btn rw-btn-dark rw-btn-small">
             Mon espace
           </a>
-        </nav>
-      </div>
+        </header>
 
-      {/* Héros */}
-      <section className="rw-hero">
-        <div className="rw-hero-bg" aria-hidden="true">
-          <StarPattern />
-        </div>
-        <div className="rw-hero-inner rw-wrap">
-          <h1 className="rw-title">
-            Ta journée, rythmée par
-            <span className="rw-hero-accent">le dhikr et la prière</span>
-          </h1>
-          <p className="rw-lead rw-hero-sub">
-            Horaires de prière selon ta position, adhkar du matin et du soir avec leurs sources,
-            Coran, suivi du cycle et du qada. Une appli pensée pour les femmes, sans pub ni score.
-          </p>
-          <div className="rw-hero-cta">
-            <a href={authHref} className="rw-btn rw-btn-primary">
-              Créer mon espace
-            </a>
-            <a href="#fonctionnalites" className="rw-btn rw-btn-outline">
-              Voir l’appli
-            </a>
-          </div>
-
-          <div className="rw-stage">
-            <span className="rw-pill rw-pill-dark" style={{ left: 0, top: "26%" }}>
-              Maghrib dans 1 h 12
-            </span>
-            <span className="rw-pill rw-pill-white" style={{ right: 0, top: "40%" }}>
-              Al-Kahf · verset 12
-            </span>
-            <span className="rw-pill rw-pill-green" style={{ left: "6%", top: "62%" }}>
-              Qada : 3 jours restants
-            </span>
-
-            <div className="rw-phone" role="img" aria-label="Aperçu de l’écran Aujourd’hui, avec des données d’exemple">
-              <span className="rw-phone-notch" aria-hidden="true" />
-              <div className="rw-phone-screen" aria-hidden="true">
-                <div>
-                  <p className="text-[11px] text-(--rw-muted)">Exemple</p>
-                  <p className="text-[18px] font-extrabold tracking-[-0.03em]">Aujourd’hui</p>
-                </div>
-                <div className="rw-phone-card rw-phone-prayer">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] opacity-80">
-                    Prochaine prière
-                  </p>
-                  <div className="mt-1 flex items-end justify-between">
-                    <div>
-                      <p className="text-[13px] font-bold">Maghrib</p>
-                      <p className="text-[30px] font-extrabold leading-none tracking-[-0.04em]">18:52</p>
-                    </div>
-                    <p className="text-[11px] opacity-80">dans 1 h 12</p>
-                  </div>
-                  <div className="rw-phone-times">
-                    {sampleTimes.map(([name, time]) => (
-                      <span key={name} className={name === "Maghrib" ? "is-next" : ""}>
-                        {name}
-                        <b>{time}</b>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="rw-phone-card">
-                  <p className="text-[10px] font-bold text-(--rw-muted)">
-                    Adhkar du matin · 1 sur {adhkarBySession.morning.length}
-                  </p>
-                  <p className="rw-ar mt-1 line-clamp-2 text-[15px] leading-[1.8]" dir="rtl" lang="ar">
-                    {sampleInvocation.arabic}
-                  </p>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-[10px] text-(--rw-muted)">
-                      {sampleSource.collection} {sampleSource.number}
-                    </span>
-                    <span className="rw-counter min-h-9! min-w-9! text-[11px]!">0/1</span>
-                  </div>
-                </div>
-                <div className="rw-phone-card bg-(--rw-green-soft)!">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[13px] font-bold">Al-Kahf</p>
-                      <p className="text-[10px] text-(--rw-muted)">Reprendre au verset 12</p>
-                    </div>
-                    <span className="rw-ar text-[18px] text-(--rw-green)" dir="rtl" lang="ar">
-                      الكهف
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Principes */}
-      <section id="principes" className="rw-principles">
-        <div className="rw-wrap rw-principles-grid">
-          {principles.map(({ title, text }) => (
-            <div key={title}>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pour qui */}
-      <section className="rw-section">
-        <div className="rw-wrap rw-forwho">
-          <h2 className="rw-title rw-h2">
-            Pensée pour <em>toi</em>, quelle que soit ta journée.
-          </h2>
+        <div className="rw-wrap rw-moment-grid mt-10">
           <div>
-            {profiles.map(({ title, text }) => (
-              <div key={title} className="rw-forwho-row">
-                <h3>{title}</h3>
-                <p>{text}</p>
+            <p className="rw-time-label">Fajr · {timeOf("Fajr")}</p>
+            <h1>
+              Ta journée
+              <br />
+              commence ici.
+            </h1>
+            <p className="rw-text">
+              Rawdah est une application musulmane pour les femmes : tes prières, tes adhkar, ton
+              Coran et ton cycle, de Fajr à Isha, dans un espace calme.
+            </p>
+            <p className="rw-signature">Une routine douce, à ton rythme.</p>
+            <div className="rw-cta">
+              <a href={authHref} className="rw-btn rw-btn-dark">
+                Créer mon espace
+              </a>
+              <a href="#journee" className="rw-btn rw-btn-ghost">
+                Suivre la journée
+              </a>
+            </div>
+          </div>
+
+          <div className="rw-moment-visual" aria-label="Exemple : adhkar du matin">
+            <div className="rw-device">
+              <div className="rw-device-head">
+                <b>Adhkar du matin</b>
+                <small>
+                  {morningIndex + 1} / {adhkarBySession.morning.length}
+                </small>
               </div>
-            ))}
+              <p className="rw-ar line-clamp-4" dir="rtl" lang="ar">
+                {morningInvocation.arabic}
+              </p>
+              <p className="rw-device-text line-clamp-3">{morningInvocation.meaning}</p>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <span className="text-[13px] font-bold text-(--rw-sage)">
+                  {morningSource.collection} {morningSource.number}
+                </span>
+                <span className="rw-counter" aria-hidden="true">
+                  0 / {morningInvocation.repetitions}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Fonctionnalités */}
-      <section id="fonctionnalites" className="rw-section pt-0!">
-        <div className="rw-wrap">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="rw-title rw-h2">
-              Tout ce qu’il te faut, <em>rien de plus</em>
-            </h2>
-            <p className="rw-lead mt-4">
-              Prière, adhkar, Coran, cycle et science. Tu choisis les modules qui s’affichent sur
-              ton écran « Aujourd’hui ».
+      {/* Dhuhr : la journée s'organise */}
+      <section id="journee" className="rw-moment rw-dhuhr">
+        <div className="rw-wrap rw-moment-grid">
+          <div>
+            <p className="rw-time-label">Dhuhr</p>
+            <span className="rw-big-time text-(--rw-sage)" aria-hidden="true">
+              {timeOf("Dhuhr")}
+            </span>
+            <h2 className="rw-h2">Ta journée s’organise autour de la prière.</h2>
+            <p className="rw-text">
+              Ta position ou ta ville suffit : les horaires de prière de Fajr à Isha s’affichent
+              chaque matin. Tes cours de science, tes lectures et tes tâches viennent se placer
+              entre deux prières. Les mosquées proches sont à portée, avec l’itinéraire.
             </p>
           </div>
+          <div className="rw-moment-visual">
+            <div className="rw-panel" aria-label="Exemple de planning">
+              <ul className="rw-agenda">
+                <li>
+                  Fajr <b>{timeOf("Fajr")}</b>
+                </li>
+                <li className="is-now">
+                  Dhuhr <b>{timeOf("Dhuhr")}</b>
+                </li>
+                <li className="is-task">
+                  Révision al-Arbaʿîn, hadith 12 <b>14:30</b>
+                </li>
+                <li>
+                  Asr <b>{timeOf("Asr")}</b>
+                </li>
+                <li>
+                  Maghrib <b>{timeOf("Maghrib")}</b>
+                </li>
+                <li>
+                  Isha <b>{timeOf("Isha")}</b>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <div className="rw-bento">
-            <article className="rw-b rw-b-adhkar">
-              <h3>Adhkar du matin et du soir</h3>
-              <p>
-                Tirés de Sahih al-Bukhari, Sahih Muslim et des recueils authentifiés. Un compteur à
-                toucher, la preuve sous chaque texte.
+      {/* Asr : le Coran */}
+      <section className="rw-moment rw-asr rw-moment-reverse">
+        <div className="rw-wrap rw-moment-grid">
+          <div>
+            <p className="rw-time-label">Asr</p>
+            <span className="rw-big-time text-(--rw-green)" aria-hidden="true">
+              {timeOf("Asr")}
+            </span>
+            <h2 className="rw-h2">Le Coran reprend là où tu t’es arrêtée.</h2>
+            <p className="rw-text">
+              Les 114 sourates, verset par verset : arabe, phonétique et traduction française.
+              Plusieurs récitateurs, et une écoute qui continue d’une page à l’autre. Chaque jour,
+              un mot du Coran avec sa traduction.
+            </p>
+          </div>
+          <div className="rw-moment-visual">
+            <div className="rw-device" aria-label="Exemple : lecture de la sourate al-Kahf">
+              <div className="rw-device-head">
+                <b>Al-Kahf · verset 10</b>
+                <span className="rw-ar text-[22px] text-(--rw-green)" dir="rtl" lang="ar">
+                  الكهف
+                </span>
+              </div>
+              <p className="rw-ar" dir="rtl" lang="ar">
+                {kahfVerse.arabic}
               </p>
-              <div className="rw-b-visual rw-adhkar-box">
-                <p className="rw-ar" dir="rtl" lang="ar">
-                  {sampleInvocation.arabic}
-                </p>
-                <div className="rw-adhkar-foot">
-                  <span>
-                    {sampleSource.collection} {sampleSource.number} · {sampleGrade.grade}
-                  </span>
-                  <span className="rw-counter" aria-hidden="true">
-                    1/1
-                  </span>
+              <p className="rw-device-text">{kahfVerse.translation}</p>
+              <p className="mt-2 text-[12px] text-(--rw-muted)">
+                Traduction mot à mot du Dr Usama Nonnenmacher
+              </p>
+              <div className="rw-player" aria-hidden="true">
+                <span className="rw-play">❚❚</span>
+                <span className="rw-progress" />
+                <span>Écoute</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Maghrib : les adhkar du soir et leurs preuves */}
+      <section id="sources" className="rw-moment rw-maghrib">
+        <div className="rw-wrap rw-moment-grid">
+          <div>
+            <p className="rw-time-label">Maghrib</p>
+            <span className="rw-big-time text-(--rw-mauve)" aria-hidden="true">
+              {timeOf("Maghrib")}
+            </span>
+            <h2 className="rw-h2">Le soir venu, chaque invocation avec sa preuve.</h2>
+            <p className="rw-text">
+              {adhkarBySession.morning.length} adhkar le matin, {adhkarBySession.evening.length} le
+              soir, tirés du Coran et de la Sunna authentique. Sous chacun : le rapporteur, le
+              recueil, le numéro et le degré d’authenticité, tels que publiés par sunnah.com.
+            </p>
+          </div>
+          <div className="rw-moment-visual">
+            <div className="rw-panel" aria-label="Exemple : invocation du soir et sa preuve">
+              <p className="rw-ar mt-0!" dir="rtl" lang="ar">
+                {eveningInvocation.arabic}
+              </p>
+              <p className="rw-device-text">{eveningInvocation.meaning}</p>
+              <dl className="rw-proof">
+                <div>
+                  <dt>Rapporteur</dt>
+                  <dd>{eveningInvocation.proof.narrator}</dd>
                 </div>
-              </div>
-            </article>
+                <div>
+                  <dt>Recueil</dt>
+                  <dd>{eveningSource.collection}</dd>
+                </div>
+                <div>
+                  <dt>Numéro</dt>
+                  <dd>{eveningSource.number}</dd>
+                </div>
+                <div>
+                  <dt>Degré</dt>
+                  <dd>
+                    {eveningGrade.grade} selon {eveningGrade.by}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="rw-dusk-to-night" aria-hidden="true" />
 
-            <article className="rw-b rw-b-coran">
-              <h3>Le Coran, verset par verset</h3>
-              <p>114 sourates en arabe, phonétique et français. Plusieurs récitateurs, écoute continue.</p>
-              <div className="rw-b-visual">
-                {sampleSurahs.map((surah) => (
-                  <div key={surah.name} className={`rw-surah ${surah.active ? "is-active" : ""}`}>
-                    <span>
-                      <b className="text-[14px]">{surah.name}</b>
-                      <small>{surah.detail}</small>
-                    </span>
-                    <span className="rw-ar" dir="rtl" lang="ar">
-                      {surah.arabic}
-                    </span>
-                  </div>
-                ))}
+      {/* Isha : la nuit, le cycle */}
+      <section className="rw-moment rw-isha rw-moment-reverse pt-8!">
+        <div className="rw-wrap rw-moment-grid">
+          <div>
+            <p className="rw-time-label">Isha</p>
+            <span className="rw-big-time text-(--rw-day)" aria-hidden="true">
+              {timeOf("Isha")}
+            </span>
+            <h2 className="rw-h2">Ton cycle et ton qada, au même endroit.</h2>
+            <p className="rw-text">
+              Note tes jours de règles, vois les prochaines dates estimées, compte tes jeûnes à
+              rattraper. Le mode ‘Udhr retire les prières de ton planning le temps des règles.
+            </p>
+          </div>
+          <div className="rw-moment-visual">
+            <div className="rw-device rw-device-dark" aria-label="Exemple : suivi du cycle">
+              <div className="rw-device-head">
+                <b>Cycle</b>
               </div>
-            </article>
-
-            <article className="rw-b rw-b-prieres">
-              <h3>Prières et planning</h3>
-              <p>Horaires calculés selon ta position, ta journée organisée autour.</p>
-              <div className="rw-b-visual rw-chips">
-                {sampleTimes.map(([name, time]) => (
-                  <span key={name} className={`rw-chip ${name === "Maghrib" ? "is-next" : ""}`}>
-                    <span>{name}</span>
-                    {time}
-                  </span>
-                ))}
-              </div>
-            </article>
-
-            <article className="rw-b rw-b-cycle">
-              <h3>Cycle et qada</h3>
-              <p>Suivi des règles, prochaines dates estimées, jeûnes à rattraper.</p>
-              <div className="rw-b-visual rw-days">
+              <div className="rw-days">
                 {sampleWeek.map(([day, date, state]) => (
                   <span
                     key={day}
@@ -375,88 +369,75 @@ export default function Landing() {
                   </span>
                 ))}
               </div>
-            </article>
-
-            <article className="rw-b rw-b-science">
-              <h3>Science bénéfique</h3>
-              <p>Livres, cours, notes de révision et matn à mémoriser par portions.</p>
-              <div className="rw-b-visual">
-                <div className="rw-book">
-                  Al-Arba‘in an-Nawawiyya
-                  <span className="rw-tag rw-tag-dark">En cours</span>
-                </div>
-                <div className="rw-book">
-                  Riyad as-Salihin
-                  <span className="rw-tag rw-tag-light">À lire</span>
-                </div>
+              <div className="rw-qada">
+                <span>
+                  <span className="text-[12px] text-[rgba(247,244,236,0.75)]">Jeûnes à rattraper</span>
+                  <b>3 jours</b>
+                </span>
+                <span className="rw-tag">Mode ‘Udhr</span>
               </div>
-            </article>
+            </div>
           </div>
-          <p className="mt-4 text-center text-[13px] text-(--rw-muted)">Aperçus avec des données d’exemple.</p>
         </div>
       </section>
 
-      {/* Démarrage */}
-      <section className="rw-section pt-0!">
+      {/* Nuit : principes, pour qui, questions */}
+      <section className="rw-night">
         <div className="rw-wrap">
-          <div className="rw-start">
-            <h2 className="rw-title text-[34px]">
-              Prête en <em>deux minutes</em>
-            </h2>
-            {steps.map(({ title, text }) => (
+          <p className="pb-6 text-center text-[13px] text-[rgba(247,244,236,0.72)]">
+            Écrans ci-dessus : données d’exemple.
+          </p>
+          <div className="rw-principles">
+            {principles.map(({ title, text }) => (
               <div key={title}>
                 <h3>{title}</h3>
                 <p>{text}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Questions */}
-      <section id="faq" className="rw-section pt-0!">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
-        <div className="rw-wrap rw-faq">
-          <div>
-            <h2 className="rw-title rw-h2">
-              Tes <em>questions</em>
-            </h2>
-            <p className="rw-lead mt-4 max-w-sm">L’essentiel avant de commencer.</p>
-          </div>
-          <div>
-            {faqs.map(({ question, answer }) => (
-              <details key={question}>
-                <summary>{question}</summary>
-                <p>{answer}</p>
-              </details>
+          <div className="rw-profiles">
+            <h2 className="rw-h2 mt-0!">Pensée pour les femmes musulmanes.</h2>
+            {profiles.map(({ title, text }) => (
+              <div key={title}>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Appel final et nom géant */}
-      <footer className="rw-footer">
-        <div className="rw-wrap">
-          <p className="rw-ar" dir="rtl" lang="ar">
-            رَوْضَة
-          </p>
-          <h2 className="rw-title rw-footer-title">
-            Ton jardin de <em>rappels</em>, chaque jour.
-          </h2>
-          <a href={authHref} className="rw-btn rw-btn-ivory mt-8">
-            Créer mon espace
-          </a>
-        </div>
-        <span className="rw-wordmark" aria-hidden="true">
-          Rawdah
-        </span>
-        <div className="rw-footer-bar">
-          <div className="rw-wrap flex w-full flex-wrap justify-between gap-2">
-            <span>Selon le Coran et la Sunna authentique · Sans publicité</span>
-            <span>© Rawdah</span>
+          <div id="faq" className="rw-faq">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+            <h2 className="rw-h2 mt-0!">Tes questions</h2>
+            <div>
+              {faqs.map(({ question, answer }) => (
+                <details key={question}>
+                  <summary>{question}</summary>
+                  <p>{answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </div>
-      </footer>
+
+        <footer className="rw-final">
+          <div className="rw-wrap">
+            <h2>Demain, à Fajr, ta journée t’attend.</h2>
+            <a href={authHref} className="rw-btn rw-btn-light mt-8">
+              Créer mon espace
+            </a>
+          </div>
+          <span className="rw-wordmark" aria-hidden="true">
+            Rawdah
+          </span>
+          <div className="rw-footer-bar">
+            <div className="rw-wrap flex w-full flex-wrap justify-between gap-2">
+              <span>Selon le Coran et la Sunna authentique · Sans publicité</span>
+              <span>© Rawdah</span>
+            </div>
+          </div>
+        </footer>
+      </section>
     </main>
   );
 }
