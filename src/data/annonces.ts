@@ -25,7 +25,7 @@ export const annonces: Annonce[] = [
     id: "2026-10-27-cartes-sans-ombre",
     date: "2026-10-27",
     title: "Cartes sans ombre",
-    text: "Les cartes n’ont plus d’ombre : l’écran est plus net et plus calme.",
+    text: "Les cartes n’ont plus d’ombre, et la carte « Reprendre la lecture » n’a plus de trait : l’écran est plus net et plus calme.",
   },
   {
     id: "2026-10-27-menu-haut-notifications",

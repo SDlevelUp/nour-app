@@ -399,7 +399,7 @@ export function TodayView({
               </button>
             </div>
 
-            <div className="mt-auto flex flex-col gap-2 border-t border-black/10 pt-5">
+            <div className="mt-auto flex flex-col gap-2 pt-5">
               <span className="n-label">Reprendre la lecture</span>
               {scienceBook ? (
                 <>
