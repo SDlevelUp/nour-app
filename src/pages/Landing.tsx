@@ -279,7 +279,7 @@ export default function Landing() {
       </section>
 
       {/* Dhuhr : la journée s'organise */}
-      <section id="journee" className="rw-moment rw-dhuhr">
+      <section id="journee" className="rw-moment rw-sep rw-dhuhr">
         <div className="rw-wrap rw-moment-grid">
           <div>
             <p className="rw-time-label">Dhuhr</p>
@@ -321,7 +321,7 @@ export default function Landing() {
       </section>
 
       {/* Asr : le Coran */}
-      <section className="rw-moment rw-asr rw-moment-reverse">
+      <section className="rw-moment rw-sep rw-asr rw-moment-reverse">
         <div className="rw-wrap rw-moment-grid">
           <div>
             <p className="rw-time-label">Asr</p>
@@ -361,7 +361,7 @@ export default function Landing() {
       </section>
 
       {/* Maghrib : les adhkar du soir et leurs preuves */}
-      <section id="sources" className="rw-moment rw-maghrib">
+      <section id="sources" className="rw-moment rw-sep rw-maghrib">
         <div className="rw-wrap rw-moment-grid">
           <div>
             <p className="rw-time-label">Maghrib</p>
@@ -407,7 +407,7 @@ export default function Landing() {
       </section>
 
       {/* Isha : la nuit, le cycle */}
-      <section className="rw-moment rw-isha rw-moment-reverse">
+      <section className="rw-moment rw-sep rw-isha rw-moment-reverse">
         <div className="rw-wrap rw-moment-grid">
           <div>
             <p className="rw-time-label">Isha</p>
@@ -449,7 +449,7 @@ export default function Landing() {
       </section>
 
       {/* Nuit : principes, pour qui, questions */}
-      <section className="rw-night">
+      <section className="rw-night rw-sep">
         <div className="rw-wrap">
           <p className="pb-6 text-center text-[13px] text-(--rw-muted)">
             Écrans ci-dessus : données d’exemple.
@@ -489,21 +489,25 @@ export default function Landing() {
           </div>
         </div>
 
-        <footer className="rw-final">
+        <footer className="rw-final rw-sep">
           <div className="rw-wrap">
             <h2>Demain, à Fajr, ta journée t’attend.</h2>
             <a href={authHref} className="rw-btn rw-btn-dark mt-8">
               Créer mon espace
             </a>
           </div>
-          <span className="rw-wordmark" aria-hidden="true">
-            Rawdah
-          </span>
-          <div className="rw-footer-bar">
-            <div className="rw-wrap flex w-full flex-wrap justify-between gap-2">
-              <span>Selon le Coran et la Sunna authentique · Sans publicité</span>
-              <span>© Rawdah</span>
-            </div>
+          <div className="rw-wrap rw-wordmark-stage" aria-hidden="true">
+            <span className="rw-wordmark">Rawdah</span>
+            <span className="rw-wordmark-pill rw-wordmark-pill-left">Chaque invocation avec sa source</span>
+            <span className="rw-wordmark-pill rw-wordmark-pill-right">Zéro publicité</span>
+          </div>
+          <div className="rw-wrap rw-footer-bar">
+            <span>© Rawdah · Selon le Coran et la Sunna authentique</span>
+            <nav className="flex gap-6" aria-label="Pied de page">
+              <a href="#journee">La journée</a>
+              <a href="#sources">Nos sources</a>
+              <a href="#faq">Questions</a>
+            </nav>
           </div>
         </footer>
       </section>

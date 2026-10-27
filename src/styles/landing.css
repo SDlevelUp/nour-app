@@ -902,29 +902,116 @@
   line-height: 1.08;
 }
 
+/* Grand « Rawdah » en couleur unie, avec deux étiquettes posées dessus (inspiration Calyra, sans dégradé). */
+.rw-wordmark-stage {
+  position: relative;
+  margin-top: 72px;
+}
+
 .rw-wordmark {
   display: block;
-  margin-top: 56px;
   font-family: "Albert Sans", ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(96px, 22vw, 320px);
+  font-size: clamp(88px, 23vw, 342px);
   font-weight: 700;
-  line-height: 0.82;
-  letter-spacing: -0.07em;
-  color: rgba(27, 42, 33, 0.06);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  color: #e4e1d5;
   white-space: nowrap;
-  transform: translateY(12%);
   user-select: none;
 }
 
+.rw-wordmark-pill {
+  position: absolute;
+  border-radius: 999px;
+  background: var(--rw-sage);
+  padding: 9px 16px;
+  color: var(--rw-ivory);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rw-wordmark-pill-left {
+  top: 58%;
+  left: 14%;
+}
+
+.rw-wordmark-pill-right {
+  top: 40%;
+  right: 12%;
+}
+
+@media (max-width: 600px) {
+  .rw-wordmark-pill {
+    display: none;
+  }
+}
+
 .rw-footer-bar {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 8px;
-  background: var(--rw-dawn);
-  padding: 18px 0 22px;
+  gap: 12px;
+  padding-top: 48px;
+  padding-bottom: 28px;
   color: var(--rw-muted);
   font-size: 13px;
+}
+
+.rw-footer-bar a:hover {
+  color: var(--rw-ink);
+}
+
+/* Cadre du site : deux traits verticaux au bord du contenu, un trait horizontal entre les sections,
+   et un petit rond à chaque croisement (inspiration Calyra). */
+.rw {
+  --rw-frame: max(8px, calc((100% - 1120px) / 2));
+  position: relative;
+}
+
+.rw::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--rw-frame);
+  right: var(--rw-frame);
+  border-left: 1px solid var(--rw-line);
+  border-right: 1px solid var(--rw-line);
+  pointer-events: none;
+}
+
+.rw-sep {
+  position: relative;
+}
+
+.rw-sep::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--rw-line);
+  pointer-events: none;
+}
+
+.rw-sep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(var(--rw-frame) - 4px);
+  right: calc(var(--rw-frame) - 4px);
+  height: 9px;
+  background:
+    radial-gradient(circle, var(--rw-dawn) 0 3px, var(--rw-line) 3px 4px, transparent 4.5px) left center / 9px 9px no-repeat,
+    radial-gradient(circle, var(--rw-dawn) 0 3px, var(--rw-line) 3px 4px, transparent 4.5px) right center / 9px 9px no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .rw::before,
+  .rw-sep::after {
+    display: none;
+  }
 }
