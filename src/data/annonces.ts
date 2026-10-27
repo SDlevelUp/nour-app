@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-27-menu-haut-notifications",
+    date: "2026-10-27",
+    title: "Menu et nouveautés mieux placés",
+    text: "Sur téléphone, le menu s’ouvre en haut, sous son bouton, et la fenêtre des nouveautés tient dans l’écran.",
+  },
+  {
     id: "2026-10-27-logo-mobile",
     date: "2026-10-27",
     title: "Un menu en haut sur téléphone",

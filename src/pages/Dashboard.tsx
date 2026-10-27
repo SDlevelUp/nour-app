@@ -2,7 +2,6 @@
 import { CycleCalendar } from "@/components/dashboard/CycleCalendar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { TopActions } from "@/components/dashboard/TopActions";
-import { NourMark } from "@/components/NourMark";
 import {
   dashboardNavigation,
   type DashboardView,
@@ -1023,7 +1022,6 @@ export default function Dashboard() {
                 className="flex items-center gap-2"
                 aria-label="Rawdah, aujourd’hui"
               >
-                <NourMark className="size-7 text-(--n-sage)" />
                 <span className="n-display text-[19px]">Rawdah</span>
               </button>
               <div className="justify-self-end">

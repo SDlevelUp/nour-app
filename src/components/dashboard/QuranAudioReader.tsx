@@ -1,4 +1,3 @@
-import { NourMark } from "@/components/NourMark";
 import {
   saveQuranResumePosition,
   type QuranResumePosition,
@@ -539,8 +538,7 @@ export function QuranAudioReader({
               className="n-surah-item"
             >
               <span className="n-surah-num">
-                <NourMark />
-                <span className="relative">{surah.number}</span>
+                    <span className="relative">{surah.number}</span>
               </span>
               <span className="min-w-0">
                 <span className="block truncate font-semibold">{surah.englishName}</span>
@@ -758,7 +756,6 @@ export function QuranAudioReader({
         <div className="n-mini-row">
         <button type="button" className="n-mini-info" onClick={onOpen}>
           <span className="n-surah-num">
-            <NourMark />
             <span className="relative">{selectedSurah}</span>
           </span>
           <span className="min-w-0 text-left">

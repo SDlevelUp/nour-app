@@ -36,5 +36,26 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Apparition au défilement de la page d’accueil (voir « rw-io » dans landing.css).
+      (function () {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+        var selector = ".rw-moment:not(.rw-hero) .rw-moment-grid > *, .rw-principles > *, .rw-faq > h2, .rw-faq > div, .rw-final h2, .rw-wordmark-stage";
+        function run() {
+          var items = document.querySelectorAll(selector);
+          if (!items.length) return;
+          document.documentElement.classList.add("rw-io");
+          var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("is-in");
+              observer.unobserve(entry.target);
+            });
+          }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+          items.forEach(function (item) { item.classList.add("rw-reveal-item"); observer.observe(item); });
+        }
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
+      })();
+    </script>
   </body>
 </html>

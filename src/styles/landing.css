@@ -1,5 +1,5 @@
 /*
- * Page publique Rawdah : « la journée, de Fajr à Isha » (2026-10-27).
+ * Page publique Rawdah : « la journée, du Fajr au Icha » (2026-10-27).
  * Ciel qui change au fil de la page : aube crème, journée vert pastel, soir mauve,
  * nuit vert profond (couleurs les plus choisies au questionnaire).
  * Typo : Albert Sans pour les titres, Urbanist pour le texte ; Amiri uniquement pour l'arabe.
@@ -955,10 +955,15 @@
   text-align: center;
 }
 
+/* Phrase de fin sur une seule ligne dès la tablette : la taille suit la largeur du contenu. */
+.rw-final .rw-wrap {
+  container-type: inline-size;
+}
+
 .rw-final h2 {
   margin: 0 auto;
   max-width: 720px;
-  font-size: clamp(32px, 5vw, 56px);
+  font-size: clamp(28px, 7vw, 40px);
   font-weight: 700;
   line-height: 1.08;
 }
@@ -966,13 +971,15 @@
 /* Grand « Rawdah » en couleur unie, avec deux étiquettes posées dessus (inspiration Calyra, sans dégradé). */
 .rw-wordmark-stage {
   position: relative;
-  margin-top: 72px;
+  margin-top: 112px;
+  container-type: inline-size; /* le mot se règle sur la largeur du contenu : jamais coupé */
 }
 
 .rw-wordmark {
   display: block;
   font-family: "Albert Sans", ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(88px, 23vw, 342px);
+  font-size: 30cqw;
+  text-align: center;
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -0.06em;
@@ -1015,7 +1022,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 48px;
+  padding-top: 88px;
   padding-bottom: 28px;
   color: var(--rw-muted);
   font-size: 13px;
@@ -1159,16 +1166,47 @@
   .rw-hero-callig {
     animation: rw-fade 1.6s 0.4s both;
   }
+}
 
-  /* Sections suivantes : apparition légère quand elles entrent à l'écran. */
-  @supports (animation-timeline: view()) {
-    .rw-moment:not(.rw-hero) .rw-moment-grid > *,
-    .rw-principles > *,
-    .rw-faq,
-    .rw-wordmark-stage {
-      animation: rw-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
-    }
+/* Tablette et petits ordinateurs : le contenu et la barre de navigation restent à l’intérieur du cadre.
+   Au-delà de 1240 px, le cadre est déjà loin du contenu. */
+@media (min-width: 761px) and (max-width: 1240px) {
+  .rw-wrap {
+    padding-left: max(20px, calc(var(--rw-frame) + 24px));
+    padding-right: max(20px, calc(var(--rw-frame) + 24px));
+  }
+
+  .rw-wrap.rw-header {
+    width: min(1080px, calc(100% - 2 * var(--rw-frame) - 32px));
+    padding: 8px 8px 8px 20px;
+  }
+}
+
+/* Apparition au défilement (tous navigateurs) : un petit script dans index.html ajoute « rw-io » sur <html>,
+   puis « is-in » sur chaque élément quand il arrive à l’écran. Sans script, tout reste affiché. */
+.rw-io .rw-reveal-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Les cartes montent un peu plus et arrivent juste après le texte. */
+.rw-io .rw-moment-visual.rw-reveal-item {
+  transform: translateY(48px) scale(0.97);
+  transition-delay: 0.12s;
+}
+
+.rw-io .rw-reveal-item.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (min-width: 761px) {
+  .rw-final h2 {
+    max-width: none;
+    white-space: nowrap;
+    font-size: min(52px, 3.9cqw);
   }
 }

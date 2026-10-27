@@ -1,4 +1,3 @@
-import { NourMark } from "@/components/NourMark";
 import { adhkarBySession } from "@/convex/adhkarData";
 import { rappels } from "@/data/rappels";
 import { prayerCalculation } from "@/hooks/use-prayer-times";
@@ -145,7 +144,6 @@ export default function Landing() {
             </nav>
           </details>
           <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
-            <NourMark className="size-7 text-(--rw-sage)" />
             Rawdah
           </a>
           <nav className="rw-nav" aria-label="Navigation principale">
@@ -168,7 +166,7 @@ export default function Landing() {
             </h1>
             <p className="rw-text">
               Rawdah est une application musulmane pour les femmes : tes prières, tes adhkar, ton
-              Coran et ton cycle, de Fajr à Isha, dans un espace calme.
+              Coran et ton cycle, du Fajr au Icha, dans un espace calme.
             </p>
             <p className="rw-signature">Une routine douce, à ton rythme.</p>
             <div className="rw-cta">
@@ -192,10 +190,7 @@ export default function Landing() {
               </div>
               <div className="rw-phone-screen" aria-hidden="true">
                 <div className="rw-phone-top">
-                  <span className="flex items-center gap-1.5">
-                    <NourMark className="size-5 text-(--rw-sage)" />
-                    <b>Rawdah</b>
-                  </span>
+                  <b>Rawdah</b>
                   <span className="flex gap-1.5">
                     <i className="rw-phone-icon" />
                     <i className="rw-phone-icon rw-phone-avatar" />
@@ -283,7 +278,7 @@ export default function Landing() {
         <div className="rw-wrap">
           <p className="rw-intro-text">
             <span>
-              De Fajr à Isha, cinq prières rythment ta journée. Rawdah l’organise autour d’elles : tes
+              Du Fajr au Icha, cinq prières rythment ta journée. Rawdah l’organise autour d’elles : tes
               adhkar, ton Coran, tes cours et ton cycle trouvent leur place entre deux rendez-vous avec
               Allah, sans pression ni score.
             </span>
@@ -301,7 +296,7 @@ export default function Landing() {
             </span>
             <h2 className="rw-h2">Ta journée s’organise autour de la prière.</h2>
             <p className="rw-text">
-              Ta position ou ta ville suffit : les horaires de prière de Fajr à Isha s’affichent
+              Ta position ou ta ville suffit : les horaires de prière du Fajr au Icha s’affichent
               chaque matin. Tes cours de science, tes lectures et tes tâches viennent se placer
               entre deux prières. Les mosquées proches sont à portée, avec l’itinéraire.
             </p>
@@ -492,7 +487,7 @@ export default function Landing() {
 
         <footer className="rw-final rw-sep">
           <div className="rw-wrap">
-            <h2>Demain, à Fajr, ta journée t’attend.</h2>
+            <h2>Demain, au Fajr, une nouvelle journée commence.</h2>
             <a href={authHref} className="rw-btn rw-btn-dark mt-8">
               Créer mon espace
             </a>

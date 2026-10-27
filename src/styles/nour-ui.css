@@ -488,6 +488,21 @@
   box-shadow: 0 10px 30px rgba(31, 42, 34, 0.2);
 }
 
+/* Menu du haut (mobile) : s’ouvre sous le bouton, en haut à gauche, comme sur la page d’accueil. */
+.n-sheet.n-sheet-top {
+  top: 64px;
+  right: auto;
+  bottom: auto;
+  left: 16px;
+  width: min(300px, calc(100vw - 32px));
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
+}
+
+.n-sheet-backdrop.n-sheet-backdrop-clear {
+  background: transparent;
+}
+
 /* ---------- Animation d'entrée ---------- */
 
 @media (prefers-reduced-motion: no-preference) {
@@ -829,17 +844,12 @@
   height: 34px;
   align-items: center;
   justify-content: center;
+  border-radius: 999px;
+  background: var(--n-sage-tint);
   color: var(--n-sage);
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-
-.n-surah-num svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
 .n-surah-name-ar {
@@ -2060,6 +2070,17 @@
   font-size: 14px;
   box-shadow: 0 18px 40px -12px rgba(31, 42, 34, 0.25);
   animation: n-rise 0.2s ease both;
+}
+
+/* Sur mobile, la cloche n’est pas au bord droit : la fenêtre se cale sur la largeur de l’écran pour ne pas être coupée. */
+@media (max-width: 1023px) {
+  .n-popover {
+    position: fixed;
+    top: 64px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
 }
 
 .n-popover-row {

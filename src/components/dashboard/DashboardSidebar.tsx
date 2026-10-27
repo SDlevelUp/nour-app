@@ -7,7 +7,6 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { NourMark } from "@/components/NourMark";
 import { Switch } from "@/components/ui/switch";
 import {
   dashboardNavigation,
@@ -90,8 +89,7 @@ export function DashboardSidebar({
           aria-label="Rawdah, aujourd’hui"
           data-tip={isCollapsed ? "Rawdah" : undefined}
         >
-          <NourMark className="size-7 shrink-0 text-(--n-sage)" />
-          {!isCollapsed && <span className="n-display text-[20px]">Rawdah</span>}
+          <span className="n-display text-[20px]">{isCollapsed ? "R" : "Rawdah"}</span>
         </button>
 
         <button
@@ -203,11 +201,11 @@ export function DashboardSidebar({
         <div className="lg:hidden">
           <button
             type="button"
-            className="n-sheet-backdrop"
+            className={`n-sheet-backdrop ${isMenuOpen ? "n-sheet-backdrop-clear" : ""}`}
             aria-label="Fermer le menu"
             onClick={() => closeSheet()}
           />
-          <div className="n-sheet" role="dialog" aria-label={isMenuOpen ? "Menu" : "Plus"}>
+          <div className={`n-sheet ${isMenuOpen ? "n-sheet-top" : ""}`} role="dialog" aria-label={isMenuOpen ? "Menu" : "Plus"}>
             <div className="flex items-center justify-between px-1 pb-2">
               <span className="n-label">{isMenuOpen ? "Menu" : "Plus"}</span>
               <button
