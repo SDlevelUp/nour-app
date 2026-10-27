@@ -7,7 +7,7 @@
  */
 
 .rw {
-  --rw-dawn: #f6efe4;
+  --rw-dawn: ##FFFEFA;
   --rw-day: #e4ecdc;
   --rw-dusk: #ebe4ef;
   --rw-night: #14261d;
@@ -88,13 +88,18 @@
 
 /* ---------- En-tête ---------- */
 
-.rw-header {
+/* Barre de navigation en carte blanche arrondie, sans ombre (inspiration Calyra). */
+.rw-wrap.rw-header {
   display: flex;
+  width: calc(100% - 32px);
+  max-width: 1080px;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  margin-top: 16px;
+  border-radius: 20px;
+  background: #fffdf9;
+  padding: 8px 8px 8px 20px;
 }
 
 .rw-logo {
@@ -132,10 +137,81 @@
   }
 }
 
+/* Menu mobile : bouton à gauche, logo au centre, « Mon espace » à droite. */
+.rw-menu {
+  position: relative;
+}
+
+.rw-menu summary {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--rw-dawn);
+  cursor: pointer;
+  list-style: none;
+}
+
+.rw-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.rw-menu nav {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  min-width: 210px;
+  border: 1px solid var(--rw-line);
+  border-radius: 24px;
+  background: #fffdf9;
+  padding: 8px;
+}
+
+.rw-menu nav a {
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rw-menu nav a:hover {
+  background: var(--rw-dawn);
+}
+
+@media (max-width: 759px) {
+  .rw-wrap.rw-header {
+    display: grid;
+    padding-left: 8px;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .rw-header > .rw-btn-small {
+    justify-self: end;
+  }
+}
+
+@media (min-width: 760px) {
+  .rw-menu {
+    display: none;
+  }
+}
+
 .rw-btn-small {
   min-height: 44px;
   padding: 0 18px;
   font-size: 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 759px) {
+  .rw-btn-small {
+    padding: 0 14px;
+    font-size: 13px;
+  }
 }
 
 /* ---------- Moments de la journée ---------- */
@@ -692,31 +768,34 @@
 }
 
 /* Preuve (Maghrib) */
+/* Preuve en lignes (libellé à gauche, valeur à droite) : aucun nom coupé. */
 .rw-proof {
   margin-top: 18px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
   border-top: 1px solid var(--rw-line);
   padding-top: 16px;
 }
 
-@media (min-width: 640px) {
-  .rw-proof {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.rw-proof > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .rw-proof dt {
+  flex: none;
   color: var(--rw-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .rw-proof dd {
-  margin: 2px 0 0;
+  margin: 0;
   font-size: 14px;
   font-weight: 700;
+  text-align: right;
 }
 
 /* Cycle (Isha) */
@@ -802,60 +881,16 @@
   }
 }
 
-.rw-principles h3,
-.rw-profiles h3 {
+.rw-principles h3 {
   font-size: 18px;
   font-weight: 700;
 }
 
-.rw-principles p,
-.rw-profiles p {
+.rw-principles p {
   margin-top: 8px;
   color: var(--rw-muted);
   font-size: 15px;
   line-height: 1.6;
-}
-
-/* Pour qui : sous le héros, trois badges arrondis (rayon 50 px). */
-.rw-wrap.rw-forwho {
-  position: relative;
-  z-index: 1;
-  margin-top: 96px;
-}
-
-.rw-forwho h2 {
-  font-size: clamp(22px, 2.4vw, 28px);
-  font-weight: 700;
-  text-align: center;
-}
-
-.rw-profiles {
-  margin-top: 24px;
-  display: grid;
-  gap: 12px;
-}
-
-@media (min-width: 900px) {
-  .rw-profiles {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-}
-
-.rw-profile {
-  border-radius: 50px;
-  background: #fffdf9;
-  padding: 18px 30px;
-}
-
-.rw-profile h3 {
-  font-size: 16px;
-}
-
-.rw-profile p {
-  margin-top: 4px;
-  font-size: 14px;
-  line-height: 1.5;
 }
 
 .rw-faq {

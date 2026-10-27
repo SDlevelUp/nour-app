@@ -24,21 +24,6 @@ const principles = [
   },
 ];
 
-const profiles = [
-  {
-    title: "Tu veux prier à l’heure",
-    text: "Tes horaires, tes adhkar du matin et du soir, et un lien régulier avec le Coran.",
-  },
-  {
-    title: "Tu étudies la science",
-    text: "Tes livres, tes cours, tes notes de révision et tes matn au même endroit.",
-  },
-  {
-    title: "Tu es en période de règles",
-    text: "Le mode ‘Udhr adapte ton planning. Ton compteur de qada continue.",
-  },
-];
-
 const faqs = [
   {
     question: "L’application impose-t-elle une routine ?",
@@ -145,6 +130,20 @@ export default function Landing() {
       {/* Fajr : l'aube */}
       <section className="rw-moment rw-fajr rw-hero">
         <header className="rw-wrap rw-header relative z-10">
+          {/* Menu mobile en HTML seul (<details>) : la page publique est prérendue sans JavaScript. */}
+          <details className="rw-menu">
+            <summary aria-label="Ouvrir le menu">
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </summary>
+            <nav aria-label="Menu">
+              <a href="#journee">La journée</a>
+              <a href="#sources">Nos sources</a>
+              <a href="#faq">Questions</a>
+              <a href={authHref}>Mon espace</a>
+            </nav>
+          </details>
           <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
             <NourMark className="size-7 text-(--rw-sage)" />
             Rawdah
@@ -269,7 +268,7 @@ export default function Landing() {
               </div>
             </div>
             <span className="rw-phone-pill rw-phone-pill-left" aria-hidden="true">
-              Dhuhr à {timeOf("Dhuhr")}
+              Horaires de prière selon ta ville
             </span>
             <span className="rw-phone-pill rw-phone-pill-right" aria-hidden="true">
               Chaque invocation avec sa source
@@ -277,18 +276,6 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Pour qui : trois badges sous le héros */}
-        <div className="rw-wrap rw-forwho">
-          <h2>Pensée pour les femmes musulmanes.</h2>
-          <div className="rw-profiles">
-            {profiles.map(({ title, text }) => (
-              <div key={title} className="rw-profile">
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Dhuhr : la journée s'organise */}

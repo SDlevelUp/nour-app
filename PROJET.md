@@ -125,6 +125,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-27 : page publique : cartes sans ombre, plus de trait au-dessus de la ligne mise en avant du planning (Dhuhr).
 - 2026-10-27 : page publique : traits verticaux du cadre éloignés du contenu, près des bords de l’écran (entre 16 et 48 px du bord).
 - 2026-10-27 : page publique : « Pensée pour les femmes musulmanes » déplacé sous le héros, les trois profils en badges arrondis (rayon 50 px) ; traits internes de la section principes retirés ; mention « données d’exemple » placée à la fin de la section Isha, avec de l’espace.
+- 2026-10-27 : page publique : bloc « Pensée pour les femmes musulmanes » retiré (par Sarah) ; barre de navigation en carte blanche arrondie sans ombre ; menu mobile en HTML seul (<details>) avec bouton à gauche, logo au centre et « Mon espace » à droite ; étiquette du téléphone « Horaires de prière selon ta ville » ; preuve de Maghrib en lignes (libellé à gauche, valeur à droite) pour qu’aucun nom ne soit coupé.
 
 ## Problèmes connus
 - Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.
