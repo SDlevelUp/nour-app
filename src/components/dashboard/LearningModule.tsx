@@ -61,7 +61,8 @@ export function LearningModule() {
         status: "to-learn",
         portions: kind === "matn" ? portions.split("\n") : [],
         reviewDate: kind === "matn" ? reviewDate || undefined : undefined,
-        arabic: kind === "hadith" ? arabic || undefined : undefined,
+        // Matn : texte arabe, une portion par ligne. Hadith : texte arabe du hadith.
+        arabic: arabic.trim() || undefined,
         transliteration:
           kind === "hadith" ? transliteration || undefined : undefined,
         translation: kind === "hadith" ? translation || undefined : undefined,
@@ -117,7 +118,7 @@ export function LearningModule() {
 
   return (
     <div className="space-y-5">
-      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions, ou un hadith à documenter. Rawdah ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
+      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions (en arabe, avec ta traduction si tu veux), ou un hadith à documenter. Rawdah ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
         <form onSubmit={(event) => void save(event)} className="mt-5 space-y-4">
           <div className="n-seg" role="group" aria-label="Type de fiche">
             <button type="button" aria-pressed={kind === "matn"} onClick={() => setKind("matn")}>
@@ -140,8 +141,19 @@ export function LearningModule() {
 
           {kind === "matn" ? (
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_200px]">
+              <label className="grid gap-1 text-[13px] font-semibold sm:col-span-2">
+                Texte arabe du matn (une portion par ligne)
+                <textarea
+                  value={arabic}
+                  onChange={(event) => setArabic(event.target.value)}
+                  maxLength={20000}
+                  dir="rtl"
+                  lang="ar"
+                  className="n-input n-textarea n-arabic text-[20px]! font-normal"
+                />
+              </label>
               <label className="grid gap-1 text-[13px] font-semibold">
-                Portions (une par ligne)
+                Traduction ou explication (une portion par ligne, facultatif)
                 <textarea
                   value={portions}
                   onChange={(event) => setPortions(event.target.value)}
@@ -223,10 +235,32 @@ export function LearningModule() {
                 </div>
                 {item.kind === "matn" ? (
                   <>
-                    {item.portions.length ? (
+                    {item.arabic ? (
+                      // Chaque portion arabe, avec sa traduction (même numéro de ligne) juste en dessous.
+                      <ol className="mt-3 space-y-3">
+                        {item.arabic
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter(Boolean)
+                          .map((line, index) => (
+                            <li key={`${index}-${line}`}>
+                              <p className="n-arabic text-[22px]" lang="ar">
+                                {line}
+                              </p>
+                              {item.portions[index] && (
+                                <p className="text-[15px] text-(--n-muted)" dir="auto">
+                                  {item.portions[index]}
+                                </p>
+                              )}
+                            </li>
+                          ))}
+                      </ol>
+                    ) : item.portions.length ? (
                       <ol className="mt-3 list-inside list-decimal space-y-1 text-[15px]">
                         {item.portions.map((part, index) => (
-                          <li key={`${index}-${part}`}>{part}</li>
+                          <li key={`${index}-${part}`} dir="auto">
+                            {part}
+                          </li>
                         ))}
                       </ol>
                     ) : (

@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-27-matn-en-arabe",
+    date: "2026-10-27",
+    title: "Ton matn en arabe",
+    text: "Dans Science bénéfique, une fiche matn accepte maintenant le texte arabe, une portion par ligne, avec ta traduction sous chaque portion si tu veux.",
+  },
+  {
     id: "2026-10-27-cartes-sans-ombre",
     date: "2026-10-27",
     title: "Cartes sans ombre",
