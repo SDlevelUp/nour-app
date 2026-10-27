@@ -553,7 +553,6 @@
   border-radius: 36px;
   background: #fffdf9;
   padding: 22px;
-  box-shadow: 0 40px 80px -48px rgba(20, 38, 29, 0.55);
 }
 
 .rw-device-dark {
@@ -566,7 +565,6 @@
   border-radius: 24px;
   background: #fffdf9;
   padding: 24px;
-  box-shadow: 0 30px 60px -44px rgba(20, 38, 29, 0.45);
 }
 
 .rw-device-head {
@@ -634,6 +632,11 @@
   padding: 13px 4px;
   font-size: 15px;
   font-weight: 600;
+}
+
+/* Pas de trait juste au-dessus de la ligne mise en avant. */
+.rw-agenda li:has(+ .is-now) {
+  border-bottom-color: transparent;
 }
 
 .rw-agenda li:last-child {
