@@ -129,35 +129,37 @@ const sampleWeek = [
 export default function Landing() {
   return (
     <main className="rw">
-      {/* Fajr : l'aube */}
-      <section className="rw-moment rw-fajr rw-hero">
-        <header className="rw-wrap rw-header relative z-10">
-          {/* Menu mobile en HTML seul (<details>) : la page publique est prérendue sans JavaScript. */}
-          <details className="rw-menu">
-            <summary aria-label="Ouvrir le menu">
-              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </summary>
-            <nav aria-label="Menu">
-              <a href="#journee">La journée</a>
-              <a href="#sources">Nos sources</a>
-              <a href="#faq">Questions</a>
-              <a href={authHref}>Mon espace</a>
-            </nav>
-          </details>
-          <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
-            Rawdah
-          </a>
-          <nav className="rw-nav" aria-label="Navigation principale">
+      {/* Barre de navigation collée en haut pendant le défilement (hors du héros, qui coupe ce qui dépasse). */}
+      <header className="rw-wrap rw-header z-30">
+        {/* Menu mobile en HTML seul (<details>) : la page publique est prérendue sans JavaScript. */}
+        <details className="rw-menu">
+          <summary aria-label="Ouvrir le menu">
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </summary>
+          <nav aria-label="Menu">
             <a href="#journee">La journée</a>
             <a href="#sources">Nos sources</a>
             <a href="#faq">Questions</a>
+            <a href={authHref}>Mon espace</a>
           </nav>
-          <a href={authHref} className="rw-btn rw-btn-dark rw-btn-small">
-            Mon espace
-          </a>
-        </header>
+        </details>
+        <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
+          Rawdah
+        </a>
+        <nav className="rw-nav" aria-label="Navigation principale">
+          <a href="#journee">La journée</a>
+          <a href="#sources">Nos sources</a>
+          <a href="#faq">Questions</a>
+        </nav>
+        <a href={authHref} className="rw-btn rw-btn-dark rw-btn-small">
+          Mon espace
+        </a>
+      </header>
+
+      {/* Fajr : l'aube */}
+      <section className="rw-moment rw-fajr rw-hero">
 
         <div className="rw-wrap rw-moment-grid rw-hero-grid">
           <div className="relative z-10">

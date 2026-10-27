@@ -201,11 +201,11 @@ export function DashboardSidebar({
         <div className="lg:hidden">
           <button
             type="button"
-            className={`n-sheet-backdrop ${isMenuOpen ? "n-sheet-backdrop-clear" : ""}`}
+            className="n-sheet-backdrop"
             aria-label="Fermer le menu"
             onClick={() => closeSheet()}
           />
-          <div className={`n-sheet ${isMenuOpen ? "n-sheet-top" : ""}`} role="dialog" aria-label={isMenuOpen ? "Menu" : "Plus"}>
+          <div className="n-sheet" role="dialog" aria-label={isMenuOpen ? "Menu" : "Plus"}>
             <div className="flex items-center justify-between px-1 pb-2">
               <span className="n-label">{isMenuOpen ? "Menu" : "Plus"}</span>
               <button

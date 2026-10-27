@@ -58,6 +58,11 @@
       })();
     </script>
     <script>
+      // Menu mobile de la page d’accueil : se referme quand on choisit un lien.
+      document.addEventListener("click", function (event) {
+        var link = event.target.closest && event.target.closest(".rw-menu nav a");
+        if (link) link.closest("details").removeAttribute("open");
+      });
       // Lecteur du verset d’al-Kahf : lecture au clic, barre de progression, arrêt quand la carte sort de l’écran.
       (function () {
         function run() {

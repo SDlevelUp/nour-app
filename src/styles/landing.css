@@ -91,13 +91,15 @@
 
 /* Barre de navigation en carte blanche arrondie, sans ombre (inspiration Calyra). */
 .rw-wrap.rw-header {
+  position: sticky;
+  top: 8px;
   display: flex;
   width: calc(100% - 32px);
   max-width: 1080px;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 8px;
   border-radius: 20px;
   background: var(--rw-card);
   padding: 8px 8px 8px 20px;
@@ -159,23 +161,34 @@
   display: none;
 }
 
+/* Menu ouvert : panneau en bas de l’écran, comme dans l’app. */
 .rw-menu nav {
-  position: absolute;
-  top: 52px;
-  left: 0;
-  z-index: 20;
+  position: fixed;
+  right: 12px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 12px;
+  z-index: 21;
   display: grid;
-  min-width: 210px;
   border: 1px solid var(--rw-line);
   border-radius: 24px;
   background: var(--rw-card);
-  padding: 8px;
+  padding: 10px;
+}
+
+/* Voile derrière le panneau : il fait partie du bouton, donc le toucher referme le menu (sans JavaScript). */
+.rw-menu[open] summary::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(27, 42, 33, 0.35);
+  cursor: default;
 }
 
 .rw-menu nav a {
   border-radius: 16px;
-  padding: 12px 16px;
-  font-size: 15px;
+  padding: 14px 16px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -1014,6 +1027,7 @@
   letter-spacing: -0.06em;
   color: #e4e1d5;
   white-space: nowrap;
+  transform: translateX(-0.04em); /* compense l’approche du « R » : les lettres restent centrées */
   user-select: none;
   -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);

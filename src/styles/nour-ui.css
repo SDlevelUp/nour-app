@@ -474,6 +474,7 @@
   background: rgba(31, 42, 34, 0.35);
 }
 
+/* Panneau du bas (mobile) : ouvert par « Plus » ou par le bouton menu du haut. */
 .n-sheet {
   position: fixed;
   right: 12px;
@@ -486,21 +487,6 @@
   padding: 14px;
   color: var(--n-ink);
   box-shadow: 0 10px 30px rgba(31, 42, 34, 0.2);
-}
-
-/* Menu du haut (mobile) : s’ouvre sous le bouton, en haut à gauche, comme sur la page d’accueil. */
-.n-sheet.n-sheet-top {
-  top: 64px;
-  right: auto;
-  bottom: auto;
-  left: 16px;
-  width: min(300px, calc(100vw - 32px));
-  max-height: calc(100dvh - 80px);
-  overflow-y: auto;
-}
-
-.n-sheet-backdrop.n-sheet-backdrop-clear {
-  background: transparent;
 }
 
 /* ---------- Animation d'entrée ---------- */
