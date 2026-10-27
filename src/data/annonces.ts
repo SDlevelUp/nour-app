@@ -12,8 +12,8 @@ export const annonces: Annonce[] = [
   {
     id: "2026-10-27-logo-mobile",
     date: "2026-10-27",
-    title: "Le logo sur téléphone",
-    text: "Sur téléphone, le logo Rawdah apparaît en haut de l’écran. Touche-le pour revenir à « Aujourd’hui ».",
+    title: "Un menu en haut sur téléphone",
+    text: "Sur téléphone, le bouton menu en haut à gauche ouvre toutes les pages, et le logo Rawdah, au centre, ramène à « Aujourd’hui ».",
   },
   {
     id: "2026-10-26-rawdah",

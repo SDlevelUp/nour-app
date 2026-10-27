@@ -33,7 +33,7 @@ import {
   subMonths,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Archive, ArchiveRestore, LocateFixed, MapPin, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, LocateFixed, MapPin, Menu, Trash2 } from "lucide-react";
 import { PlaceSearch } from "@/components/dashboard/PlaceSearch";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
@@ -172,6 +172,7 @@ export default function Dashboard() {
   const [hasOpenedQuran, setHasOpenedQuran] = useState(false);
   if (activeView === "quran" && !hasOpenedQuran) setHasOpenedQuran(true);
   const [isExcusePeriod, setIsExcusePeriod] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() =>
     readStored("nour-sidebar-collapsed", false),
   );
@@ -996,22 +997,45 @@ export default function Dashboard() {
         onCollapse={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
         onDarkModeChange={setIsDarkMode}
         onSignOut={() => void handleSignOut()}
+        isMenuOpen={isMobileMenuOpen}
+        onMenuOpenChange={setIsMobileMenuOpen}
       />
       <div
         className={`min-h-screen bg-background transition-[padding] duration-300 ease-in-out ${isSidebarCollapsed ? "lg:pl-18" : "lg:pl-65"}`}
       >
         <header className={`n-topbar ${activeView === "overview" ? "n-topbar-plain" : ""}`}>
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 xl:px-8">
-            {/* Logo sur mobile : sur ordinateur, il est dans la barre latérale. */}
-            <button
-              type="button"
-              onClick={() => navigateToView("overview")}
-              className="flex items-center gap-2 lg:hidden"
-              aria-label="Rawdah, aujourd’hui"
-            >
-              <NourMark className="size-7 text-(--n-sage)" />
-              <span className="n-display text-[19px]">Rawdah</span>
-            </button>
+            {/* Mobile : menu à gauche, logo au centre, cloche et profil à droite.
+                Sur ordinateur, menu et logo sont dans la barre latérale. */}
+            <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center lg:hidden">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((open) => !open)}
+                aria-expanded={isMobileMenuOpen}
+                aria-label="Ouvrir le menu"
+                className="n-top-btn justify-self-start"
+              >
+                <Menu className="size-4.5" strokeWidth={1.8} />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigateToView("overview")}
+                className="flex items-center gap-2"
+                aria-label="Rawdah, aujourd’hui"
+              >
+                <NourMark className="size-7 text-(--n-sage)" />
+                <span className="n-display text-[19px]">Rawdah</span>
+              </button>
+              <div className="justify-self-end">
+                <TopActions
+                  firstName={firstName || ""}
+                  email={user?.email}
+                  isDarkMode={isDarkMode}
+                  onDarkModeChange={setIsDarkMode}
+                  onSignOut={() => void handleSignOut()}
+                />
+              </div>
+            </div>
             {activeView !== "overview" && (
             <>
             <p className="text-[14px]">
@@ -1062,7 +1086,7 @@ export default function Dashboard() {
             )}
             </>
             )}
-            <div className="ml-auto">
+            <div className="ml-auto hidden lg:block">
               <TopActions
                 firstName={firstName || ""}
                 email={user?.email}

@@ -26,6 +26,8 @@ type DashboardSidebarProps = {
   onCollapse: () => void;
   onDarkModeChange: (enabled: boolean) => void;
   onSignOut: () => void;
+  isMenuOpen: boolean; // menu complet ouvert depuis le bouton du haut (mobile)
+  onMenuOpenChange: (open: boolean) => void;
 };
 
 const mobileTabs = dashboardNavigation.filter((item) => item.group === "daily");
@@ -42,9 +44,18 @@ export function DashboardSidebar({
   onCollapse,
   onDarkModeChange,
   onSignOut,
+  isMenuOpen,
+  onMenuOpenChange,
 }: DashboardSidebarProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const isMoreActive = moreItems.some((item) => item.view === activeView);
+  // Le panneau sert au bouton « Plus » (pages secondaires) et au menu du haut (toutes les pages).
+  const isSheetOpen = isMoreOpen || isMenuOpen;
+  const sheetItems = isMenuOpen ? dashboardNavigation : moreItems;
+  const closeSheet = () => {
+    setIsMoreOpen(false);
+    onMenuOpenChange(false);
+  };
 
   const excuseToggle = (
     <div>
@@ -158,7 +169,7 @@ export function DashboardSidebar({
             key={view}
             type="button"
             onClick={() => {
-              setIsMoreOpen(false);
+              closeSheet();
               onNavigate(view);
             }}
             aria-current={activeView === view && !isMoreOpen ? "page" : undefined}
@@ -171,7 +182,10 @@ export function DashboardSidebar({
         ))}
         <button
           type="button"
-          onClick={() => setIsMoreOpen((open) => !open)}
+          onClick={() => {
+            onMenuOpenChange(false);
+            setIsMoreOpen((open) => !open);
+          }}
           aria-expanded={isMoreOpen}
           aria-current={isMoreActive || isMoreOpen ? "page" : undefined}
           aria-label="Plus"
@@ -185,20 +199,20 @@ export function DashboardSidebar({
         </button>
       </nav>
 
-      {isMoreOpen && (
+      {isSheetOpen && (
         <div className="lg:hidden">
           <button
             type="button"
             className="n-sheet-backdrop"
             aria-label="Fermer le menu"
-            onClick={() => setIsMoreOpen(false)}
+            onClick={() => closeSheet()}
           />
-          <div className="n-sheet" role="dialog" aria-label="Plus">
+          <div className="n-sheet" role="dialog" aria-label={isMenuOpen ? "Menu" : "Plus"}>
             <div className="flex items-center justify-between px-1 pb-2">
-              <span className="n-label">Plus</span>
+              <span className="n-label">{isMenuOpen ? "Menu" : "Plus"}</span>
               <button
                 type="button"
-                onClick={() => setIsMoreOpen(false)}
+                onClick={() => closeSheet()}
                 className="n-nav-item w-auto! p-1.5!"
                 aria-label="Fermer"
               >
@@ -206,12 +220,12 @@ export function DashboardSidebar({
               </button>
             </div>
             <div className="space-y-0.5">
-              {moreItems.map(({ label, view, icon: Icon }) => (
+              {sheetItems.map(({ label, view, icon: Icon }) => (
                 <button
                   key={view}
                   type="button"
                   onClick={() => {
-                    setIsMoreOpen(false);
+                    closeSheet();
                     onNavigate(view);
                   }}
                   aria-current={activeView === view ? "page" : undefined}
