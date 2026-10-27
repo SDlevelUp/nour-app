@@ -20,7 +20,8 @@
   --rw-line: #d5d9cf;
 
   min-height: 100vh;
-  overflow-x: hidden;
+  /* clip (et non hidden) : coupe ce qui dépasse sans créer une seconde barre de défilement. */
+  overflow-x: clip;
   background: var(--rw-dawn);
   color: var(--rw-ink);
   font-family: "Urbanist", ui-sans-serif, system-ui, sans-serif;
@@ -215,8 +216,25 @@
 }
 
 .rw-dusk-to-night {
-  height: 140px;
-  background: linear-gradient(180deg, var(--rw-dusk), var(--rw-night));
+  height: 360px;
+  margin-top: -1px;
+  /* Crépuscule : du mauve à la nuit selon une courbe douce, sans démarcation visible. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--rw-night) 0%, var(--rw-dusk)) 0%,
+    color-mix(in oklab, var(--rw-night) 0.2%, var(--rw-dusk)) 8.3%,
+    color-mix(in oklab, var(--rw-night) 1.9%, var(--rw-dusk)) 16.7%,
+    color-mix(in oklab, var(--rw-night) 6.3%, var(--rw-dusk)) 25%,
+    color-mix(in oklab, var(--rw-night) 14.8%, var(--rw-dusk)) 33.3%,
+    color-mix(in oklab, var(--rw-night) 28.9%, var(--rw-dusk)) 41.7%,
+    color-mix(in oklab, var(--rw-night) 50%, var(--rw-dusk)) 50%,
+    color-mix(in oklab, var(--rw-night) 71.1%, var(--rw-dusk)) 58.3%,
+    color-mix(in oklab, var(--rw-night) 85.2%, var(--rw-dusk)) 66.7%,
+    color-mix(in oklab, var(--rw-night) 93.8%, var(--rw-dusk)) 75%,
+    color-mix(in oklab, var(--rw-night) 98.1%, var(--rw-dusk)) 83.3%,
+    color-mix(in oklab, var(--rw-night) 99.8%, var(--rw-dusk)) 91.7%,
+    color-mix(in oklab, var(--rw-night) 100%, var(--rw-dusk)) 100%
+  );
 }
 
 .rw-isha,
@@ -606,6 +624,7 @@
 }
 
 .rw-final {
+  overflow: hidden;
   padding: 72px 0 0;
   text-align: center;
 }
