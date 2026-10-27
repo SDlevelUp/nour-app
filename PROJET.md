@@ -123,6 +123,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-27 : page publique : titres en Albert Sans (comme l’app) au lieu de Sora, texte toujours en Urbanist ; téléphone du héros réduit d’environ 15 %.
 - 2026-10-27 : page publique, inspiration Calyra sans dégradé : cadre fin sur tout le site (deux traits verticaux au bord du contenu, un trait entre chaque section, un petit rond à chaque croisement ; traits verticaux et ronds masqués sous 760 px) ; pied de page avec un grand « Rawdah » en couleur unie sur toute la largeur, deux étiquettes posées dessus (« Chaque invocation avec sa source », « Zéro publicité ») et une barre © Rawdah + liens La journée, Nos sources, Questions.
 - 2026-10-27 : page publique : cartes sans ombre, plus de trait au-dessus de la ligne mise en avant du planning (Dhuhr).
+- 2026-10-27 : page publique : traits verticaux du cadre éloignés du contenu, près des bords de l’écran (entre 16 et 48 px du bord).
 
 ## Problèmes connus
 - Référencement : le site reste sur le sous-domaine Vercel (`muslim-dhikr-companion-main.vercel.app`), décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.

@@ -968,7 +968,7 @@
 /* Cadre du site : deux traits verticaux au bord du contenu, un trait horizontal entre les sections,
    et un petit rond à chaque croisement (inspiration Calyra). */
 .rw {
-  --rw-frame: max(8px, calc((100% - 1120px) / 2));
+  --rw-frame: clamp(16px, 2.5vw, 48px); /* traits près des bords de l’écran, loin du contenu */
   position: relative;
 }
 
