@@ -355,7 +355,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px; /* écran aéré, même si le bas est coupé */
   overflow: hidden;
   padding: 18px 14px 0;
 }
@@ -555,14 +555,15 @@
   box-shadow: 0 14px 30px -14px rgba(27, 42, 33, 0.5);
 }
 
+/* Étiquettes calées sur les bords du téléphone (246 px de large) : elles ne mordent que sur le cadre. */
 .rw-phone-pill-left {
   top: 30%;
-  left: 0;
+  right: calc(50% + 100px);
 }
 
 .rw-phone-pill-right {
   bottom: 14%;
-  right: 0;
+  left: calc(50% + 100px);
 }
 
 @media (max-width: 520px) {
