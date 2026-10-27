@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard
 Disallow: /auth
 
-Sitemap: https://muslim-dhikr-companion-main.vercel.app/sitemap.xml
+Sitemap: https://rawdahapp.vercel.app/sitemap.xml
