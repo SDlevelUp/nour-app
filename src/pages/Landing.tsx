@@ -276,6 +276,19 @@ export default function Landing() {
             </span>
           </div>
         </div>
+
+        {/* Pour qui : trois badges sous le héros */}
+        <div className="rw-wrap rw-forwho">
+          <h2>Pensée pour les femmes musulmanes.</h2>
+          <div className="rw-profiles">
+            {profiles.map(({ title, text }) => (
+              <div key={title} className="rw-profile">
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Dhuhr : la journée s'organise */}
@@ -446,14 +459,14 @@ export default function Landing() {
             </div>
           </div>
         </div>
+        <p className="rw-wrap mt-16! text-center text-[13px] text-(--rw-muted)">
+          Écrans ci-dessus : données d’exemple.
+        </p>
       </section>
 
       {/* Nuit : principes, pour qui, questions */}
       <section className="rw-night rw-sep">
         <div className="rw-wrap">
-          <p className="pb-6 text-center text-[13px] text-(--rw-muted)">
-            Écrans ci-dessus : données d’exemple.
-          </p>
           <div className="rw-principles">
             {principles.map(({ title, text }) => (
               <div key={title}>
@@ -461,18 +474,6 @@ export default function Landing() {
                 <p>{text}</p>
               </div>
             ))}
-          </div>
-
-          <div className="rw-forwho">
-            <h2 className="rw-h2 mt-0!">Pensée pour les femmes musulmanes.</h2>
-            <div className="rw-profiles">
-              {profiles.map(({ title, text }) => (
-                <div key={title}>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
           <div id="faq" className="rw-faq">
