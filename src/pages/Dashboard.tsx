@@ -2,6 +2,7 @@
 import { CycleCalendar } from "@/components/dashboard/CycleCalendar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { TopActions } from "@/components/dashboard/TopActions";
+import { NourMark } from "@/components/NourMark";
 import {
   dashboardNavigation,
   type DashboardView,
@@ -1001,6 +1002,16 @@ export default function Dashboard() {
       >
         <header className={`n-topbar ${activeView === "overview" ? "n-topbar-plain" : ""}`}>
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 xl:px-8">
+            {/* Logo sur mobile : sur ordinateur, il est dans la barre latérale. */}
+            <button
+              type="button"
+              onClick={() => navigateToView("overview")}
+              className="flex items-center gap-2 lg:hidden"
+              aria-label="Rawdah, aujourd’hui"
+            >
+              <NourMark className="size-7 text-(--n-sage)" />
+              <span className="n-display text-[19px]">Rawdah</span>
+            </button>
             {activeView !== "overview" && (
             <>
             <p className="text-[14px]">

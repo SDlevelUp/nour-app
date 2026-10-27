@@ -1,5 +1,6 @@
 import { NourMark } from "@/components/NourMark";
 import { adhkarBySession } from "@/convex/adhkarData";
+import { rappels } from "@/data/rappels";
 import { prayerCalculation } from "@/hooks/use-prayer-times";
 
 const authHref = "/auth?returnTo=%2Fdashboard";
@@ -143,10 +144,6 @@ export default function Landing() {
     <main className="rw">
       {/* Fajr : l'aube */}
       <section className="rw-moment rw-fajr rw-hero">
-        <span className="rw-ar rw-hero-callig" aria-hidden="true">
-          رَوْضَة
-        </span>
-
         <header className="rw-wrap rw-header relative z-10">
           <a href="/" className="rw-logo" aria-label="Rawdah, accueil">
             <NourMark className="size-7 text-(--rw-sage)" />
@@ -162,8 +159,8 @@ export default function Landing() {
           </a>
         </header>
 
-        <div className="rw-wrap rw-moment-grid mt-10">
-          <div>
+        <div className="rw-wrap rw-moment-grid rw-hero-grid">
+          <div className="relative z-10">
             <p className="rw-time-label">Fajr · {timeOf("Fajr")}</p>
             <h1>
               Ta journée
@@ -185,27 +182,98 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="rw-moment-visual" aria-label="Exemple : adhkar du matin">
-            <div className="rw-device">
-              <div className="rw-device-head">
-                <b>Adhkar du matin</b>
-                <small>
-                  {morningIndex + 1} / {adhkarBySession.morning.length}
-                </small>
+          <div className="rw-moment-visual rw-phone-stage relative z-10">
+            <span className="rw-ar rw-hero-callig" aria-hidden="true">
+              رَوْضَة
+            </span>
+            <div className="rw-phone" role="img" aria-label="Exemple : l’écran Aujourd’hui de Rawdah sur téléphone">
+              <div className="rw-phone-island" />
+              <div className="rw-phone-status" aria-hidden="true">
+                <b>11:33</b>
               </div>
-              <p className="rw-ar line-clamp-4" dir="rtl" lang="ar">
-                {morningInvocation.arabic}
-              </p>
-              <p className="rw-device-text line-clamp-3">{morningInvocation.meaning}</p>
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <span className="text-[13px] font-bold text-(--rw-sage)">
-                  {morningSource.collection} {morningSource.number}
-                </span>
-                <span className="rw-counter" aria-hidden="true">
-                  0 / {morningInvocation.repetitions}
-                </span>
+              <div className="rw-phone-screen" aria-hidden="true">
+                <div className="rw-phone-top">
+                  <span className="flex items-center gap-1.5">
+                    <NourMark className="size-5 text-(--rw-sage)" />
+                    <b>Rawdah</b>
+                  </span>
+                  <span className="flex gap-1.5">
+                    <i className="rw-phone-icon" />
+                    <i className="rw-phone-icon rw-phone-avatar" />
+                  </span>
+                </div>
+                <p className="rw-ar rw-phone-salam" dir="rtl" lang="ar">
+                  السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
+                </p>
+                <p className="rw-phone-title">As-salâmu ʿalaykum wa raḥmatullâhi wa barakâtuh</p>
+                <p className="rw-phone-date">
+                  <b>Mardi 27 octobre</b> · 17 joumada al oula 1448 AH
+                </p>
+
+                <div className="rw-phone-prayer">
+                  <svg className="rw-phone-pattern" aria-hidden="true">
+                    <defs>
+                      <pattern id="rw-khatam" width="28" height="28" patternUnits="userSpaceOnUse">
+                        <rect x="6" y="6" width="16" height="16" fill="none" stroke="currentColor" />
+                        <rect x="6" y="6" width="16" height="16" fill="none" stroke="currentColor" transform="rotate(45 14 14)" />
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#rw-khatam)" />
+                  </svg>
+                  <span className="rw-phone-label">Prochaine prière</span>
+                  <div className="flex items-baseline justify-between">
+                    <b className="text-[20px]">Dhuhr</b>
+                    <span className="text-[11px]">
+                      dans <b>2 h 10</b>
+                    </span>
+                  </div>
+                  <b className="rw-phone-big">{timeOf("Dhuhr")}</b>
+                  <ol className="rw-phone-stops">
+                    {sampleTimes.map(([name, time]) => (
+                      <li key={name} className={name === "Fajr" ? "is-done" : name === "Dhuhr" ? "is-next" : ""}>
+                        <i />
+                        {name}
+                        <small>{time}</small>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                {rappels[0] && (
+                  <figure className="rw-phone-card rw-phone-rappel">
+                    <span className="rw-phone-label text-(--rw-mauve)!">Rappel du jour</span>
+                    <blockquote className="line-clamp-4">« {rappels[0].text} »</blockquote>
+                    <figcaption>
+                      <b>{rappels[0].author}</b> · {rappels[0].source}
+                    </figcaption>
+                  </figure>
+                )}
+
+                <div className="rw-phone-card">
+                  <div className="flex items-center justify-between">
+                    <span className="rw-phone-label">Adhkar du matin</span>
+                    <small>
+                      {morningIndex + 1} / {adhkarBySession.morning.length}
+                    </small>
+                  </div>
+                  <p className="rw-ar line-clamp-2" dir="rtl" lang="ar">
+                    {morningInvocation.arabic}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <small className="font-bold text-(--rw-sage)">
+                      {morningSource.collection} {morningSource.number}
+                    </small>
+                    <span className="rw-phone-counter">0 / {morningInvocation.repetitions}</span>
+                  </div>
+                </div>
               </div>
             </div>
+            <span className="rw-phone-pill rw-phone-pill-left" aria-hidden="true">
+              Dhuhr à {timeOf("Dhuhr")}
+            </span>
+            <span className="rw-phone-pill rw-phone-pill-right" aria-hidden="true">
+              Chaque invocation avec sa source
+            </span>
           </div>
         </div>
       </section>
@@ -337,14 +405,13 @@ export default function Landing() {
           </div>
         </div>
       </section>
-      <div className="rw-dusk-to-night" aria-hidden="true" />
 
       {/* Isha : la nuit, le cycle */}
-      <section className="rw-moment rw-isha rw-moment-reverse pt-8!">
+      <section className="rw-moment rw-isha rw-moment-reverse">
         <div className="rw-wrap rw-moment-grid">
           <div>
             <p className="rw-time-label">Isha</p>
-            <span className="rw-big-time text-(--rw-day)" aria-hidden="true">
+            <span className="rw-big-time text-(--rw-sage)" aria-hidden="true">
               {timeOf("Isha")}
             </span>
             <h2 className="rw-h2">Ton cycle et ton qada, au même endroit.</h2>
@@ -384,7 +451,7 @@ export default function Landing() {
       {/* Nuit : principes, pour qui, questions */}
       <section className="rw-night">
         <div className="rw-wrap">
-          <p className="pb-6 text-center text-[13px] text-[rgba(247,244,236,0.72)]">
+          <p className="pb-6 text-center text-[13px] text-(--rw-muted)">
             Écrans ci-dessus : données d’exemple.
           </p>
           <div className="rw-principles">
@@ -396,14 +463,16 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="rw-profiles">
+          <div className="rw-forwho">
             <h2 className="rw-h2 mt-0!">Pensée pour les femmes musulmanes.</h2>
-            {profiles.map(({ title, text }) => (
-              <div key={title}>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
-            ))}
+            <div className="rw-profiles">
+              {profiles.map(({ title, text }) => (
+                <div key={title}>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div id="faq" className="rw-faq">
@@ -423,7 +492,7 @@ export default function Landing() {
         <footer className="rw-final">
           <div className="rw-wrap">
             <h2>Demain, à Fajr, ta journée t’attend.</h2>
-            <a href={authHref} className="rw-btn rw-btn-light mt-8">
+            <a href={authHref} className="rw-btn rw-btn-dark mt-8">
               Créer mon espace
             </a>
           </div>
