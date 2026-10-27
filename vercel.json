@@ -1,4 +1,12 @@
 {
   "buildCommand": "if [ -n \"$CONVEX_DEPLOY_KEY\" ]; then npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name VITE_CONVEX_URL; else npm run build; fi",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "muslim-dhikr-companion-main.vercel.app" }],
+      "destination": "https://rawdahapp.vercel.app/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/app.html" }]
 }
