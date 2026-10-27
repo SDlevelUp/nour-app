@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-27-nouveau-calendrier",
+    date: "2026-10-27",
+    title: "Un calendrier plus doux",
+    text: "Pour choisir une date (rappel de révision, journal du Coran, Science), un nouveau calendrier s’ouvre, en français, semaine du lundi au dimanche, et suit le mode nuit.",
+  },
+  {
     id: "2026-10-27-matn-en-arabe",
     date: "2026-10-27",
     title: "Ton matn en arabe",

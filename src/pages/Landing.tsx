@@ -283,8 +283,7 @@ export default function Landing() {
         <div className="rw-wrap">
           <p className="rw-intro-text">
             <span>
-              Du Fajr au Icha, cinq prières rythment ta journée. Rawdah l’organise autour d’elles : tes
-              adhkar, ton Coran, tes cours et ton cycle trouvent leur place entre deux rendez-vous avec
+              Du Fajr au Icha, cinq prières rythment ta journée. Rawdah l’organise autour d’elles : tes adhkar, ton Coran, tes cours et ton cycle trouvent leur place entre deux rendez-vous avec
               Allah, sans pression ni score.
             </span>
           </p>

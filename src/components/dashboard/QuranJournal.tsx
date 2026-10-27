@@ -10,6 +10,7 @@ import { PenLine } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
+import { DateField } from "@/components/dashboard/DateField";
 import { toast } from "sonner";
 
 function todayKey() {
@@ -150,13 +151,7 @@ export function QuranJournal({
           </label>
           <label className="grid gap-1 text-[13px] font-semibold">
             Date
-            <input
-              type="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              required
-              className="n-input"
-            />
+            <DateField value={date} onChange={setDate} />
           </label>
           <label className="grid gap-1 text-[13px] font-semibold">
             Heure

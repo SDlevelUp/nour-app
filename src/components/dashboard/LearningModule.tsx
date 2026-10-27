@@ -4,6 +4,7 @@ import { NotebookPen } from "lucide-react";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
+import { DateField } from "@/components/dashboard/DateField";
 import { toast } from "sonner";
 
 type LearningKind = "matn" | "hadith";
@@ -164,12 +165,7 @@ export function LearningModule() {
               </label>
               <label className="grid content-start gap-1 text-[13px] font-semibold">
                 Rappel de révision (facultatif)
-                <input
-                  type="date"
-                  value={reviewDate}
-                  onChange={(event) => setReviewDate(event.target.value)}
-                  className="n-input"
-                />
+                <DateField value={reviewDate} onChange={setReviewDate} clearable />
               </label>
             </div>
           ) : (
@@ -286,12 +282,12 @@ export function LearningModule() {
                       </label>
                       <label className="grid gap-1 text-[13px] font-semibold">
                         À revoir le
-                        <input
-                          type="date"
+                        <DateField
                           value={item.reviewDate ?? ""}
                           disabled={pending === item._id}
-                          onChange={(event) => void changeReviewDate(item._id, event.target.value)}
-                          className="n-input h-10!"
+                          onChange={(date) => void changeReviewDate(item._id, date)}
+                          clearable
+                          className="h-10!"
                         />
                       </label>
                     </div>

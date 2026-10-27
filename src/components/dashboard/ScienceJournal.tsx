@@ -6,6 +6,7 @@ import { ComposerCard } from "@/components/dashboard/ComposerCard";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LearningModule } from "@/components/dashboard/LearningModule";
+import { DateField } from "@/components/dashboard/DateField";
 import { passageScienceDuJour } from "@/data/scienceQuotidien";
 
 function todayKey() {
@@ -297,13 +298,7 @@ export function ScienceJournal({
                 <div className="flex flex-wrap items-end gap-3">
                   <label className="grid gap-1 text-[13px] font-semibold">
                     Date
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(event) => setDate(event.target.value)}
-                      required
-                      className="n-input w-auto!"
-                    />
+                    <DateField value={date} onChange={setDate} className="w-auto!" />
                   </label>
                   <label className="grid gap-1 text-[13px] font-semibold">
                     Heure
