@@ -24,7 +24,7 @@ export function QuranDailyCards({ hidden }: { hidden?: boolean }) {
             <p className="n-display text-[20px] leading-snug">
               {mot.translation.replace(/[\s,.;:!»]+$/u, "")}
             </p>
-            <p className="n-arabic text-[38px] leading-[1.5] text-(--n-sage-dark)" lang="ar">
+            <p className="n-arabic text-[38px] leading-normal text-(--n-sage-dark)" lang="ar">
               {/* Signes de pause (waqf) retirés du mot isolé ; ils restent dans le verset. */}
               {mot.arabic.replace(/[ۖ-ۜ]/gu, "")}
             </p>
