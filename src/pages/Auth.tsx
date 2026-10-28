@@ -15,13 +15,17 @@ import {
 } from "@/components/ui/input-otp";
 
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 interface AuthProps {
   redirectAfterAuth?: string;
 }
+
+type Mode = "signIn" | "signUp" | "forgot";
+// Écran du code : confirmation de l'adresse (inscription) ou nouveau mot de passe (oubli).
+type CodeStep = { kind: "verify" | "reset"; email: string };
 
 function resolveRedirectAfterAuth(
   returnTo: string | null,
@@ -33,6 +37,54 @@ function resolveRedirectAfterAuth(
   return fallback;
 }
 
+// En production, Convex masque le détail des erreurs (« Server Error ») : un message
+// clair par étape, sauf pour les erreurs volontaires (ConvexError) qui arrivent telles quelles.
+function convexErrorMessage(error: unknown): string | null {
+  if (error && typeof error === "object" && "data" in error) {
+    const { data } = error as { data: unknown };
+    if (typeof data === "string") return data;
+  }
+  return null;
+}
+
+function PasswordField({
+  name,
+  autoComplete,
+  placeholder,
+  disabled,
+}: {
+  name: string;
+  autoComplete: string;
+  placeholder: string;
+  disabled: boolean;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+      <Input
+        name={name}
+        type={visible ? "text" : "password"}
+        placeholder={placeholder}
+        className="px-9"
+        autoComplete={autoComplete}
+        minLength={8}
+        maxLength={128}
+        disabled={disabled}
+        required
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((value) => !value)}
+        className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+        aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
 function Auth({ redirectAfterAuth }: AuthProps = {}) {
   const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
   const { isLoading: authLoading, isAuthenticated, signIn } = useAuth();
@@ -42,7 +94,8 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     searchParams.get("returnTo"),
     redirectAfterAuth,
   );
-  const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
+  const [mode, setMode] = useState<Mode>("signIn");
+  const [codeStep, setCodeStep] = useState<CodeStep | null>(null);
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,42 +105,82 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       navigate(redirect, { replace: true });
     }
   }, [authLoading, isAuthenticated, navigate, redirect]);
-  const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
+
+  const switchMode = (next: Mode) => {
+    setMode(next);
     setError(null);
-    try {
-      const formData = new FormData(event.currentTarget);
-      const email = String(formData.get("email") ?? "").trim();
-      formData.set("email", email);
-      await signIn("email-otp", formData);
-      setStep({ email });
-      setIsLoading(false);
-    } catch (error) {
-      // En production, Convex masque le détail (« Server Error ») : message clair à la place.
-      console.error("Email sign-in error:", error);
-      setError(
-        "Le code n’a pas pu être envoyé. Vérifie ton adresse et réessaie dans quelques minutes.",
-      );
-      setIsLoading(false);
-    }
   };
 
-  const handleOtpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const backToForm = () => {
+    setCodeStep(null);
+    setOtp("");
+    setError(null);
+  };
+
+  const handlePasswordSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    formData.set("email", email);
+    formData.set("flow", mode);
     try {
-      const formData = new FormData(event.currentTarget);
-      await signIn("email-otp", formData);
+      const result = await signIn("password", formData);
+      if (result.signingIn) {
+        navigate(redirect, { replace: true });
+        return;
+      }
+      // Adresse pas encore confirmée : un code vient d'être envoyé.
+      setCodeStep({ kind: "verify", email });
+    } catch (error) {
+      console.error("Password sign-in error:", error);
+      setError(
+        convexErrorMessage(error) ??
+          (mode === "signUp"
+            ? "Impossible de créer ton espace avec cette adresse. Si tu as déjà un mot de passe, utilise « Se connecter » ou « Mot de passe oublié »."
+            : "E-mail ou mot de passe incorrect."),
+      );
+    }
+    setIsLoading(false);
+  };
+
+  const handleForgotSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    try {
+      await signIn("password", { email, flow: "reset" });
+      setCodeStep({ kind: "reset", email });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      setError(
+        "Aucun mot de passe n’est lié à cette adresse, ou le code n’a pas pu être envoyé. Si tu t’es inscrite avec un code ou avec Google, choisis « Créer mon espace » avec la même adresse.",
+      );
+    }
+    setIsLoading(false);
+  };
+
+  const handleCodeSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!codeStep) return;
+    setIsLoading(true);
+    setError(null);
+    const formData = new FormData(event.currentTarget);
+    formData.set("flow", codeStep.kind === "verify" ? "email-verification" : "reset-verification");
+    try {
+      await signIn("password", formData);
       navigate(redirect, { replace: true });
     } catch (error) {
-      console.error("OTP verification error:", error);
-
-      setError("Ce code est incorrect ou a expiré. Vérifie-le ou demande un nouveau code.");
-      setIsLoading(false);
-
+      console.error("Code verification error:", error);
+      setError(
+        convexErrorMessage(error) ??
+          "Ce code est incorrect ou a expiré. Vérifie-le ou recommence pour en recevoir un nouveau.",
+      );
       setOtp("");
+      setIsLoading(false);
     }
   };
 
@@ -116,13 +209,19 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     }
   };
 
+  const errorMessage = error && (
+    <p role="alert" className="text-sm text-red-500">
+      {error}
+    </p>
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Auth Content */}
       <div className="flex flex-1 items-center justify-center px-4 py-8">
         <div className="flex w-full max-w-sm flex-col items-center justify-center">
           <Card className="w-full pb-0 border shadow-md">
-            {step === "signIn" ? (
+            {codeStep === null ? (
               <>
                 <CardHeader className="text-center">
                   <div className="flex justify-center">
@@ -194,10 +293,15 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                         </div>
                       </div>
                     </CardContent>
-                    <form onSubmit={handleEmailSubmit}>
-                      <CardContent className="pt-0">
-                        <div className="relative flex items-center gap-2">
-                          <div className="relative flex-1">
+
+                    {mode === "forgot" ? (
+                      <form onSubmit={handleForgotSubmit}>
+                        <CardContent className="space-y-3 pt-0">
+                          <p className="text-sm font-medium">Mot de passe oublié</p>
+                          <p className="text-sm text-muted-foreground">
+                            Indique ton adresse : tu reçois un code pour choisir un nouveau mot de passe.
+                          </p>
+                          <div className="relative">
                             <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
                               name="email"
@@ -205,34 +309,111 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                               type="email"
                               className="pl-9"
                               autoComplete="email"
+                              autoCapitalize="none"
                               disabled={isLoading}
                               required
                             />
                           </div>
+                          {errorMessage}
+                          <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Recevoir un code
+                          </Button>
                           <Button
-                            type="submit"
-                            variant="outline"
-                            size="icon"
-                            aria-label="Envoyer le code de connexion"
+                            type="button"
+                            variant="ghost"
+                            className="w-full"
+                            onClick={() => switchMode("signIn")}
                             disabled={isLoading}
                           >
-                            {isLoading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <ArrowRight className="h-4 w-4" />
-                            )}
+                            Retour à la connexion
                           </Button>
-                        </div>
-                        {error && (
-                          <p role="alert" className="mt-2 text-sm text-red-500">
-                            {error}
-                          </p>
-                        )}
-                        <p className="mt-3 text-center text-sm text-muted-foreground">
-                          Pas encore d’espace ? Il est créé dès ton premier code.
-                        </p>
-                      </CardContent>
-                    </form>
+                        </CardContent>
+                      </form>
+                    ) : (
+                      <form onSubmit={handlePasswordSubmit}>
+                        <CardContent className="space-y-3 pt-0">
+                          <div
+                            role="tablist"
+                            aria-label="Connexion ou inscription"
+                            className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+                          >
+                            {(
+                              [
+                                ["signIn", "Se connecter"],
+                                ["signUp", "Créer mon espace"],
+                              ] as const
+                            ).map(([value, label]) => (
+                              <button
+                                key={value}
+                                type="button"
+                                role="tab"
+                                aria-selected={mode === value}
+                                onClick={() => switchMode(value)}
+                                className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
+                                  mode === value
+                                    ? "bg-card text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              name="email"
+                              placeholder="vous@exemple.fr"
+                              type="email"
+                              className="pl-9"
+                              autoComplete="email"
+                              autoCapitalize="none"
+                              disabled={isLoading}
+                              required
+                            />
+                          </div>
+                          <PasswordField
+                            key={mode}
+                            name="password"
+                            autoComplete={mode === "signUp" ? "new-password" : "current-password"}
+                            placeholder={mode === "signUp" ? "Choisis un mot de passe" : "Mot de passe"}
+                            disabled={isLoading}
+                          />
+                          {mode === "signUp" && (
+                            <p className="text-xs text-muted-foreground">
+                              8 caractères minimum. Un code t’est envoyé une seule fois pour
+                              confirmer ton adresse, ensuite ton mot de passe suffit.
+                            </p>
+                          )}
+                          {errorMessage}
+                          <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : null}
+                            {mode === "signUp" ? "Créer mon espace" : "Se connecter"}
+                          </Button>
+                          {mode === "signIn" ? (
+                            <p className="text-center text-sm">
+                              <Button
+                                type="button"
+                                variant="link"
+                                className="h-auto p-0"
+                                onClick={() => switchMode("forgot")}
+                                disabled={isLoading}
+                              >
+                                Mot de passe oublié ?
+                              </Button>
+                            </p>
+                          ) : (
+                            <p className="text-center text-xs text-muted-foreground">
+                              Déjà inscrite avec un code ou avec Google ? Crée ton mot de passe
+                              ici avec la même adresse : tu retrouves ton espace.
+                            </p>
+                          )}
+                        </CardContent>
+                      </form>
+                    )}
                   </>
                 )}
                 <CardContent className={isDemoMode ? "space-y-3" : "pt-0"}>
@@ -256,24 +437,22 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     <UserX className="mr-2 h-4 w-4" />
                     {isDemoMode ? "Commencer le test" : "Continuer sans compte"}
                   </Button>
-                  {error && isDemoMode && (
-                    <p role="alert" className="text-sm text-red-500">
-                      {error}
-                    </p>
-                  )}
+                  {isDemoMode && errorMessage}
                 </CardContent>
               </>
             ) : (
               <>
                 <CardHeader className="text-center mt-4">
-                  <CardTitle>Vérifie ton e-mail</CardTitle>
+                  <CardTitle>
+                    {codeStep.kind === "verify" ? "Confirme ton adresse" : "Nouveau mot de passe"}
+                  </CardTitle>
                   <CardDescription>
-                    Nous avons envoyé un code à {step.email}
+                    Nous avons envoyé un code à {codeStep.email}. Pense à regarder dans tes spams.
                   </CardDescription>
                 </CardHeader>
-                <form onSubmit={handleOtpSubmit}>
-                  <CardContent className="pb-4">
-                    <input type="hidden" name="email" value={step.email} />
+                <form onSubmit={handleCodeSubmit}>
+                  <CardContent className="space-y-4 pb-4">
+                    <input type="hidden" name="email" value={codeStep.email} />
                     <input type="hidden" name="code" value={otp} />
 
                     <div className="flex justify-center">
@@ -305,23 +484,19 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                         </InputOTPGroup>
                       </InputOTP>
                     </div>
+                    {codeStep.kind === "reset" && (
+                      <PasswordField
+                        name="newPassword"
+                        autoComplete="new-password"
+                        placeholder="Nouveau mot de passe (8 caractères min.)"
+                        disabled={isLoading}
+                      />
+                    )}
                     {error && (
-                      <p className="mt-2 text-sm text-red-500 text-center">
+                      <p role="alert" className="text-sm text-red-500 text-center">
                         {error}
                       </p>
                     )}
-                    <p className="text-sm text-muted-foreground text-center mt-4">
-                      Tu n’as pas reçu de code ?{" "}
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="p-0 h-auto"
-                        onClick={() => setStep("signIn")}
-                        disabled={isLoading}
-                      >
-                        Réessayer
-                      </Button>
-                    </p>
                   </CardContent>
                   <CardFooter className="flex-col gap-2">
                     <Button
@@ -336,7 +511,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                         </>
                       ) : (
                         <>
-                          Vérifier le code
+                          {codeStep.kind === "verify" ? "Confirmer" : "Enregistrer le mot de passe"}
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </>
                       )}
@@ -344,11 +519,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     <Button
                       type="button"
                       variant="ghost"
-                      onClick={() => setStep("signIn")}
+                      onClick={backToForm}
                       disabled={isLoading}
                       className="w-full"
                     >
-                      Utiliser une autre adresse
+                      Pas reçu de code ? Recommencer
                     </Button>
                   </CardFooter>
                 </form>

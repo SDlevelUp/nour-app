@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-28-mot-de-passe",
+    date: "2026-10-28",
+    title: "Ton propre mot de passe",
+    text: "Tu peux créer ton espace avec ton e-mail et un mot de passe : un code t’est envoyé une seule fois pour confirmer ton adresse, ensuite ton mot de passe suffit. Déjà inscrite avec un code ou Google ? Choisis « Créer mon espace » avec la même adresse, tu retrouves tout. « Mot de passe oublié ? » t’envoie un code pour en choisir un nouveau.",
+  },
+  {
     id: "2026-10-28-page-connexion",
     date: "2026-10-28",
     title: "Connexion plus simple",
