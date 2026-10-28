@@ -1,90 +1,51 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, Lock } from "lucide-react";
-import type { ReactNode } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Navigate, useLocation } from "react-router";
+
+// Délai maximal d'attente du retour de Google avant de renvoyer vers /auth.
+const AUTH_CODE_TIMEOUT_MS = 10_000;
 
 /**
- * Wraps a route that requires a signed-in user.
+ * Protège une page réservée aux personnes connectées.
  *
- * Signed-out visitors used to be bounced straight to `/auth`, which left them
- * on a bare sign-in form with no idea which page they had asked for or why they
- * were moved. The block is now stated on the page they landed on, and sign-in
- * still returns them to it via `returnTo`. Pass `redirectImmediately` for a
- * route where the bounce really is the better experience.
+ * Au retour de Google, l'URL porte un `?code=` que Convex Auth échange contre
+ * une session : pendant cet échange, on affiche « Connexion en cours… » au lieu
+ * de conclure trop tôt que la personne n'est pas connectée (cause du « il faut
+ * se connecter deux fois »). Sans session, on renvoie directement vers la page
+ * de connexion, qui ramène ici via `returnTo`.
  */
-export function RequireAuth({
-  children,
-  title = "Sign in to continue",
-  description = "This page is only available to signed-in users.",
-  redirectImmediately = false,
-}: {
-  children: ReactNode;
-  /** Headline on the blocked screen. */
-  title?: string;
-  /** Says what the visitor gets by signing in. */
-  description?: string;
-  /** Skip the explanation and go straight to `/auth`. */
-  redirectImmediately?: boolean;
-}) {
+export function RequireAuth({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const hasAuthCode = params.has("code");
+  const [codeTimedOut, setCodeTimedOut] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!hasAuthCode) return;
+    const timer = window.setTimeout(() => setCodeTimedOut(true), AUTH_CODE_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [hasAuthCode]);
+
+  const waitingForGoogle = hasAuthCode && !codeTimedOut;
+
+  if (isLoading || (!isAuthenticated && waitingForGoogle)) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" aria-hidden="true" />
+        <p role="status" className="text-sm text-muted-foreground">
+          {hasAuthCode ? "Connexion en cours…" : "Chargement de ton espace…"}
+        </p>
       </main>
     );
   }
 
   if (!isAuthenticated) {
-    const returnTo = `${location.pathname}${location.search}`;
-    const signInHref = `/auth?returnTo=${encodeURIComponent(returnTo)}`;
-
-    if (redirectImmediately) {
-      return <Navigate to={signInHref} replace />;
-    }
-
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-background p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="flex justify-center">
-              <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
-                <Lock className="size-5 text-muted-foreground" />
-              </div>
-            </div>
-            <CardTitle className="text-xl">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center text-sm text-muted-foreground">
-            You'll come straight back to this page once you're signed in.
-          </CardContent>
-          <CardFooter className="flex flex-col gap-2">
-            <Button className="w-full" onClick={() => navigate(signInHref)}>
-              Sign in
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={() => navigate("/")}
-            >
-              Back to home
-            </Button>
-          </CardFooter>
-        </Card>
-      </main>
-    );
+    params.delete("code");
+    const search = params.toString();
+    const returnTo = `${location.pathname}${search ? `?${search}` : ""}`;
+    return <Navigate to={`/auth?returnTo=${encodeURIComponent(returnTo)}`} replace />;
   }
 
   return children;

@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-28-page-connexion",
+    date: "2026-10-28",
+    title: "Connexion plus simple",
+    text: "La page de connexion affiche le nom Rawdah, explique que ton espace est créé dès ton premier code et donne des messages clairs en cas de souci. Au retour de Google, « Connexion en cours… » s’affiche au lieu d’un écran en anglais.",
+  },
+  {
     id: "2026-10-28-connexion-email",
     date: "2026-10-28",
     title: "Connexion par e-mail",

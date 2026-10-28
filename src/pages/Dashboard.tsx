@@ -2215,7 +2215,7 @@ export default function Dashboard() {
                     <div className="n-place-current mt-4">
                       <MapPin className="size-5 shrink-0" strokeWidth={1.8} />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[12px] font-semibold uppercase tracking-[0.1em] text-(--n-muted)">
+                        <span className="block text-[12px] font-semibold uppercase tracking-widest text-(--n-muted)">
                           Ville des horaires
                         </span>
                         <span className="block truncate text-[17px] font-semibold">

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/input-otp";
 
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowRight, Loader2, Mail, MoonStar, UserX } from "lucide-react";
+import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -64,11 +64,10 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       setStep({ email });
       setIsLoading(false);
     } catch (error) {
+      // En production, Convex masque le détail (« Server Error ») : message clair à la place.
       console.error("Email sign-in error:", error);
       setError(
-        error instanceof Error
-          ? error.message
-          : "Impossible d’envoyer le code de vérification. Réessaie.",
+        "Le code n’a pas pu être envoyé. Vérifie ton adresse et réessaie dans quelques minutes.",
       );
       setIsLoading(false);
     }
@@ -85,7 +84,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     } catch (error) {
       console.error("OTP verification error:", error);
 
-      setError("Le code de vérification saisi est incorrect.");
+      setError("Ce code est incorrect ou a expiré. Vérifie-le ou demande un nouveau code.");
       setIsLoading(false);
 
       setOtp("");
@@ -99,11 +98,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       await signIn("google", { redirectTo: redirect });
     } catch (error) {
       console.error("Google sign-in error:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "La connexion avec Google a échoué. Réessaie.",
-      );
+      setError("La connexion avec Google a échoué. Réessaie.");
       setIsLoading(false);
     }
   };
@@ -116,9 +111,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       navigate(redirect, { replace: true });
     } catch (error) {
       console.error("Guest login error:", error);
-      setError(
-        `Connexion sans compte impossible : ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
+      setError("La connexion sans compte a échoué. Réessaie.");
       setIsLoading(false);
     }
   };
@@ -138,8 +131,8 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       onClick={() => navigate("/")}
                       aria-label="Retour à l’accueil"
                     >
-                      <span className="mb-4 mt-4 flex size-16 items-center justify-center rounded-2xl bg-[#523B46] text-white">
-                        <MoonStar className="size-8" aria-hidden="true" />
+                      <span className="font-display mb-3 mt-4 block text-[30px] font-bold leading-none tracking-[-0.03em] text-foreground">
+                        Rawdah
                       </span>
                     </button>
                   </div>
@@ -235,6 +228,9 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                             {error}
                           </p>
                         )}
+                        <p className="mt-3 text-center text-sm text-muted-foreground">
+                          Pas encore d’espace ? Il est créé dès ton premier code.
+                        </p>
                       </CardContent>
                     </form>
                   </>
