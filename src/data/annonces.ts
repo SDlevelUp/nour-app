@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-28-connexion-email",
+    date: "2026-10-28",
+    title: "Connexion par e-mail",
+    text: "Plus besoin de compte Google : entre ton adresse e-mail, tu reçois un code de Rawdah et ton espace est créé dès le premier code. Pense à regarder tes spams.",
+  },
+  {
     id: "2026-10-28-science-modifier",
     date: "2026-10-28",
     title: "Corrige tes séances et tes fiches",

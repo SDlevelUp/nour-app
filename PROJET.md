@@ -51,7 +51,8 @@ Côté Convex (`npx convex env set`) :
 - `JWKS`, `JWT_PRIVATE_KEY`, `SITE_URL` : clés et URL de Convex Auth.
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` : connexion Google.
 - `NOUR_DEMO_MODE` : `true` sur le déploiement de test pour désactiver Google et e-mail.
-- Variables du relais Hostinger : voir `hostinger-mailer/README.md` [À CONFIRMER : liste exacte].
+- `NOUR_MAILER_URL` : adresse du relais d’envoi des codes de connexion (`https://sdlevelup.fr/rawdah-mailer/send-otp.php`).
+- `NOUR_MAILER_API_KEY` : clé partagée entre Convex et le relais ; la même figure dans `rawdah-mailer-secrets.php` sur Hostinger.
 
 ## Feuille de route
 
@@ -137,6 +138,7 @@ Côté Convex (`npx convex env set`) :
 - 2026-10-27 : redirection permanente (308) de `muslim-dhikr-companion-main.vercel.app` vers `rawdahapp.vercel.app` en gardant le chemin et les paramètres (`vercel.json`, choix de Sarah) ; les personnes connectées sur l’ancienne adresse se reconnectent une fois. Règle à part pour la racine « / », que le motif « /:path* » ne couvrait pas.
 - 2026-10-27 : téléphone du héros : étiquettes calées sur les bords du téléphone (elles ne cachent plus « Dhuhr »), écran plus aéré (16 px entre les blocs, le bas peut être coupé).
 - 2026-10-28 : Science bénéfique : correction des séances (`scienceProgress.update`) et des fiches matn/hadith (`scienceLearning.update`, le type ne change pas), avec formulaire pré-rempli dans la carte ; vérifications communes à l’ajout et à la modification (`cleanEntry`, `cleanContent`, texte arabe limité à 20 000 caractères). Livres et Apprentissage reprennent la disposition de Séances : formulaire à gauche, carte de résumé à droite (« Tes lectures » : à lire, en cours, lus et livre du moment ; « Ton apprentissage » : à apprendre, en cours, mémorisés et prochaine révision). Convex déployé en production. Grand « Rawdah » du pied de page recentré au pixel (compensation de l’approche du « R »).
+- 2026-10-28 : connexion par e-mail rétablie en production. Relais PHP installé sur Hostinger dans `public_html/rawdah-mailer/` (PHPMailer 6.10.0 joint, sans Composer), fichier `rawdah-mailer-secrets.php` à côté de `public_html` (hors d’Internet). Envoi depuis la boîte `contact.rawdah@sdlevelup.fr` (offre e-mail gratuite de Hostinger, choix de Sarah) sous le nom « Rawdah », objet « Votre code de connexion Rawdah ». `NOUR_MAILER_URL` et `NOUR_MAILER_API_KEY` définies dans Convex prod. Testé par Sarah : code reçu, connexion réussie ; le compte est créé au premier code validé.
 
 ## Problèmes connus
 - Référencement : le site est sur le sous-domaine Vercel gratuit `rawdahapp.vercel.app` depuis le 2026-10-27 (`rawdah.vercel.app` était déjà pris) ; l’ancienne adresse `muslim-dhikr-companion-main.vercel.app` redirige vers elle (redirection permanente dans `vercel.json`). Décision de Sarah du 2026-10-22 de ne pas acheter de nom de domaine. L’adresse apparaît dans `index.html`, `public/robots.txt` et `public/sitemap.xml`.
@@ -151,6 +153,5 @@ Côté Convex (`npx convex env set`) :
 - Les règles CSS globales `.dashboard-shell [class*="rounded-"]`, `[class*="text-stone-"]`… réécrivent les classes Tailwind de l'ancien design ; le nouveau design utilise les classes `n-*` pour y échapper. À supprimer une fois tous les écrans restylés.
 - Le déploiement `useful-anaconda-844` n'apparaît pas dans le tableau de bord Convex de Sarah (lien direct en 404) ; seul l'accès en ligne de commande fonctionne. À retrouver dans le bon compte ou à migrer vers un projet visible, avec export des données au préalable (constaté le 2026-10-19).
 - Convex n'est plus déployé automatiquement au build Vercel : après un changement dans `src/convex/`, lancer `npx convex deploy` vers anaconda.
-- Connexion par e-mail en production : `NOUR_MAILER_URL` et `NOUR_MAILER_API_KEY` ne sont pas définies dans Convex, l'envoi du code échoue (constaté le 2026-10-19).
 - Traduction française du Coran : chargée depuis `raw.githubusercontent.com/mehdi-stark/Coran-Quran` ; traducteur non identifié et non affiché [À CONFIRMER : quelle traduction, et faut-il en choisir une sourcée].
 - Entrée « Notre démarche » prévue dans la navigation, pas encore ajoutée faute de contenu [À CONFIRMER : qui est derrière l'app, minhaj, relecture].

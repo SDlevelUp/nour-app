@@ -2,7 +2,7 @@
 
 return [
     'apiKey' => 'replace-with-a-long-random-secret',
-    'smtpUsername' => 'contact@sdlevelup.fr',
+    'smtpUsername' => 'contact.rawdah@sdlevelup.fr',
     'smtpPassword' => 'replace-with-the-mailbox-password',
-    'fromName' => 'Nour',
+    'fromName' => 'Rawdah',
 ];

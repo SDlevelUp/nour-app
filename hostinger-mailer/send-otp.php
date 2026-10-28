@@ -16,14 +16,14 @@ function respond(int $status, array $body): void
 
 function enforceRecipientRateLimit(string $recipient): void
 {
-    $rateLimitFile = sys_get_temp_dir() . '/nour-otp-' .
+    $rateLimitFile = sys_get_temp_dir() . '/rawdah-otp-' .
         hash('sha256', strtolower($recipient)) . '.json';
     $file = fopen($rateLimitFile, 'c+');
     if ($file === false || !flock($file, LOCK_EX)) {
         if (is_resource($file)) {
             fclose($file);
         }
-        error_log('Nour mail relay could not access its rate-limit storage.');
+        error_log('Rawdah mail relay could not access its rate-limit storage.');
         respond(503, ['ok' => false, 'error' => 'relay_unavailable']);
     }
 
@@ -35,7 +35,7 @@ function enforceRecipientRateLimit(string $recipient): void
     if (!is_array($timestamps)) {
         flock($file, LOCK_UN);
         fclose($file);
-        error_log('Nour mail relay rate-limit storage is invalid.');
+        error_log('Rawdah mail relay rate-limit storage is invalid.');
         respond(503, ['ok' => false, 'error' => 'relay_unavailable']);
     }
 
@@ -62,7 +62,7 @@ function enforceRecipientRateLimit(string $recipient): void
     fclose($file);
 
     if (!$written) {
-        error_log('Nour mail relay could not update rate-limit storage.');
+        error_log('Rawdah mail relay could not update rate-limit storage.');
         respond(503, ['ok' => false, 'error' => 'relay_unavailable']);
     }
 }
@@ -77,9 +77,9 @@ if ($contentLength > 4096) {
     respond(413, ['ok' => false, 'error' => 'request_too_large']);
 }
 
-$configPath = dirname(__DIR__, 2) . '/nour-mailer-secrets.php';
+$configPath = dirname(__DIR__, 2) . '/rawdah-mailer-secrets.php';
 if (!is_file($configPath)) {
-    error_log('Nour mail relay is missing its private configuration file.');
+    error_log('Rawdah mail relay is missing its private configuration file.');
     respond(503, ['ok' => false, 'error' => 'relay_not_configured']);
 }
 
@@ -94,7 +94,7 @@ if (
     $config['smtpUsername'] === '' ||
     $config['smtpPassword'] === ''
 ) {
-    error_log('Nour mail relay private configuration is invalid.');
+    error_log('Rawdah mail relay private configuration is invalid.');
     respond(503, ['ok' => false, 'error' => 'relay_not_configured']);
 }
 
@@ -150,25 +150,25 @@ try {
     $mailer->Timeout = 15;
     $mailer->setFrom(
         $config['smtpUsername'],
-        is_string($config['fromName'] ?? null) ? $config['fromName'] : 'Nour',
+        is_string($config['fromName'] ?? null) ? $config['fromName'] : 'Rawdah',
     );
     $mailer->addAddress($recipient);
     $mailer->isHTML(true);
-    $mailer->Subject = 'Votre code de connexion Nour';
+    $mailer->Subject = 'Votre code de connexion Rawdah';
     $escapedOtp = htmlspecialchars($otp, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $mailer->Body =
-        '<p>Voici votre code de connexion à Nour :</p>' .
+        '<p>Voici votre code de connexion à Rawdah :</p>' .
         '<p style="font-size:28px;font-weight:bold;letter-spacing:6px">' .
         $escapedOtp .
         '</p><p>Ce code expire dans 15 minutes. Si vous n’êtes pas à l’origine ' .
         'de cette demande, vous pouvez ignorer cet e-mail.</p>';
     $mailer->AltBody =
-        "Voici votre code de connexion à Nour : {$otp}\n\n" .
+        "Voici votre code de connexion à Rawdah : {$otp}\n\n" .
         'Ce code expire dans 15 minutes. Si vous n’êtes pas à l’origine ' .
         'de cette demande, vous pouvez ignorer cet e-mail.';
     $mailer->send();
 } catch (Throwable $error) {
-    error_log('Nour mail relay failed to send an OTP email: ' . $error->getMessage());
+    error_log('Rawdah mail relay failed to send an OTP email: ' . $error->getMessage());
     respond(502, ['ok' => false, 'error' => 'email_delivery_failed']);
 }
 
