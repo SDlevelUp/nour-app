@@ -10,6 +10,12 @@ export type Annonce = {
 
 export const annonces: Annonce[] = [
   {
+    id: "2026-10-28-science-modifier",
+    date: "2026-10-28",
+    title: "Corrige tes séances et tes fiches",
+    text: "Dans Science bénéfique, un lien « Modifier » permet de corriger une séance ou une fiche (matn, hadith). Livres et Apprentissage montrent aussi un résumé à droite, comme Séances.",
+  },
+  {
     id: "2026-10-27-nouveau-calendrier",
     date: "2026-10-27",
     title: "Un calendrier plus doux",

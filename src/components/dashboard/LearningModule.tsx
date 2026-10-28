@@ -24,6 +24,21 @@ export function LearningModule() {
   const updateStatus = useMutation(api.scienceLearning.setStatus);
   const updateReviewDate = useMutation(api.scienceLearning.setReviewDate);
   const removeItem = useMutation(api.scienceLearning.remove);
+  const updateItem = useMutation(api.scienceLearning.update);
+  // Fiche en cours de correction (une seule à la fois) et ses champs.
+  const [editingId, setEditingId] = useState<Id<"scienceLearningItems"> | null>(null);
+  const [edit, setEdit] = useState({
+    title: "",
+    arabic: "",
+    portions: "",
+    transliteration: "",
+    translation: "",
+    narrator: "",
+    collection: "",
+    number: "",
+    grade: "",
+    gradingSource: "",
+  });
   const [kind, setKind] = useState<LearningKind>("matn");
   const [title, setTitle] = useState("");
   const [portions, setPortions] = useState("");
@@ -117,9 +132,58 @@ export function LearningModule() {
     }
   };
 
+  const startEdit = (item: Doc<"scienceLearningItems">) => {
+    setEditingId(item._id);
+    setEdit({
+      title: item.title,
+      arabic: item.arabic ?? "",
+      portions: item.portions.join("\n"),
+      transliteration: item.transliteration ?? "",
+      translation: item.translation ?? "",
+      narrator: item.narrator ?? "",
+      collection: item.collection ?? "",
+      number: item.number ?? "",
+      grade: item.grade ?? "",
+      gradingSource: item.gradingSource ?? "",
+    });
+  };
+
+  const saveEdit = async (item: Doc<"scienceLearningItems">) => {
+    setPending(item._id);
+    try {
+      await updateItem({
+        itemId: item._id,
+        title: edit.title,
+        portions: item.kind === "matn" ? edit.portions.split("\n") : [],
+        arabic: edit.arabic || undefined,
+        transliteration: edit.transliteration || undefined,
+        translation: edit.translation || undefined,
+        narrator: edit.narrator || undefined,
+        collection: edit.collection || undefined,
+        number: edit.number || undefined,
+        grade: edit.grade || undefined,
+        gradingSource: edit.gradingSource || undefined,
+      });
+      setEditingId(null);
+      toast.success("Fiche corrigée.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible de modifier la fiche.");
+    } finally {
+      setPending(null);
+    }
+  };
+
+  // Résumé (carte de droite) : fiches par statut et prochaine révision prévue.
+  const today = new Intl.DateTimeFormat("fr-CA").format(new Date());
+  const countBy = (status: LearningStatus) => (items ?? []).filter((item) => item.status === status).length;
+  const nextReview = (items ?? [])
+    .filter((item) => item.reviewDate && item.reviewDate >= today && item.status !== "memorized")
+    .sort((first, second) => (first.reviewDate ?? "").localeCompare(second.reviewDate ?? ""))[0];
+
   return (
     <div className="space-y-5">
-      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions (en arabe, avec ta traduction si tu veux), ou un hadith à documenter. Rawdah ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0}>
+      <div className="grid items-start gap-4 lg:grid-cols-3">
+      <ComposerCard title="Nouvelle fiche" hint="Un matn à apprendre par portions (en arabe, avec ta traduction si tu veux), ou un hadith à documenter. Rawdah ne fournit aucun contenu ici : complète chaque fiche avec un contenu vérifié." icon={NotebookPen} defaultOpen={items !== undefined && items.length === 0} className="lg:col-span-2">
         <form onSubmit={(event) => void save(event)} className="mt-5 space-y-4">
           <div className="n-seg" role="group" aria-label="Type de fiche">
             <button type="button" aria-pressed={kind === "matn"} onClick={() => setKind("matn")}>
@@ -200,6 +264,40 @@ export function LearningModule() {
         </form>
       </ComposerCard>
 
+        <article className="n-card n-card-dark">
+          <span className="n-label">Ton apprentissage</span>
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            {(
+              [
+                [countBy("to-learn"), "à apprendre"],
+                [countBy("learning"), "en cours"],
+                [countBy("memorized"), "mémorisés"],
+              ] as const
+            ).map(([count, label]) => (
+              <div key={label}>
+                <p className="n-display text-[36px] leading-none">{count}</p>
+                <p className="mt-1 text-[13px] text-(--n-on-dark-muted)">{label}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 border-t border-white/15 pt-4 text-[14px] text-(--n-on-dark-muted)">
+            {nextReview?.reviewDate ? (
+              <>
+                Prochaine révision :{" "}
+                <b className="font-semibold text-(--n-on-dark)">{nextReview.title}</b>
+                {", le "}
+                {new Date(`${nextReview.reviewDate}T12:00:00`).toLocaleDateString("fr-FR", {
+                  day: "numeric",
+                  month: "long",
+                })}
+              </>
+            ) : (
+              "Tes prochaines révisions apparaîtront ici."
+            )}
+          </p>
+        </article>
+      </div>
+
       <div>
         <h2 className="n-display px-1 text-[22px]">Mes fiches</h2>
         {items === undefined ? (
@@ -211,7 +309,93 @@ export function LearningModule() {
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
-            {items.map((item) => (
+            {items.map((item) =>
+              editingId === item._id ? (
+                <li key={item._id} className="n-card">
+                  <form
+                    className="space-y-3"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void saveEdit(item);
+                    }}
+                  >
+                    <span className="n-label">
+                      {item.kind === "matn" ? "Corriger le matn" : "Corriger la fiche hadith"}
+                    </span>
+                    <label className="grid gap-1 text-[13px] font-semibold">
+                      Titre
+                      <input
+                        value={edit.title}
+                        onChange={(event) => setEdit({ ...edit, title: event.target.value })}
+                        maxLength={200}
+                        required
+                        className="n-input font-normal"
+                      />
+                    </label>
+                    {item.kind === "matn" ? (
+                      <>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Texte arabe du matn (une portion par ligne)
+                          <textarea
+                            value={edit.arabic}
+                            onChange={(event) => setEdit({ ...edit, arabic: event.target.value })}
+                            maxLength={20000}
+                            dir="rtl"
+                            lang="ar"
+                            className="n-input n-textarea n-arabic text-[20px]! font-normal"
+                          />
+                        </label>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Traduction ou explication (une portion par ligne)
+                          <textarea
+                            value={edit.portions}
+                            onChange={(event) => setEdit({ ...edit, portions: event.target.value })}
+                            maxLength={10000}
+                            className="n-input n-textarea font-normal"
+                          />
+                        </label>
+                      </>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {(
+                          [
+                            ["arabic", "Texte arabe"],
+                            ["transliteration", "Translittération"],
+                            ["translation", "Traduction française"],
+                            ["narrator", "Rapporteur"],
+                            ["collection", "Recueil"],
+                            ["number", "Numéro"],
+                            ["grade", "Degré"],
+                            ["gradingSource", "Source de la classification"],
+                          ] as const
+                        ).map(([field, label]) => (
+                          <label key={field} className="grid gap-1 text-[13px] font-semibold">
+                            {label}
+                            <input
+                              value={edit[field]}
+                              onChange={(event) => setEdit({ ...edit, [field]: event.target.value })}
+                              dir={field === "arabic" ? "rtl" : undefined}
+                              className="n-input font-normal"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        className="n-link text-sm text-(--n-muted)!"
+                        onClick={() => setEditingId(null)}
+                      >
+                        Annuler
+                      </button>
+                      <button type="submit" disabled={pending === item._id} className="n-btn n-btn-sage disabled:opacity-40">
+                        {pending === item._id ? "Enregistrement…" : "Enregistrer"}
+                      </button>
+                    </div>
+                  </form>
+                </li>
+              ) : (
               <li key={item._id} className="n-card n-rise">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -220,14 +404,24 @@ export function LearningModule() {
                     </span>
                     <h3 className="n-display mt-2 text-[18px]">{item.title}</h3>
                   </div>
-                  <button
-                    type="button"
-                    className="n-link text-[13px] text-(--n-muted)! disabled:opacity-50"
-                    disabled={pending === item._id}
-                    onClick={() => void deleteItem(item._id)}
-                  >
-                    Supprimer
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      className="n-link text-[13px] disabled:opacity-50"
+                      disabled={editingId !== null}
+                      onClick={() => startEdit(item)}
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      className="n-link text-[13px] text-(--n-muted)! disabled:opacity-50"
+                      disabled={pending === item._id}
+                      onClick={() => void deleteItem(item._id)}
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
                 {item.kind === "matn" ? (
                   <>
@@ -315,7 +509,8 @@ export function LearningModule() {
                   </dl>
                 )}
               </li>
-            ))}
+              ),
+            )}
           </ul>
         )}
       </div>

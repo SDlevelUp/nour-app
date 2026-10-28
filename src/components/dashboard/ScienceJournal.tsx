@@ -22,6 +22,7 @@ export function ScienceJournal({
   const books = useQuery(api.scienceBooks.list, {});
   const addEntry = useMutation(api.scienceProgress.add);
   const removeEntry = useMutation(api.scienceProgress.remove);
+  const updateEntry = useMutation(api.scienceProgress.update);
   const addBook = useMutation(api.scienceBooks.add);
   const updateBook = useMutation(api.scienceBooks.update);
   const setBookStatus = useMutation(api.scienceBooks.setStatus);
@@ -42,6 +43,19 @@ export function ScienceJournal({
   const [isSaving, setIsSaving] = useState(false);
   const [pendingDelete, setPendingDelete] =
     useState<Id<"scienceStudyLogs"> | null>(null);
+  // Séance en cours de correction (une seule à la fois) et ses champs.
+  const [editingEntryId, setEditingEntryId] =
+    useState<Id<"scienceStudyLogs"> | null>(null);
+  const [editEntry, setEditEntry] = useState({
+    date: "",
+    time: "",
+    title: "",
+    lesson: "",
+    source: "",
+    url: "",
+    notes: "",
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookNotes, setBookNotes] = useState("");
@@ -78,6 +92,11 @@ export function ScienceJournal({
   const visibleBooks = (books ?? []).filter((book) =>
     bookFilter === "read" ? book.status === "read" : book.status !== "read",
   );
+  // Résumé des lectures (carte de droite) : comptes par statut et livre du moment.
+  const booksInProgress = upcomingBooks.filter((book) => book.status === "in-progress");
+  const booksToRead = upcomingBooks.filter((book) => book.status === "to-read");
+  const booksRead = (books ?? []).filter((book) => book.status === "read").length;
+  const currentBook = booksInProgress[0] ?? booksToRead[0];
 
   const saveBook = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -199,6 +218,43 @@ export function ScienceJournal({
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const startEditEntry = (entry: Doc<"scienceStudyLogs">) => {
+    setEditingEntryId(entry._id);
+    setEditEntry({
+      date: entry.date,
+      time: entry.time ?? "10:00",
+      title: entry.title,
+      lesson: entry.lesson,
+      source: entry.source ?? "",
+      url: entry.url ?? "",
+      notes: entry.notes ?? "",
+    });
+  };
+
+  const saveEntryEdits = async (logId: Id<"scienceStudyLogs">) => {
+    setIsSavingEdit(true);
+    try {
+      await updateEntry({
+        logId,
+        date: editEntry.date,
+        time: editEntry.time,
+        title: editEntry.title,
+        lesson: editEntry.lesson,
+        source: editEntry.source || undefined,
+        url: editEntry.url || undefined,
+        notes: editEntry.notes || undefined,
+      });
+      setEditingEntryId(null);
+      toast.success("Séance corrigée.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible de modifier cette séance.",
+      );
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 
@@ -411,7 +467,100 @@ export function ScienceJournal({
               </p>
             ) : (
               <ul className="mt-3 grid gap-3 md:grid-cols-2">
-                {entries.map((entry) => (
+                {entries.map((entry) =>
+                  editingEntryId === entry._id ? (
+                    <li key={entry._id} className="n-card">
+                      <form
+                        className="space-y-3"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          void saveEntryEdits(entry._id);
+                        }}
+                      >
+                        <span className="n-label">Corriger la séance</span>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Cours ou livre
+                          <input
+                            value={editEntry.title}
+                            onChange={(event) => setEditEntry({ ...editEntry, title: event.target.value })}
+                            maxLength={160}
+                            required
+                            className="n-input font-normal"
+                          />
+                        </label>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Leçon ou chapitre
+                          <input
+                            value={editEntry.lesson}
+                            onChange={(event) => setEditEntry({ ...editEntry, lesson: event.target.value })}
+                            maxLength={200}
+                            required
+                            className="n-input font-normal"
+                          />
+                        </label>
+                        <div className="flex flex-wrap items-end gap-3">
+                          <label className="grid gap-1 text-[13px] font-semibold">
+                            Date
+                            <DateField
+                              value={editEntry.date}
+                              onChange={(value) => setEditEntry({ ...editEntry, date: value })}
+                              className="w-auto!"
+                            />
+                          </label>
+                          <label className="grid gap-1 text-[13px] font-semibold">
+                            Heure
+                            <input
+                              type="time"
+                              value={editEntry.time}
+                              onChange={(event) => setEditEntry({ ...editEntry, time: event.target.value })}
+                              required
+                              className="n-input w-auto! font-normal"
+                            />
+                          </label>
+                        </div>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Enseignant (facultatif)
+                          <input
+                            value={editEntry.source}
+                            onChange={(event) => setEditEntry({ ...editEntry, source: event.target.value })}
+                            maxLength={160}
+                            className="n-input font-normal"
+                          />
+                        </label>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Lien (facultatif)
+                          <input
+                            type="url"
+                            value={editEntry.url}
+                            onChange={(event) => setEditEntry({ ...editEntry, url: event.target.value })}
+                            placeholder="https://…"
+                            className="n-input font-normal"
+                          />
+                        </label>
+                        <label className="grid gap-1 text-[13px] font-semibold">
+                          Notes (facultatif)
+                          <textarea
+                            value={editEntry.notes}
+                            onChange={(event) => setEditEntry({ ...editEntry, notes: event.target.value })}
+                            maxLength={2000}
+                            className="n-input n-textarea font-normal"
+                          />
+                        </label>
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            type="button"
+                            className="n-link text-sm text-(--n-muted)!"
+                            onClick={() => setEditingEntryId(null)}
+                          >
+                            Annuler
+                          </button>
+                          <button type="submit" disabled={isSavingEdit} className="n-btn n-btn-sage disabled:opacity-40">
+                            {isSavingEdit ? "Enregistrement…" : "Enregistrer"}
+                          </button>
+                        </div>
+                      </form>
+                    </li>
+                  ) : (
                   <li key={entry._id} className="n-card n-rise">
                     <div className="flex items-start justify-between gap-3">
                       <time dateTime={entry.date} className="text-[13px] font-semibold text-(--n-sage)">
@@ -421,15 +570,26 @@ export function ScienceJournal({
                         {" · "}
                         {entry.time ?? "10:00"}
                       </time>
-                      <button
-                        type="button"
-                        onClick={() => void deleteEntry(entry._id)}
-                        disabled={pendingDelete === entry._id}
-                        aria-label={`Supprimer la séance ${entry.title}`}
-                        className="n-link shrink-0 text-[13px] text-(--n-muted)! disabled:opacity-50"
-                      >
-                        {pendingDelete === entry._id ? "Suppression…" : "Supprimer"}
-                      </button>
+                      <div className="flex shrink-0 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => startEditEntry(entry)}
+                          disabled={editingEntryId !== null}
+                          aria-label={`Modifier la séance ${entry.title}`}
+                          className="n-link text-[13px] disabled:opacity-50"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void deleteEntry(entry._id)}
+                          disabled={pendingDelete === entry._id}
+                          aria-label={`Supprimer la séance ${entry.title}`}
+                          className="n-link text-[13px] text-(--n-muted)! disabled:opacity-50"
+                        >
+                          {pendingDelete === entry._id ? "Suppression…" : "Supprimer"}
+                        </button>
+                      </div>
                     </div>
                     <h3 className="n-display mt-2 text-[18px] leading-snug">{entry.title}</h3>
                     <p className="mt-1 text-[15px]">{entry.lesson}</p>
@@ -447,7 +607,8 @@ export function ScienceJournal({
                       </a>
                     )}
                   </li>
-                ))}
+                  ),
+                )}
               </ul>
             )}
           </div>
@@ -456,7 +617,8 @@ export function ScienceJournal({
 
       {tab === "books" && (
         <>
-          <ComposerCard title="Ajouter un livre" hint="Garde tes prochaines lectures dans l’ordre qui te convient." icon={LibraryBig} defaultOpen={books !== undefined && books.length === 0}>
+          <div className="grid items-start gap-4 lg:grid-cols-3">
+          <ComposerCard title="Ajouter un livre" hint="Garde tes prochaines lectures dans l’ordre qui te convient." icon={LibraryBig} defaultOpen={books !== undefined && books.length === 0} className="lg:col-span-2">
             <form onSubmit={(event) => void saveBook(event)} className="mt-5 grid gap-3 sm:grid-cols-2">
               <label className="grid gap-1 text-[13px] font-semibold">
                 Titre
@@ -498,6 +660,35 @@ export function ScienceJournal({
               </div>
             </form>
           </ComposerCard>
+
+            <article className="n-card n-card-dark">
+              <span className="n-label">Tes lectures</span>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                {(
+                  [
+                    [booksToRead.length, "à lire"],
+                    [booksInProgress.length, "en cours"],
+                    [booksRead, "lus"],
+                  ] as const
+                ).map(([count, label]) => (
+                  <div key={label}>
+                    <p className="n-display text-[36px] leading-none">{count}</p>
+                    <p className="mt-1 text-[13px] text-(--n-on-dark-muted)">{label}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-5 border-t border-white/15 pt-4 text-[14px] text-(--n-on-dark-muted)">
+                {currentBook ? (
+                  <>
+                    {currentBook.status === "in-progress" ? "En cours : " : "Prochaine lecture : "}
+                    <b className="font-semibold text-(--n-on-dark)">{currentBook.title}</b>
+                  </>
+                ) : (
+                  "Ton prochain livre apparaîtra ici."
+                )}
+              </p>
+            </article>
+          </div>
 
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 px-1">
